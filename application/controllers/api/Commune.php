@@ -1,5 +1,5 @@
 <?php
-//bla balalalalalala
+//harizo
 defined('BASEPATH') OR exit('No direct script access allowed');
 
 // afaka fafana refa ts ilaina
