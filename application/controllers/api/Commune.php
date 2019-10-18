@@ -15,6 +15,7 @@ class Commune extends REST_Controller {
     public function index_get() {
         $id = $this->get('id');
         $cle_etrangere = $this->get('cle_etrangere');
+        $id_commune = $this->get('id_commune');
         $id_district = $this->get('id_district');
         $id_region = $this->get('id_region');
 		$taiza="";
@@ -23,15 +24,16 @@ class Commune extends REST_Controller {
         } else {
             if ($id)  {
                 $data = array();
-                $commune = $this->CommuneManager->findById($id);
-                $district = $this->DistrictManager->findById($commune->district_id);
-                $data['id'] = $commune->id;
-                $data['code'] = $commune->code;
-                $data['nom'] = $commune->nom;
-                $data['district'] = $district;
-            } else if($id_district && $id_region) {
-				$taiza="Ato ambony ary id_district=".$id_district."  ary id_region=".$id_region; 
-				$menu = $this->CommuneManager->find_Commune_avec_District_et_Region();
+                $data = $this->CommuneManager->findById($id);
+            } else if($id_commune) {
+				$taiza="Ato ambony ary id_commune=".$id_commune."  ary id_region=".$id_region; 
+				$menu = $this->CommuneManager->find_Fokontany_avec_District_et_Region($id_commune);
+                if ($menu) {
+					$data=$menu;
+                } else
+                    $data = array();
+			} else if($id_district) {	
+				$menu = $this->CommuneManager->find_Commune_avec_District_et_Region($id_district);
                 if ($menu) {
 					$data=$menu;
                 } else

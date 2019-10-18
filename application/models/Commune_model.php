@@ -51,12 +51,28 @@ class Commune_model extends CI_Model {
             return null;
         }                 
     }
-	public function find_Commune_avec_District_et_Region() {
-		$requete='select c.id,c.nom,c.code,c.district_id,d.nom as nomdistrict,d.region_id,r.nom as region
-				from commune as c
-				left outer join district as d on d.id=c.district_id
-				left outer join region as r on r.id=d.region_id
-				order by c.nom,d.nom,r.nom	';				
+	public function find_Commune_avec_District_et_Region($id_district) {
+		$requete='select c.id,c.nom,c.code,c.district_id,d.nom as nomdistrict,d.region_id,r.nom as region'
+				.' from commune as c'
+				.' left outer join district as d on d.id=c.district_id'
+				.' left outer join region as r on r.id=d.region_id'
+				.' where c.district_id='.$id_district
+				.' order by c.nom,d.nom,r.nom	';				
+		$query= $this->db->query($requete);		
+		if($query->result()) {
+			return $query->result();
+        }else{
+            return null;
+        }  
+	}
+	public function find_Fokontany_avec_District_et_Region($id_commune) {
+		$requete='select f.id,f.nom,f.code,f.id_commune,c.nom as commune,d.nom as nomdistrict,d.region_id,r.nom as region'
+				.' from fokontany as f'
+				.' left outer join commune as c on c.id=f.id_commune'
+				.' left outer join district as d on d.id=c.district_id'
+				.' left outer join region as r on r.id=d.region_id'
+				.' where f.id_commune='.$id_commune
+				.' order by f.nomc.nom,,d.nom,r.nom	';				
 		$query= $this->db->query($requete);		
 		if($query->result()) {
 			return $query->result();

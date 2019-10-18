@@ -22,12 +22,14 @@ class District extends REST_Controller {
         } else {
             if ($id) {
                 $data = array();
-                $district = $this->DistrictManager->findById($id);
-                $region = $this->RegionManager->findById($district->region_id);
+                $data = $this->DistrictManager->findById($id);
+               /* $district = $this->DistrictManager->findById($id);
+                $region = $this->RegionManager->findByIdArray($district->region_id);
                 $data['id'] = $district->id;
                 $data['code'] = $district->code;
                 $data['nom'] = $district->nom;
-                $data['region'] = $region;
+                $data['region_id'] = $district->region_id;
+                $data['region'] = $region;*/
             } else {
                 $menu = $this->DistrictManager->findAll();
                 if ($menu) {

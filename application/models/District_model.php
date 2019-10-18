@@ -77,7 +77,20 @@ class District_model extends CI_Model {
             return null;
         }                 
     }
-    public function findById($id)  {
+    public function findById($id) {
+        $result =  $this->db->select('*')
+                        ->from($this->table)
+                        ->where("id", $id)
+                        ->order_by('id', 'asc')
+                        ->get()
+                        ->result();
+        if($result) {
+            return $result;
+        }else{
+            return null;
+        }                 
+    }		
+    public function findByIdOLD($id)  {
         $this->db->where("id", $id);
         $q = $this->db->get($this->table);
         if ($q->num_rows() > 0) {
