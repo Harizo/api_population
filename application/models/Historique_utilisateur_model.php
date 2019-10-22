@@ -8,7 +8,7 @@ class Historique_utilisateur_model extends CI_Model
     public function add($historique_utilisateur)
     {
         $this->db->set($this->_set($historique_utilisateur))
-                            ->set('date_action', 'NOW()', false)
+                            // ->set('date_action', 'NOW()', false)
                             ->insert($this->table);
         if($this->db->affected_rows() === 1)
         {
@@ -35,8 +35,9 @@ class Historique_utilisateur_model extends CI_Model
     public function _set($historique_utilisateur)
     {
         return array(
-            'action'           =>      $historique_utilisateur['action'],
-            'id_utilisateur'    =>      $historique_utilisateur['id_utilisateur']                       
+            'action'         => $historique_utilisateur['action'],
+            'date_action'    => $historique_utilisateur['date_action'],
+            'id_utilisateur' => $historique_utilisateur['id_utilisateur']                       
         );
     }
 

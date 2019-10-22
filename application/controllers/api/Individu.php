@@ -11,6 +11,7 @@ class Individu extends REST_Controller {
         parent::__construct();
         $this->load->model('individu_model', 'IndividuManager');
         $this->load->model('fokontany_model', 'FokontanyManager');
+        $this->load->model('acteur_model', 'ActeurManager');
         $this->load->model('type_beneficiaire_model', 'TypebeneficiaireManager');
         $this->load->model('enquete_menage_model', 'EnquetemenageManager');
     }
@@ -50,6 +51,16 @@ class Individu extends REST_Controller {
             if ($menu) {
                 foreach ($menu as $key => $value) {
 					$ga = $this->EnquetemenageManager->findById($value->id_groupe_appartenance,"groupe_appartenance");
+                    $acteur = array();
+                    $acteur_temp = $this->ActeurManager->findById($value->id_type_beneficiaire);
+					if(count($acteur_temp) >0) {
+						$acteur=$acteur_temp;
+					}	
+                    $fokontany = array();
+                    $type_emp = $this->FokontanyManager->findById($value->id_fokontany);
+					if(count($type_emp) >0) {
+						$fokontany=$type_emp;
+					}	
                     $data[$key]['id'] = $value->id;
                     $data[$key]['id_menage'] = $value->id_menage;
                     $data[$key]['identifiant_unique'] = $value->identifiant_unique;
@@ -105,6 +116,10 @@ class Individu extends REST_Controller {
                     $data[$key]['langue'] = $value->langue;
                     $data[$key]['situationmatrimoniale'] = $situationmatrimoniale;
                     $data[$key]['id_situation_matrimoniale'] = $value->id_situation_matrimoniale;
+                    $data[$key]['id_fokontany'] = $value->id_fokontany;
+                    $data[$key]['fokontany'] = $fokontany;
+                    $data[$key]['id_acteur'] = $value->id_acteur;
+                    $data[$key]['acteur'] = $acteur;
                 }
             }
 		}
@@ -171,6 +186,16 @@ class Individu extends REST_Controller {
 		if(isset($hv) && $hv !="" && intval($hv) >0) {
 			$id_situation_matrimoniale=$hv;
 		}
+		$id_acteur=null;
+		$temporaire = $this->post('id_acteur') ;
+		if(isset($temporaire) && $temporaire !="" && intval($temporaire) >0) {
+			$id_acteur=$temporaire;
+		}
+		$id_fokontany=null;
+		$temporaire = $this->post('id_fokontany') ;
+		if(isset($temporaire) && $temporaire !="" && intval($temporaire) >0) {
+			$id_fokontany=$temporaire;
+		}
 		$data = array(
 			'id_menage'                => $this->post('id_menage'),
 			'identifiant_unique'       => $this->post('identifiant_unique'),
@@ -205,8 +230,10 @@ class Individu extends REST_Controller {
 			'id_handicap_moteur'       => $id_handicap_moteur,
 			'id_type_ecole'            => $id_type_ecole,
 			'id_niveau_de_classe'      => $id_niveau_de_classe,
-			'langue'                => $langue,
+			'langue'                   => $langue,
 			'id_situation_matrimoniale' => $id_situation_matrimoniale,
+			'id_fokontany'             => $id_fokontany,
+			'id_acteur'                => $id_acteur,
 		);
         if ($supprimer == 0) {
             if ($id == 0) {

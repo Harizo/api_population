@@ -15,11 +15,17 @@ class Listevalidationbeneficiaire extends REST_Controller {
     public function index_get() {
         $donnees_validees = $this->get('donnees_validees');
         $id_utilisateur = $this->get('id_utilisateur');
+        $etat = $this->get('etat');
 		$data = array();
-		if ($donnees_validees && $id_utilisateur) {
+		if ($etat) {
+			if(intval($etat)==10) {
+				$etat=0;
+			} else {
+				$etat=1;
+			}
+			$listedonnees = $this->ListevalidationbeneficiaireManager->findByValidation($etat);
+		} else if($donnees_validees && $id_utilisateur) {	
 			$listedonnees = $this->ListevalidationbeneficiaireManager->findByValidationAndUtilisateur($donnees_validees,$id_utilisateur);
-		} else if($donnees_validees) {	
-			$listedonnees = $this->ListevalidationbeneficiaireManager->findByValidation($donnees_validees);
 		} else {			
 			$listedonnees = $this->ListevalidationbeneficiaireManager->findAll();
 		}
@@ -46,17 +52,25 @@ class Listevalidationbeneficiaire extends REST_Controller {
 						$data[$key]['raisonsociale'] = $utilisateur->raison_sociale ;
 					}
 				}
-				$data[$key]['date_reception'] = $value->date_reception;
+				$date_reception = new DateTime($value->date_reception);
+				$date_reception =$date_reception->format('d/m/Y H:i:s');		
+				$data[$key]['date_reception'] =$date_reception ;
 				$data[$key]['nom_fichier'] = $value->nom_fichier;
 				$data[$key]['donnees_validees'] = $value->donnees_validees;
-				$data[$key]['date_validation'] = $value->date_validation;
+				if($value->date_validation) {
+					$date_validation = new DateTime($value->date_validation);
+					$date_validation =$date_validation->format('d/m/Y H:i:s');		
+					$data[$key]['date_validation'] = $date_validation;
+				} else {
+					$data[$key]['date_validation'] = $value->date_validation;
+				}
 				$data[$key]['repertoire'] = $value->repertoire;
 				$data[$key]['id_utilisateur_validation'] = $value->id_utilisateur_validation;
 				$data[$key]['utilisateur_validation'] = $utilisateur_validation;
+				$data[$key]['nomutilisateurvalidation'] ="";
 				if($utilisateur_validation) {
 					foreach($utilisateur_validation as $k=>$v) {
-						$data[$key]['nomutilisateur'] = $utilisateur_validation->prenom . " ".$utilisateur_validation->nom;
-						$data[$key]['raisonsociale'] = $utilisateur_validation->raison_sociale ;
+						$data[$key]['nomutilisateurvalidation'] = $utilisateur_validation->prenom . " ".$utilisateur_validation->nom;
 					}
 				}
 			}
@@ -111,10 +125,18 @@ class Listevalidationbeneficiaire extends REST_Controller {
                 }
                 $Id_data_inserted = $this->ListevalidationbeneficiaireManager->add($data);  
 				$retour = 	$this->ListevalidationbeneficiaireManager->findById($Id_data_inserted);
+				$valeur_retour=array();
+				foreach($retour as $k=>$v) {
+					$date_reception = new DateTime($v->date_reception);
+					$date_reception =$date_reception->format('d/m/Y H:i:s');		
+					$valeur_retour[$k]["date_reception"]=$date_reception;
+					$valeur_retour[$k]["id"]=$v->id;
+					$valeur_retour[$k]["repertoire"]=$v->repertoire;
+				}
                 if (!is_null($Id_data_inserted)) {
                     $this->response([
                         'status' => TRUE,
-                        'response' => $retour,
+                        'response' => $valeur_retour,
                         'message' => 'Data insert success'
                             ], REST_Controller::HTTP_OK);
                 } else {

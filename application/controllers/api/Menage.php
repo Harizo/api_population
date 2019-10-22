@@ -11,6 +11,7 @@ class Menage extends REST_Controller {
         parent::__construct();
         $this->load->model('menage_model', 'MenageManager');
         $this->load->model('fokontany_model', 'FokontanyManager');
+        $this->load->model('acteur_model', 'ActeurManager');
         $this->load->model('type_beneficiaire_model', 'TypebeneficiaireManager');
     }
 	public function convertDateAngular($daty){
@@ -58,6 +59,11 @@ class Menage extends REST_Controller {
 					if(count($type_emp) >0) {
 						$type_beneficiaire=$type_emp;
 					}	
+                    $acteur = array();
+                    $acteur_temp = $this->ActeurManager->findById($value->id_type_beneficiaire);
+					if(count($acteur_temp) >0) {
+						$acteur=$acteur_temp;
+					}	
                     $data[$key]['id'] = $value->id;
                     $data[$key]['identifiant_unique'] = $value->identifiant_unique;
                     $data[$key]['identifiant_appariement'] = $value->identifiant_appariement;
@@ -90,6 +96,8 @@ class Menage extends REST_Controller {
                     $data[$key]['depense_mensuel'] = $value->depense_mensuel;
                     $data[$key]['id_fokontany'] = $value->id_fokontany;
                     $data[$key]['fokontany'] = $fokontany;
+                    $data[$key]['id_acteur'] = $value->id_acteur;
+                    $data[$key]['acteur'] = $acteur;
                     $data[$key]['id_type_beneficiaire'] = $value->id_type_beneficiaire;
                     $data[$key]['type_beneficiaire'] = $type_beneficiaire;
                 }
@@ -118,13 +126,18 @@ class Menage extends REST_Controller {
 		$date_inscription = $this->convertDateAngular($this->post('date_inscription'));
 		$id_fokontany=null;
 		$id_type_beneficiaire=null;
-		$tmp=$this->post('id_fokontany');
-		if(isset($tmp) && $tmp !="" && intval($tmp) >0) {
-			$id_fokontany=$tmp;
+		$id_acteur=null;
+		$temporaire=$this->post('id_fokontany');
+		if(isset($temporaire) && $temporaire !="" && intval($temporaire) >0) {
+			$id_fokontany=$temporaire;
 		}
-		$tmp=$this->post('id_type_beneficiaire');
-		if(isset($tmp) && $tmp !="" && intval($tmp) >0) {
-			$id_type_beneficiaire=$tmp;
+		$temporaire=$this->post('id_type_beneficiaire');
+		if(isset($temporaire) && $temporaire !="" && intval($temporaire) >0) {
+			$id_type_beneficiaire=$temporaire;
+		}
+		$temporaire=$this->post('id_acteur');
+		if(isset($temporaire) && $temporaire !="" && intval($temporaire) >0) {
+			$id_acteur=$temporaire;
 		}
 		$data = array(
 			'identifiant_unique'     => $this->post('identifiant_unique'),
@@ -157,6 +170,7 @@ class Menage extends REST_Controller {
 			'revenu_mensuel'         => $this->post('revenu_mensuel'),
 			'depense_mensuel'        => $this->post('depense_mensuel'),
 			'id_fokontany'           => $id_fokontany,
+			'id_acteur'              => $id_acteur,
 			'id_type_beneficiaire'   => $id_type_beneficiaire
 		);
         if ($supprimer == 0) {

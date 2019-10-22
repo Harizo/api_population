@@ -8,7 +8,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 class Validationbeneficiaire extends CI_Controller {
     public function __construct() {
         parent::__construct();
-        $this->load->model('validationbeneficiaire_model', 'ValidationbeneficiaireManager');
+        $this->load->model('validationbeneficiaire_model', 'ImportationbeneficiaireManager');
         $this->load->model('region_model', 'RegionManager');
         $this->load->model('district_model', 'DistrictManager');
         $this->load->model('commune_model', 'CommuneManager');
@@ -309,9 +309,9 @@ class Validationbeneficiaire extends CI_Controller {
 					$reg=array();
 					if($nom_region >'') {
 						if($amoron_mania==false) {
-							$reg = $this->ValidationbeneficiaireManager->selectionregion($nom_region);
+							$reg = $this->ImportationbeneficiaireManager->selectionregion($nom_region);
 						} else {
-							$reg = $this->ValidationbeneficiaireManager->selectionregionparid(5);
+							$reg = $this->ImportationbeneficiaireManager->selectionregionparid(5);
 						}	
 						if(count($reg) >0) {
 							foreach($reg as $indice=>$v) {
@@ -349,7 +349,7 @@ class Validationbeneficiaire extends CI_Controller {
 						if(intval($id_region) >0) {
 							if($nom_district >'') {
 								$region_ok = true;
-								$dis = $this->ValidationbeneficiaireManager->selectiondistrict($nom_district,$id_region);
+								$dis = $this->ImportationbeneficiaireManager->selectiondistrict($nom_district,$id_region);
 								if(count($dis) >0) {
 									foreach($dis as $indice=>$v) {
 										$id_district = $v->id;
@@ -380,7 +380,7 @@ class Validationbeneficiaire extends CI_Controller {
 								if(intval($id_district) >0) {
 									if($nom_commune >'') {
 										$district_ok = true;
-										$comm = $this->ValidationbeneficiaireManager->selectioncommune($nom_commune,$id_district);
+										$comm = $this->ImportationbeneficiaireManager->selectioncommune($nom_commune,$id_district);
 										if(count($comm) >0) {
 											foreach($comm as $indice=>$v) {
 												$id_commune = $v->id;
@@ -404,7 +404,7 @@ class Validationbeneficiaire extends CI_Controller {
 										}	
 										if(intval($id_commune) >0) {
 											if($nom_fokontany >'') {
-												$fkt = $this->ValidationbeneficiaireManager->selectionfokontany($nom_fokontany,$id_commune);
+												$fkt = $this->ImportationbeneficiaireManager->selectionfokontany($nom_fokontany,$id_commune);
 												if(count($fkt) >0) {
 													foreach($fkt as $indice=>$v) {
 														// A utliser ultérieurement lors de la deuxième vérification : id_fokontany
@@ -981,7 +981,7 @@ class Validationbeneficiaire extends CI_Controller {
 					}
 					//$id_acteur
 					// 1- Recherche par identifiant_appariement = $identifiant_appariement et $id_acteur stocké auparavant
-					 $retour=$this->ValidationbeneficiaireManager->RechercheParIdentifiantPartenaire($identifiant_appariement,$id_acteur);
+					 $retour=$this->ImportationbeneficiaireManager->RechercheParIdentifiantActeur($identifiant_appariement,$id_acteur);
 						$nombre=0;
 						foreach($retour as $k=>$v) {
 							$nombre = $v->nombre;
@@ -1011,7 +1011,7 @@ class Validationbeneficiaire extends CI_Controller {
 							// Individu apprtenant à un ménage
 							$parametre_table="individu_menage";
 						}
-						$retour=$this->ValidationbeneficiaireManager->RechercheParNomPrenomCIN_Fokontany_Acteur($parametre_table,$identifiant_appariement,$id_acteur,$nom,$prenom,$cin,$id_fokontany);
+						$retour=$this->ImportationbeneficiaireManager->RechercheParNomPrenomCIN_Fokontany_Acteur($parametre_table,$identifiant_appariement,$id_acteur,$nom,$prenom,$cin,$id_fokontany);
 						$nombre=0;
 						foreach($retour as $k=>$v) {
 							$nombre = $v->nombre;
@@ -1028,6 +1028,18 @@ class Validationbeneficiaire extends CI_Controller {
 							$nombre_erreur = $nombre_erreur + 1;						
 						}
 					}
+					if(null==$date_naissance) {
+						// Calcul date_naissance par défaut
+						$date_actuelle  = new DateTime();
+						$annee_actuelle= $date_actuelle->format("Y");
+						$sheet->setCellValue('I'.$ligne, $annee_actuelle);
+						$age=intval($age);
+						$date_par_defaut = $annee_actuelle."-01-01";	
+						$date_par_defaut = new DateTime($date_par_defaut);
+						$date_naissance = $date_par_defaut->sub(DateInterval::createFromDateString("'".$age." year'"));
+						$date_naissance=$date_naissance->format("d/m/Y");
+						$sheet->setCellValue('F'.$ligne, $date_naissance);
+					}
 				}	
 				$ligne = $ligne + 1;
 			}
@@ -1042,6 +1054,8 @@ class Validationbeneficiaire extends CI_Controller {
 			} else {
 				$val_ret["reponse"] = "OK";			
 				$val_ret["nombre_erreur"] = 0;				
+				$objWriter = PHPExcel_IOFactory::createWriter($excel, 'Excel2007');
+				$objWriter->save(dirname(__FILE__) . "/../../../../" .$repertoire. $nomfichier);
 			}
 		}	
 		return ($val_ret);

@@ -60,6 +60,8 @@ class Individu_model extends CI_Model {
 			'id_niveau_de_classe'      => $individu['id_niveau_de_classe'],
 			'langue'                   => $individu['langue'],
 			'id_situation_matrimoniale' => $individu['id_situation_matrimoniale'],
+			'id_fokontany'              => $individu['id_fokontany'],
+			'id_acteur'                 => $individu['id_acteur'],
         );
     }
     public function delete($id) {

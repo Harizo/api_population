@@ -13,6 +13,15 @@ class Menage_model extends CI_Model {
             return null;
         }                    
     }
+    public function addchefmenage($menage) {
+        $this->db->set($this->_setbeneficiaire_acteur($menage))
+                            ->insert($this->table);
+        if($this->db->affected_rows() === 1) {
+            return $this->db->insert_id();
+        }else{
+            return null;
+        }                    
+    }
     public function update($id, $menage) {
         $this->db->set($this->_set($menage))
                             ->where('id', (int) $id)
@@ -37,7 +46,7 @@ class Menage_model extends CI_Model {
 			'adresse'                => $menage['adresse'],
 			'date_naissance'         => $menage['date_naissance'],
 			'profession'             => $menage['profession'],
-			'situation_matrimoniale' => $menage['situation_matrimoniale'],
+			'id_situation_matrimoniale' => $menage['id_situation_matrimoniale'],
 			'sexe'                   => $menage['sexe'],
 			'date_inscription'       => $menage['date_inscription'],
 			'nom_prenom_pere'        => $menage['nom_prenom_pere'],
@@ -55,7 +64,42 @@ class Menage_model extends CI_Model {
 			'revenu_mensuel'         => $menage['revenu_mensuel'],
 			'depense_mensuel'        => $menage['depense_mensuel'],
 			'id_fokontany'           => $menage['id_fokontany'],
-			'id_type_menage'         => $menage['id_type_menage']
+			'id_acteur'              => $menage['id_acteur'],
+        );
+    }
+    public function _setbeneficiaire_acteur($menage) {
+        return array(
+			'identifiant_unique'     => $menage['identifiant_unique'],
+			'identifiant_appariement'=> $menage['identifiant_appariement'],
+			'numero_sequentiel'      => $menage['numero_sequentiel'],
+			'lieu_residence'         => $menage['lieu_residence'],
+			'surnom_chefmenage'      => $menage['surnom_chefmenage'],
+			'nom'                    => $menage['nom'],
+			'prenom'                 => $menage['prenom'],
+			'cin'                    => $menage['cin'],
+			'chef_menage'            => $menage['chef_menage'],
+			'adresse'                => $menage['adresse'],
+			'date_naissance'         => $menage['date_naissance'],
+			'profession'             => $menage['profession'],
+			'id_situation_matrimoniale' => $menage['id_situation_matrimoniale'],
+			'sexe'                   => $menage['sexe'],
+			'date_inscription'       => $menage['date_inscription'],
+			'nom_prenom_pere'        => $menage['nom_prenom_pere'],
+			'nom_prenom_mere'        => $menage['nom_prenom_mere'],
+			'telephone'              => $menage['telephone'],
+			'statut'                 => $menage['statut'],
+			'date_sortie'            => $menage['date_sortie'],
+			'nom_enqueteur'            => $menage['nom_enqueteur'],
+			'date_enquete'            => $menage['date_enquete'],
+			'nom_superviseur_enquete' => $menage['nom_superviseur_enquete'],
+			'date_supervision'       => $menage['date_supervision'],
+			'flag_integration_donnees' => $menage['flag_integration_donnees'],
+			'nouvelle_integration'   => $menage['nouvelle_integration'],
+			'commentaire'            => $menage['commentaire'],
+			'revenu_mensuel'         => $menage['revenu_mensuel'],
+			'depense_mensuel'        => $menage['depense_mensuel'],
+			'id_fokontany'           => $menage['id_fokontany'],
+			'id_acteur'              => $menage['id_acteur'],
         );
     }
     public function delete($id) {

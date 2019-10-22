@@ -1,9 +1,9 @@
 <?php  if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
-class Validationbeneficiaire_model extends CI_Model
+class Importationbeneficiaire_model extends CI_Model
 {
-    protected $table = 'region';
-
+    protected $table_menage = 'menage';
+    protected $table_individu = 'individu';
 	public function selectionregion($nom) {
 		$requete="select id,nom,code from region where lower(nom)='".$nom."' limit 1";
 		$query = $this->db->query($requete);
@@ -60,7 +60,7 @@ class Validationbeneficiaire_model extends CI_Model
         return $query->result();				
 	}
     public function RechercheParIdentifiantActeur($identifiant_appariement,$id_acteur) {
-		$requete= "select count(*) as nombre from menage where identifiant_appariement='".$identifiant_appariement."' and id_acteur=".$id_acteur;
+		$requete= "select id as id_menage from menage where identifiant_appariement='".$identifiant_appariement."' and id_acteur=".$id_acteur;
 		$query = $this->db->query($requete);
         return $query->result();				
     }
@@ -84,5 +84,21 @@ class Validationbeneficiaire_model extends CI_Model
 			$query = $this->db->query($requete);
 			return $query->result();				
 		}
+	}
+	public function AttributionIdentifiantUniqueMenage() {
+			$requete="select (count(*) + 1) as nombre from menage";
+			$query = $this->db->query($requete);
+			return $query->result();						
+	}
+	public function AttributionIdentifiantUniqueIndividu() {
+			$requete="select (count(*) + 1) as nombre from individu";
+			$query = $this->db->query($requete);
+			return $query->result();						
+	}
+	public function MiseAJourListeValidationBeneficiaire($id_liste_validation_beneficiaire,$date_validation,$id_utilisateur_validation) {
+			$requete="update liste_validation_beneficiaire set donnees_validees=1,date_validation='".$date_validation."',"
+					."id_utilisateur_validation=".$id_utilisateur_validation." where id=".$id_liste_validation_beneficiaire;
+			$query = $this->db->query($requete);
+			return "OK";						
 	}
 }

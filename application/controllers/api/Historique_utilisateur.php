@@ -74,10 +74,14 @@ class Historique_utilisateur extends REST_Controller {
     public function index_post() {
 
         $id = $this->post('id') ;
-    
+ 		$date_action = new DateTime;
+		$date_action->add(new DateInterval('PT1H'));
+		$date_action =$date_action->format('Y-m-d H:i:s');		
+   
           
         $data = array(
             'action' => $this->post('action'),
+            'date_action' => $date_action,
             'id_utilisateur' => $this->post('id_utilisateur')
         );
         if (!$data) {
