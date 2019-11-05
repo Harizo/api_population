@@ -12,6 +12,7 @@ class Commune extends REST_Controller {
         $this->load->model('commune_model', 'CommuneManager');
         $this->load->model('district_model', 'DistrictManager');
     }
+    //recuperation commune
     public function index_get() {
         $id = $this->get('id');
         $cle_etrangere = $this->get('cle_etrangere');
@@ -20,7 +21,21 @@ class Commune extends REST_Controller {
         $id_region = $this->get('id_region');
 		$taiza="";
         if ($cle_etrangere) {
-            $data = $this->CommuneManager->findAllByDistrict($cle_etrangere);           
+            //$data = $this->CommuneManager->findAllByDistrict($cle_etrangere);
+            $data = array();
+            $tmp = $this->CommuneManager->findAllByDistrict($cle_etrangere);
+            if ($tmp) 
+            {
+                foreach ($tmp as $key => $value) 
+                {
+                    $district = array();
+                    $district = $this->DistrictManager->findByIdOLD($value->district_id);
+                    $data[$key]['id'] = $value->id;
+                    $data[$key]['code'] = $value->code;
+                    $data[$key]['nom'] = $value->nom;
+                    $data[$key]['district'] = $district;
+                }
+            }           
         } else {
             if ($id)  {
                 $data = array();
@@ -70,6 +85,7 @@ class Commune extends REST_Controller {
             ], REST_Controller::HTTP_OK);
         }
     }
+    //insertion,modification,suppression commune
     public function index_post() {
         $id = $this->post('id') ;
         $supprimer = $this->post('supprimer') ;

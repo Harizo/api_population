@@ -12,7 +12,7 @@ class Region extends REST_Controller {
         $this->load->model('region_model', 'RegionManager');
         $this->load->model('site_model', 'SiteManager');
     }
-
+    //recuperation region
     public function index_get() {
         $id = $this->get('id');
         $cle_etrangere = $this->get('cle_etrangere');
@@ -56,6 +56,7 @@ class Region extends REST_Controller {
             ], REST_Controller::HTTP_OK);
         }
     }
+    //insertion,modification,suppression region
     public function index_post() {
         $id = $this->post('id') ;
         $supprimer = $this->post('supprimer') ;

@@ -36,7 +36,7 @@ class Region_model extends CI_Model
         return array(
             'code'       =>      $region['code'],
             'nom'        =>      $region['nom'],
-            'superficie'    =>      $region['superficie']                       
+            //'superficie'    =>      $region['superficie']                       
         );
     }
 
