@@ -79,4 +79,20 @@ class Historique_utilisateur_model extends CI_Model
         return null;
     }
 
+    public function findByDateUtilisateur($requete)
+    {
+        $result =  $this->db->select('*')
+                        ->from($this->table)
+                        ->order_by('date_action','desc')
+                        ->where($requete)
+                        ->get()
+                        ->result();
+        if($result)
+        {
+            return $result;
+        }else{
+            return null;
+        }                 
+    }
+
 }
