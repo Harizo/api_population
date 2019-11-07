@@ -21,10 +21,10 @@ class Intervention extends REST_Controller {
         $cle_etrangere = $this->get('cle_etrangere');
 		$data = array();
 		if ($id) {
-			$tmp = $this->InterventionManager->findById($id);
-			if($tmp) {
-				// $data=$tmp;
-				$menu=$tmp;
+			$temporaire = $this->InterventionManager->findById($id);
+			if($temporaire) {
+				// $data=$temporaire;
+				$menu=$temporaire;
 			} else {
 				$menu=array();
 			}
@@ -64,6 +64,13 @@ class Intervention extends REST_Controller {
 					if(count($freq) >0) {
 						$frequencetransfert=$freq;
 					}	
+					$detail_transfert="";
+					$detail_trasfert_temporaire=$this->DetailtypetransfertinterventionManager->findByInterventionParConcatenation($value->id);
+					if($detail_trasfert_temporaire) {
+						foreach($detail_trasfert_temporaire as $k=>$v) {
+							$detail_transfert=$detail_transfert.$v->detail_transfert."; ";
+						}
+					}
                     $data[$key]['id'] = $value->id;
                     $data[$key]['id_programme'] = $value->id_programme;
                     $data[$key]['identifiant'] = $value->identifiant;
@@ -86,10 +93,10 @@ class Intervention extends REST_Controller {
                     $data[$key]['typetransfert'] = $typetransfert;
                     $data[$key]['id_frequence_transfert'] = $value->id_frequence_transfert;
                     $data[$key]['frequencetransfert'] = $frequencetransfert;
-                    $data[$key]['montant_transfert'] = $value->montant_transfert;
                     $data[$key]['flag_integration_donnees'] = $value->flag_integration_donnees;
                     $data[$key]['nouvelle_integration'] = $value->nouvelle_integration;
                     $data[$key]['commentaire'] = $value->commentaire;
+                    $data[$key]['detail_transfert'] = $detail_transfert;
                     $data[$key]['detail_type_transfert_intervention'] = $detail_type_transfert_intervention;
                     $data[$key]['detail_financement_intervention'] = array();
                     $data[$key]['detail_zone_intervention'] = array();
@@ -115,24 +122,24 @@ class Intervention extends REST_Controller {
         $id = $this->post('id') ;
         $supprimer = $this->post('supprimer') ;
 		$id_type_transfert=null;
-		$tmp=$this->post('id_type_transfert');
-		if(isset($tmp) && $tmp !="" && intval($tmp) >0) {
-			$id_type_transfert=$tmp;
+		$temporaire=$this->post('id_type_transfert');
+		if(isset($temporaire) && $temporaire !="" && intval($temporaire) >0) {
+			$id_type_transfert=$temporaire;
 		}
 		$id_acteur=null;
-		$tmp=$this->post('id_acteur');
-		if(isset($tmp) && $tmp !="" && intval($tmp) >0) {
-			$id_acteur=$tmp;
+		$temporaire=$this->post('id_acteur');
+		if(isset($temporaire) && $temporaire !="" && intval($temporaire) >0) {
+			$id_acteur=$temporaire;
 		}
 		$id_type_action=null;
-		$tmp=$this->post('id_type_action');
-		if(isset($tmp) && $tmp !="" && intval($tmp) >0) {
-			$id_type_action=$tmp;
+		$temporaire=$this->post('id_type_action');
+		if(isset($temporaire) && $temporaire !="" && intval($temporaire) >0) {
+			$id_type_action=$temporaire;
 		}
 		$id_frequence_transfert=null;
-		$tmp=$this->post('id_frequence_transfert');
-		if(isset($tmp) && $tmp !="" && intval($tmp) >0) {
-			$id_frequence_transfert=$tmp;
+		$temporaire=$this->post('id_frequence_transfert');
+		if(isset($temporaire) && $temporaire !="" && intval($temporaire) >0) {
+			$id_frequence_transfert=$temporaire;
 		}
  		$data = array(
 			'id_programme' => $this->post('id_programme'),
@@ -152,7 +159,6 @@ class Intervention extends REST_Controller {
 			'duree' => $this->post('duree'),
 			'unite_duree' => $this->post('unite_duree'),
 			'id_type_transfert' => $id_type_transfert,
-			'montant_transfert' => $this->post('montant_transfert'),
 			'flag_integration_donnees' => $this->post('flag_integration_donnees'),
 			'nouvelle_integration' => $this->post('nouvelle_integration'),
 			'commentaire' => $this->post('commentaire'),

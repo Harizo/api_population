@@ -4,20 +4,20 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 
 require APPPATH . '/libraries/REST_Controller.php';
 
-class Suivi_individu extends REST_Controller {
+class Suivi_individu_entete extends REST_Controller {
 
     public function __construct() {
         parent::__construct();
-        $this->load->model('suivi_individu_model', 'SuiviindividuManager');
+        $this->load->model('suivi_individu_entete_model', 'SuiviindividuenteteManager');
         $this->load->model('sourcefinancement_model', 'SourcefinancementManager');
         $this->load->model('type_transfert_model', 'TypetransfertManager');
         $this->load->model('intervention_model', 'InterventionManager');
     }
-	// TABLE CONCERNEE DANS LA BDD : suivi_individu
+	// TABLE CONCERNEE DANS LA BDD : suivi_individu_entete
 	// index_get : 1- récupération des données suivant les cas : clé etrangère = id_menage
 	// 2- récupération des données suivant id_intervention et id_menage
 	// 3- récupération des données : par intervention
-	// 4- récupération de toutes les données dans la table suivi_individu
+	// 4- récupération de toutes les données dans la table suivi_menage_entete
     public function index_get() {
         $id = $this->get('id');
 
@@ -27,15 +27,17 @@ class Suivi_individu extends REST_Controller {
         $data = array() ;
         if ($cle_etrangere) 
         {
-            $suivi_individu = $this->SuiviindividuManager->findAllByIndividu($cle_etrangere);
+            $suivi_individu_entete = $this->SuiviindividuenteteManager->findAllByIndividu($cle_etrangere);
 
             
 
-            if ($suivi_individu) 
+            if ($suivi_individu_entete) 
             {
-                $data['id'] = ($suivi_individu->id);
-                $data['id_individu'] = ($suivi_individu->id_individu);
-                $data['id_intervention'] = unserialize($suivi_individu->id_intervention);
+                $data['id'] = ($suivi_individu_entete->id);
+                $data['date_suivi'] = ($suivi_individu_entete->date_suivi);
+                $data['id_intervention'] = ($suivi_individu_entete->id_intervention);
+                $data['id_fokontany'] = ($suivi_individu_entete->id_fokontany);
+                $data['id_liste_validation_intervention'] = ($suivi_individu_entete->id_liste_validation_intervention);
                 
             }
         }
@@ -46,26 +48,33 @@ class Suivi_individu extends REST_Controller {
 				$data=array();
  				$id_i=$id_intervention;
                $id_prog = '"%'.$id_intervention.'%"' ;
-                $list_suivi_individu = $this->SuiviindividuManager->findAllByProgrammeAndIndividu($id_intervention,$id_individu);
+                $list_suivi_individu = $this->SuiviindividuenteteManager->findAllByProgrammeAndIndividu($id_intervention,$id_individu);
                 if ($list_suivi_individu) 
                 {
 						$detail_suivi_individu=array();
+						$nutrition=array();
+						$transfert_argent=array();
+						$mariage_precoce=array();
+						$promotion_genre=array();
 					
                     foreach ($list_suivi_individu as $key => $value) 
                     {
 						$intervention=array();
 						$intervention = $this->InterventionManager->findById($id_i);
-						$tmp=array();
+						$temporaire=array();
 						
-						$tmp['id'] = $value->id;
-                        $tmp['id_suivi_individu_entete'] = ($value->id_suivi_individu_entete);
-                        $tmp['nom'] = ($value->nom);
-                        $tmp['prenom'] = ($value->prenom);
-                        $tmp['date_naissance'] = ($value->date_naissance);
-                        $tmp['date_suivi'] = $value->date_suivi;
-                        $tmp['id_intervention'] = $id_i;
-                        $tmp['intervention'] = $intervention;
-						$detail_suivi_individu=$tmp;					
+						$temporaire['id'] = $value->id;
+                        $temporaire['id_menage'] = ($value->id_menage);
+                        $temporaire['nom'] = ($value->nom);
+                        $temporaire['prenom'] = ($value->prenom);
+                        $temporaire['date_naissance'] = ($value->date_naissance);
+                        $temporaire['date_suivi'] = $value->date_suivi;
+                        $temporaire['id_fokontany'] = $value->id_fokontany;
+                        $temporaire['id_liste_validation_intervention'] = $value->id_liste_validation_intervention;
+                        $temporaire['id_intervention'] = $id_i;
+                        $temporaire['intervention'] = $intervention;
+                        $temporaire['observation'] = $value->observation;	
+						$detail_suivi_individu=$temporaire;					
 					}
 					$data[0]['detail_suivi_individu']=$detail_suivi_individu;
                 }				
@@ -74,7 +83,7 @@ class Suivi_individu extends REST_Controller {
             if ($id_intervention) 
             {
                 $id_prog = '"'.$id_intervention.'"' ;
-                $list_suivi_individu = $this->SuiviindividuManager->findAllByProgramme($id_prog);
+                $list_suivi_individu = $this->SuiviindividuenteteManager->findAllByProgramme($id_prog);
                 if ($list_suivi_individu) 
                 {
                     foreach ($list_suivi_individu as $key => $value) 
@@ -85,7 +94,12 @@ class Suivi_individu extends REST_Controller {
                         $data[$key]['AgeInscrire'] = ($value->AgeInscrire);
                         $data[$key]['Addresse'] = ($value->Addresse);
                         $data[$key]['NumeroEnregistrement'] = ($value->NumeroEnregistrement);
+                        $data[$key]['id_liste_validation_intervention'] = ($value->id_liste_validation_intervention);
+                       // $data['id_individu'] = ($suivi_individu_entete->id_individu);
                         $data[$key]['id_intervention'] = ($id_intervention);
+                        $data[$key]['id_fokontany'] = ($id_fokontany);
+                        $data[$key]['date_suivi'] = ($date_suivi);
+                        //$data[$key]['menage'] = $this->menageManager->findById($value->id_individu);
                        
                     }
                 }
@@ -94,11 +108,11 @@ class Suivi_individu extends REST_Controller {
             {
                 if ($id) 
                 {
-                    $data = $this->SuiviindividuManager->findById($id);
+                    $data = $this->SuiviindividuenteteManager->findById($id);
                 } 
                 else 
                 {
-                    $data = $this->SuiviindividuManager->findAll();                   
+                    $data = $this->SuiviindividuenteteManager->findAll();                   
                 }
             }
         }
@@ -118,7 +132,7 @@ class Suivi_individu extends REST_Controller {
             ], REST_Controller::HTTP_OK);
         }
     }
-	// TABLE CONCERNEE DANS LA BDD : suivi_individu
+	// TABLE CONCERNEE DANS LA BDD : suivi_individu_entete
 	// index_post : sauvegarde les données dans la table
 	// ou bien suppression des données dans la table si la variable $supprimer = 1 (via controleur javascript)
 	// ou bien mise à jour table si la variable $id >0
@@ -127,8 +141,11 @@ class Suivi_individu extends REST_Controller {
         $supprimer = $this->post('supprimer') ;
         if ($supprimer == 0) {
 			$data = array(
-				'id_individu' => $this->post('id_individu'),
-				'id_suivi_individu_entete' => $this->post('id_suivi_individu_entete'),
+				'id_intervention' => $this->post('id_intervention'),
+				'date_suivi' => $this->post('date_suivi'),
+				'observation' => $this->post('observation'),
+				'id_fokontany' => $this->post('id_fokontany'),
+				'id_liste_validation_intervention' => $this->post('id_liste_validation_intervention'),
 			);               
             if ($id == 0) {
                 if (!$data) 
@@ -140,7 +157,7 @@ class Suivi_individu extends REST_Controller {
                             ], REST_Controller::HTTP_BAD_REQUEST);
                 }
 
-                $dataId = $this->SuiviindividuManager->add($data);
+                $dataId = $this->SuiviindividuenteteManager->add($data);
 
                 if (!is_null($dataId)) 
                 {
@@ -164,7 +181,7 @@ class Suivi_individu extends REST_Controller {
                         'message' => 'No request found'
                             ], REST_Controller::HTTP_BAD_REQUEST);
                 }
-                $update = $this->SuiviindividuManager->update($id, $data);              
+                $update = $this->SuiviindividuenteteManager->update($id, $data);              
                 if(!is_null($update)){
                     $this->response([
                         'status' => TRUE, 
@@ -186,7 +203,7 @@ class Suivi_individu extends REST_Controller {
             'message' => 'No request found'
                 ], REST_Controller::HTTP_BAD_REQUEST);
             }
-            $delete = $this->SuiviindividuManager->delete($id);          
+            $delete = $this->SuiviindividuenteteManager->delete($id);          
             if (!is_null($delete)) {
                 $this->response([
                     'status' => TRUE,
