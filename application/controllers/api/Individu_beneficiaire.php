@@ -24,7 +24,8 @@ class Individu_beneficiaire extends REST_Controller {
             if ($individu_beneficiaire) {
                 $data['id'] = ($individu_beneficiaire->id);
                 $data['id_individu'] = ($individu_beneficiaire->id_individu);
-                $data['id_intervention'] = unserialize($individu_beneficiaire->id_intervention);              
+                $data['id_intervention'] = ($individu_beneficiaire->id_intervention);              
+                $data['date_sortie'] = ($individu_beneficiaire->date_sortie);              
             }
         } else {
             if ($id_intervention && $id_fokontany) 	{ 
@@ -39,6 +40,7 @@ class Individu_beneficiaire extends REST_Controller {
                         $data[$key]['adresse'] = $value->adresse;
                         $data[$key]['id_menage'] = $value->id_menage;
                         $data[$key]['date_naissance'] = $value->date_naissance;
+                        $data[$key]['date_sortie'] = $value->date_sortie;
                         $data[$key]['id_intervention'] = $id_intervention;
                         $data[$key]['detail_charge'] = 0;
                         $data[$key]['detail_suivi_individu'] = array();
@@ -61,6 +63,7 @@ class Individu_beneficiaire extends REST_Controller {
                         $data[$key]['AgeInscrire'] = ($value->AgeInscrire);
                         $data[$key]['Addresse'] = ($value->Addresse);
                         $data[$key]['NumeroEnregistrement'] = ($value->NumeroEnregistrement);
+                        $data[$key]['date_sortie'] = ($value->date_sortie);
                         $data[$key]['id_intervention'] = ($id_intervention);
                     }
                 }
@@ -93,7 +96,8 @@ class Individu_beneficiaire extends REST_Controller {
             if ($id == 0) {
                 $data = array(
                     'id_individu' => $this->post('id_individu'),
-                    'id_intervention' => serialize($this->post('id_intervention'))
+                    'id_intervention' => ($this->post('id_intervention')),
+                    'date_sortie' => ($this->post('date_sortie')),
                 );               
                 if (!$data) {
                     $this->response([

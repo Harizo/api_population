@@ -14,9 +14,14 @@ class Historique_utilisateur extends REST_Controller {
         $this->load->model('site_model', 'SiteManager');
     }
 
+    //recuperation donnée
     public function index_get() {
         $id = $this->get('id');
-       
+        $menu= $this->get('menu');
+        $date_debut = $this->get('date_debut'); 
+        $date_fin = $this->get('date_fin'); 
+        $id_utilisateur = $this->get('id_utilisateur');  
+
         if ($id) 
         {
             $data = array();
@@ -30,7 +35,24 @@ class Historique_utilisateur extends REST_Controller {
                 $data['user'] = $user;
             }
             
-        } else {
+        } 
+        elseif($menu=="filtrehistorique")
+        {   $data = array();
+            $historique = $this->HistoriqueutilisateurManager->findByDateUtilisateur($this->generer_requete_filtre($date_debut,$date_fin,$id_utilisateur));
+            if($historique)
+            {   
+                foreach ($historique as $key => $value)
+                {
+                    $utilisateur = $this->UserManager->findById($value->id_utilisateur);
+                    $data[$key]['id'] = $value->id;
+                    $data[$key]['action'] = $value->action;
+                    $data[$key]['date_action'] = $value->date_action;
+                    $data[$key]['user'] = $utilisateur;
+                }
+                
+            }
+        }
+        else {
             $menu = $this->HistoriqueutilisateurManager->findAll();
             if ($menu) {
                 foreach ($menu as $key => $value) {
@@ -71,6 +93,7 @@ class Historique_utilisateur extends REST_Controller {
         }
     }
 
+    //insertion,modification, suppression donnée
     public function index_post() {
 
         $id = $this->post('id') ;
@@ -171,6 +194,17 @@ class Historique_utilisateur extends REST_Controller {
                 'message' => 'No request found'
                     ], REST_Controller::HTTP_BAD_REQUEST);
         }
+    }
+
+    //requete du filtre 
+    public function generer_requete_filtre($date_debut,$date_fin,$id_utilisateur)
+    {
+        $requete = "date_action BETWEEN '".$date_debut."' AND '".$date_fin."' " ;
+        if($id_utilisateur!='*' && $id_utilisateur!='undefined')
+        {
+            $requete = $requete." AND id_utilisateur='".$id_utilisateur."'" ;
+        }
+        return $requete;
     }
 
 }

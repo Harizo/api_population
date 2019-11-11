@@ -1,15 +1,14 @@
 <?php  if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
-class Suivi_menage_model extends CI_Model
+class Suivi_menage_entete_model extends CI_Model
 {
-    protected $table = 'suivi_menage';
+    protected $table = 'suivi_menage_entete';
 
-
- 	// TABLE CONCERNEE DANS LA BDD : suivi_menage
+	// TABLE CONCERNEE DANS LA BDD : suivi_menage_entete
 	// Cette fonction ajoute un enregistrement dans la table
-   public function add($suivi_menage)
+    public function add($suivi_menage_entete)
     {
-        $this->db->set($this->_set($suivi_menage))
+        $this->db->set($this->_set($suivi_menage_entete))
                             ->insert($this->table);
         if($this->db->affected_rows() === 1)
         {
@@ -20,9 +19,9 @@ class Suivi_menage_model extends CI_Model
     }
 
 	// Cette fonction met à jour un enregistrement dans la table
-    public function update($id, $suivi_menage)
+    public function update($id, $suivi_menage_entete)
     {
-        $this->db->set($this->_set($suivi_menage))
+        $this->db->set($this->_set($suivi_menage_entete))
                             ->where('id', (int) $id)
                             ->update($this->table);
         if($this->db->affected_rows() === 1)
@@ -32,14 +31,16 @@ class Suivi_menage_model extends CI_Model
             return null;
         }                      
     }
-
 	// Cette fonction affecte les données  d'un enregistrement via controleur php avant d'être passée en paramètre
 	// dans la fonction add ou fontion update
-    public function _set($suivi_menage)
+    public function _set($suivi_menage_entete)
     {
         return array(
-            'id_menage'         => $suivi_menage['id_menage'],
-            'id_suivi_menage_entete'      => $suivi_menage['id_suivi_menage_entete'],                      
+            'id_intervention'                  => $suivi_menage_entete['id_intervention'],                      
+            'date_suivi'                       => $suivi_menage_entete['date_suivi'],                      
+            'observation'                      => $suivi_menage_entete['observation'],                      
+            'id_fokontany'                     => $suivi_menage_entete['id_fokontany'],                      
+            'id_liste_validation_intervention' => $suivi_menage_entete['id_liste_validation_intervention'],                      
         );
     }
 
@@ -73,7 +74,7 @@ class Suivi_menage_model extends CI_Model
     public function findAllByProgramme($id_interventions)
     {
         $result =  $this->db->select('menage.id as id_menage,
-                                        suivi_menage.id as id,
+                                        suivi_menage_entete.id as id,
                                         menage.NomInscrire as NomInscrire,
                                         menage.PersonneInscription as PersonneInscription,
                                         menage.AgeInscrire as AgeInscrire,
@@ -81,7 +82,7 @@ class Suivi_menage_model extends CI_Model
                                         menage.NumeroEnregistrement as NumeroEnregistrement
                                         ')
                         ->from($this->table)
-                        ->join('menage', 'menage.id = suivi_menage.id_menage')
+                        ->join('menage', 'menage.id = suivi_menage_entete.id_menage')
                     //    ->order_by('id')
                         ->like('id_intervention', $id_interventions)
                         ->get()
@@ -119,7 +120,7 @@ class Suivi_menage_model extends CI_Model
     {
 		$requete="select sm.id,sm.id_menage,m.nom,m.prenom,m.date_naissance,m.profession,m.date_inscription,"
 				."sm.id_intervention,sm.date_suivi,sm.montant,sm.observation,sm.id_type_transfert"
-				." from suivi_menage as sm"
+				." from suivi_menage_entete as sm"
 				." left outer join menage as m on m.id=sm.id_menage"
 				." left outer join fokontany as v on v.id=m.id_fokontany"
                 ." where sm.id_intervention=".$id_interventions

@@ -1,10 +1,11 @@
 <?php  if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
-class Intervention_model extends CI_Model {
-    protected $table = 'intervention';
+class Listevalidationintervention_model extends CI_Model {
+    protected $table = 'liste_validation_intervention';
 
-    public function add($intervention)  {
-        $this->db->set($this->_set($intervention))
+    public function add($liste_validation_intervention)  {
+        $this->db->set($this->_set($liste_validation_intervention))
+							// ->set('date_reception', 'NOW()', 'Europe/Moscow')	décalage  heure de temps : la poisse
                             ->insert($this->table);
         if($this->db->affected_rows() === 1)  {
             return $this->db->insert_id();
@@ -12,8 +13,8 @@ class Intervention_model extends CI_Model {
             return null;
         }                    
     }
-    public function update($id, $intervention)  {
-        $this->db->set($this->_set($intervention))
+    public function update($id, $liste_validation_intervention)  {
+        $this->db->set($this->_set($liste_validation_intervention))
                             ->where('id', (int) $id)
                             ->update($this->table);
         if($this->db->affected_rows() === 1)  {
@@ -22,28 +23,15 @@ class Intervention_model extends CI_Model {
             return null;
         }                      
     }
-    public function _set($intervention) {
+    public function _set($liste_validation_intervention) {
         return array(
-            'identifiant' => $intervention['identifiant'],
-            'id_programme' => $intervention['id_programme'],
-            'nom_informateur' => $intervention['nom_informateur'],
-            'prenom_informateur' => $intervention['prenom_informateur'],
-            'telephone_informateur' => $intervention['telephone_informateur'],
-            'email_informateur' => $intervention['email_informateur'],
-            'ministere_tutelle' => $intervention['ministere_tutelle'],
-            'intitule' => $intervention['intitule'],
-            'id_acteur' => $intervention['id_acteur'],
-            'categorie_intervention' => $intervention['categorie_intervention'],
-            'id_type_action' => $intervention['id_type_action'],
-            'id_frequence_transfert' => $intervention['id_frequence_transfert'],
-            'inscription_budgetaire' => $intervention['inscription_budgetaire'],
-            'programmation' => $intervention['programmation'],
-            'duree' => $intervention['duree'],
-            'unite_duree' => $intervention['unite_duree'],
-            'id_type_transfert' => $intervention['id_type_transfert'],
-            'flag_integration_donnees' => $intervention['flag_integration_donnees'],
-            'nouvelle_integration' => $intervention['nouvelle_integration'],
-            'commentaire' => $intervention['commentaire'],
+            'id_utilisateur'            => $liste_validation_intervention['id_utilisateur'],
+            'nom_fichier'               => $liste_validation_intervention['nom_fichier'],
+            'repertoire'                => $liste_validation_intervention['repertoire'],
+            'donnees_validees'          => $liste_validation_intervention['donnees_validees'],
+            'date_reception'            => $liste_validation_intervention['date_reception'],
+            'date_validation'           => $liste_validation_intervention['date_validation'],
+            'id_utilisateur_validation' => $liste_validation_intervention['id_utilisateur_validation'],
         );
     }
     public function delete($id) {
@@ -57,7 +45,7 @@ class Intervention_model extends CI_Model {
     public function findAll() {
         $result =  $this->db->select('*')
                         ->from($this->table)
-                        ->order_by('intitule')
+                        ->order_by('date_reception')
                         ->get()
                         ->result();
         if($result) {
@@ -79,11 +67,11 @@ class Intervention_model extends CI_Model {
             return null;
         }                 
     }
-    public function findByIntitule($intitule) {
+    public function findByValidation($donnees_validees) {
         $result =  $this->db->select('*')
                         ->from($this->table)
-                        ->where("intitule", $intitule)
-                        ->order_by('intitule', 'asc')
+                        ->where("donnees_validees", $donnees_validees)
+                        ->order_by('date_reception', 'asc')
                         ->get()
                         ->result();
         if($result) {
@@ -92,11 +80,12 @@ class Intervention_model extends CI_Model {
             return null;
         }                 
     }
-    public function findByProgramme($id_programme) {
+    public function findByValidationAndUtilisateur($donnees_validees,$id_utilisateur) {
         $result =  $this->db->select('*')
                         ->from($this->table)
-                        ->where("id_programme", $id_programme)
-                        ->order_by('id', 'asc')
+                        ->where("donnees_validees", $donnees_validees)
+                        ->where("id_utilisateur", $id_utilisateur)
+                        ->order_by('date_reception', 'asc')
                         ->get()
                         ->result();
         if($result) {

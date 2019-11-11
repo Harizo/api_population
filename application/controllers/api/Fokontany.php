@@ -12,15 +12,31 @@ class Fokontany extends REST_Controller {
         $this->load->model('commune_model', 'CommuneManager');
         $this->load->model('site_model', 'SiteManager');
     }
-
+    //recuperation fokontany
     public function index_get() {
 		set_time_limit(0);
         $id = $this->get('id');
         $cle_etrangere = $this->get('cle_etrangere');
 
         if ($cle_etrangere) {
-            $data = $this->FokontanyManager->findAllByCommune($cle_etrangere);
-            // $data = $this->FokontanyManager->find_Liste_Fokontany_avec_Commune_et_District_et_Region($cle_etrangere);    
+            //$data = $this->FokontanyManager->findAllByCommune($cle_etrangere);
+            // $data = $this->FokontanyManager->find_Liste_Fokontany_avec_Commune_et_District_et_Region($cle_etrangere);
+            $data = array();
+            $tmp = $this->FokontanyManager->findAllByCommune($cle_etrangere);
+            if ($tmp) 
+            {
+                foreach ($tmp as $key => $value) 
+                {
+                    $commune = array();
+                    $commune = $this->CommuneManager->findByIdOLD($value->id_commune);
+                    $data[$key]['id'] = $value->id;
+                    $data[$key]['code'] = $value->code;
+                    $data[$key]['nom'] = $value->nom;
+                    $data[$key]['latitude'] = $value->latitude;
+                    $data[$key]['longitude'] = $value->longitude;
+                    $data[$key]['commune'] = $commune;
+                }
+            }    
         } else {
             if ($id) {
                 $data = array();
@@ -66,6 +82,7 @@ class Fokontany extends REST_Controller {
             ], REST_Controller::HTTP_OK);
         }
     }
+    //insertion,modification,suppression fokontany
     public function index_post() {
         $id = $this->post('id') ;
         $supprimer = $this->post('supprimer') ;

@@ -105,6 +105,14 @@ class Commune_model extends CI_Model {
         }else{
             return null;
         }                 
+    }
+    public function findByIdOLD($id) 
+    {
+        $this->db->where("id", $id);
+        $q = $this->db->get($this->table);
+        if ($q->num_rows() > 0) {
+            return $q->row();
+        }
     }	
     /*public function findById($id)  {
         $this->db->where("id", $id);
@@ -132,4 +140,11 @@ class Commune_model extends CI_Model {
 			return null;
 		}	
     }*/
+    public function findAllByDistrictObjet($district_id) {
+        $this->db->where("district_id", $district_id);
+        $q = $this->db->get($this->table);
+        if ($q->num_rows() > 0) {
+            return $q->row(); 
+        }                
+    }
 }

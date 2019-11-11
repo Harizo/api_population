@@ -1,21 +1,21 @@
 <?php  if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
-class Importationbeneficiaire_model extends CI_Model
+class Validationintervention_model extends CI_Model
 {
-    protected $table_menage = 'menage';
-    protected $table_individu = 'individu';
-	// Séléction region par nom
+    protected $table = 'region';
+	// Selection région par nom
 	public function selectionregion($nom) {
 		$requete="select id,nom,code from region where lower(nom)='".$nom."' limit 1";
 		$query = $this->db->query($requete);
         return $query->result();				
 	}
+	// Selection région par id
 	public function selectionregionparid($id) {
 		$requete="select id,nom,code from region where id='".$id."'";
 		$query = $this->db->query($requete);
         return $query->result();				
 	}
-	// Séléction district par nom et id_region
+	// Selection district par nom et id_region
 	public function selectiondistrict($nom,$id_region) {
 		if(intval($id_region)==5) {
 			$requete="select id,nom,code from district where region_id ='".$id_region."' limit 1";
@@ -25,37 +25,37 @@ class Importationbeneficiaire_model extends CI_Model
 		$query = $this->db->query($requete);
         return $query->result();				
 	}
-	// Séléction district par id
+	// Selection district par id
 	public function selectiondistrictparid($id) {
 			$requete="select id,nom,code,region_id from district where id ='".$id."'";
 		$query = $this->db->query($requete);
         return $query->result();				
 	}
-	// Séléction commune par nom et id_district
+	// Selection commune par nom et id_district
 	public function selectioncommune($nom,$id_district) {
 		$requete="select id,nom,code from commune where lower(nom)='".$nom."' and district_id ='".$id_district."' limit 1";
 		$query = $this->db->query($requete);
         return $query->result();				
 	}
-	// Séléction commune par id (clé primaire)
+	// Selection commune par id
 	public function selectioncommuneparid($id) {
 		$requete="select id,nom,code,district_id from commune where id='".$id."'";
 		$query = $this->db->query($requete);
         return $query->result();				
 	}
-	// Séléction fokontany par nom et id-commune
+	// Selection fokontany par nom et id_commune
 	public function selectionfokontany($nom,$id_commune) {
 		$requete="select id,nom,code from fokontany where lower(nom)='".$nom."' and id_commune ='".$id_commune."' limit 1";
 		$query = $this->db->query($requete);
         return $query->result();				
 	}
-	// Récupère id_menage par l'intermediaire de l'identifiant_appariement et id_acteur
+	// Comptage bénéficiaire par identifiant_appariement et id_acteur
     public function RechercheParIdentifiantActeur($identifiant_appariement,$id_acteur) {
-		$requete= "select id as id_menage from menage where identifiant_appariement='".$identifiant_appariement."' and id_acteur=".$id_acteur;
+		$requete= "select count(*) as nombre from menage where identifiant_appariement='".$identifiant_appariement."' and id_acteur=".$id_acteur;
 		$query = $this->db->query($requete);
         return $query->result();				
     }
-	// Test la présence d'un ménage ou individu selon les critères cités en paramètres (LIRE)
+	// Recherche l'existence d'un ménage ou un individu selon le cas : critères = lire paramètres de la focntion
 	public function RechercheParNomPrenomCIN_Fokontany_Acteur($parametre_table,$identifiant_appariement,$id_acteur,$nom,$prenom,$cin,$id_fokontany) {
 		if($parametre_table=="individu") {
 			// Individu tout court : sans considération clé étrangère id_menage
@@ -77,37 +77,21 @@ class Importationbeneficiaire_model extends CI_Model
 			return $query->result();				
 		}
 	}
-	// Attribution Identifiant Unique Menage
-	public function AttributionIdentifiantUniqueMenage() {
-			$requete="select (count(*) + 1) as nombre from menage";
-			$query = $this->db->query($requete);
-			return $query->result();						
-	}
-	// Attribution Identifiant Unique Individu
-	public function AttributionIdentifiantUniqueIndividu() {
-			// Identifiant unique individu : départ à partir 10 000 001
-			$requete="select (count(*) + 10000000) as nombre from individu";
-			$query = $this->db->query($requete);
-			return $query->result();						
-	}
-	// Marquage liste bénéficiaire validés : c'est-à-dire déjà importés dans la BDD (aucune manipulation n'est permise,seulement
-	// download le fichier si l'utilisateur veut voir les contenus)
-	public function MiseAJourListeValidationBeneficiaire($id_liste_validation_beneficiaire,$date_validation,$id_utilisateur_validation) {
-			$requete="update liste_validation_beneficiaire set donnees_validees=1,date_validation='".$date_validation."',"
-					."id_utilisateur_validation=".$id_utilisateur_validation." where id=".$id_liste_validation_beneficiaire;
-			$query = $this->db->query($requete);
-			return "OK";						
-	}
-	// Nombre liste fichier beneficiaire non importes : pour affichage dans le menu
-	public function recuperer_nombre_liste_fichier_non_importes_beneficiaire() {
-		$requete="select count(*) as nombre_beneficiaire_non_importes from liste_validation_beneficiaire where date_validation IS NULL";
+	// Recherche si un intervention se déroule dans un fokontany donné
+	public function RechercheFokontanyIntervention($id_fokontany,$id_intervention) {
+		$requete="select count(*) as nombre from zone_intervention where id_fokontany=".$id_fokontany." and id_intervention=".$id_intervention;
 		$query = $this->db->query($requete);
-		return $query->result();				
+		return $query->result();						
 	}
-	// Nombre liste fichier intervention non importes : pour affichage dans le menu
-	public function recuperer_nombre_liste_fichier_non_importes_intervention() {
-		$requete="select count(*) as nombre_intervention_non_importes from liste_validation_intervention where date_validation IS NULL";
-		$query = $this->db->query($requete);
-		return $query->result();				
+	// Recherche doublon si le fichier à controler se trouve déjà dans la BDD : critères = $parametre_table : individu ou menage,$date_intervention,$id_fokontany,$id_intervention
+	public function RechercheDoublonInterventionParDateEtFokontany($parametre_table,$date_intervention,$id_fokontany,$id_intervention) {
+		if($parametre_table=="ménage") {
+			$requete="select count(*) as nombre from suivi_menage_entete where date_suivi='".$date_intervention."' and id_fokontany=".$id_fokontany." and id_intervention=".$id_intervention;
+			$query = $this->db->query($requete);
+		} else {
+			$requete="select count(*) as nombre from suivi_individu_entete where date_suivi='".$date_intervention."' and id_fokontany=".$id_fokontany." and id_intervention=".$id_intervention;
+			$query = $this->db->query($requete);			
+		}	
+		return $query->result();						
 	}
 }

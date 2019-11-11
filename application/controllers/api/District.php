@@ -12,12 +12,26 @@ class District extends REST_Controller {
         $this->load->model('district_model', 'DistrictManager');
         $this->load->model('region_model', 'RegionManager');
     }
-
+    //recuperation district
     public function index_get() {
         $id = $this->get('id');
         $cle_etrangere = $this->get('cle_etrangere');
-        if ($cle_etrangere) {
-            $data = $this->DistrictManager->findAllByRegion($cle_etrangere);
+        if ($cle_etrangere){
+            $data = array();
+
+            $tmp = $this->DistrictManager->findAllByRegion($cle_etrangere);
+            if ($tmp) 
+            {
+                foreach ($tmp as $key => $value) 
+                {
+                    $region = array();
+                    $region = $this->RegionManager->findById($value->region_id);
+                    $data[$key]['id'] = $value->id;
+                    $data[$key]['code'] = $value->code;
+                    $data[$key]['nom'] = $value->nom;
+                    $data[$key]['region'] = $region;
+                }
+            }
             
         } else {
             if ($id) {
@@ -60,6 +74,7 @@ class District extends REST_Controller {
             ], REST_Controller::HTTP_OK);
         }
     }
+    //insertion,modification,suppression district
     public function index_post() {
         $id = $this->post('id') ;
         $supprimer = $this->post('supprimer') ;

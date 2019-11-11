@@ -14,6 +14,11 @@ class Suivi_menage extends REST_Controller {
         $this->load->model('intervention_model', 'InterventionManager');
     }
 
+	// TABLE CONCERNEE DANS LA BDD : suivi_menage
+	// index_get : 1- récupération des données suivant les cas : clé etrangère = id_menage
+	// 2- récupération des données suivant id_intervention et id_menage
+	// 3- récupération des données : par intervention
+	// 4- récupération de toutes les données dans la table suivi_menage
     public function index_get() {
         $id = $this->get('id');
 
@@ -132,75 +137,17 @@ class Suivi_menage extends REST_Controller {
             ], REST_Controller::HTTP_OK);
         }
     }
-    public function index_post() {
+ 	// TABLE CONCERNEE DANS LA BDD : suivi_menage
+	// index_post : sauvegarde les données dans la table
+	// ou bien suppression des données dans la table si la variable $supprimer = 1 (via controleur javascript)
+	// ou bien mise à jour table si la variable $id >0
+   public function index_post() {
         $id = $this->post('id') ;
         $supprimer = $this->post('supprimer') ;
-		$id_partenaire=null;
-		$id_acteur=null;
-		$id_type_transfert=null;
-		$montant=null;
-		$poids=null;
-		$perimetre_bracial=null;
-		$age_mois=null;
-		$taille=null;
-		$zscore=null;
-		$mois_grossesse=null;
-		$tmp=$this->post('id_partenaire') ;
-		if($tmp && intval($tmp) >0) {
-			$id_partenaire=$tmp;
-		}
-		$tmp=$this->post('id_acteur') ;
-		if($tmp && intval($tmp) >0) {
-			$id_acteur=$tmp;
-		}
-		$tmp=$this->post('id_type_transfert') ;
-		if($tmp && intval($tmp) >0) {
-			$id_type_transfert=$tmp;
-		}
-		$tmp=$this->post('montant') ;
-		if($tmp && intval($tmp) >0) {
-			$montant=$tmp;
-		}
-		$tmp=$this->post('poids') ;
-		if($tmp && intval($tmp) >0) {
-			$poids=$tmp;
-		}
-		$tmp=$this->post('perimetre_bracial') ;
-		if($tmp && intval($tmp) >0) {
-			$perimetre_bracial=$tmp;
-		}
-		$tmp=$this->post('age_mois') ;
-		if($tmp && intval($tmp) >0) {
-			$age_mois=$tmp;
-		}
-		$tmp=$this->post('taille') ;
-		if($tmp && intval($tmp) >0) {
-			$taille=$tmp;
-		}
-		$tmp=$this->post('zscore') ;
-		if($tmp) {
-			$zscore=$tmp;
-		}
-		$tmp=$this->post('mois_grossesse') ;
-		if($tmp && intval($tmp) >0) {
-			$mois_grossesse=$tmp;
-		}
         if ($supprimer == 0) {
 			$data = array(
 				'id_menage' => $this->post('id_menage'),
-				'id_intervention' => $this->post('id_intervention'),
-				'id_partenaire' => $id_partenaire,
-				'id_acteur' => $id_acteur,
-				'id_type_transfert' => $id_type_transfert,
-				'date_suivi' => $this->post('date_suivi'),
-				'montant' => $montant,
-				'poids' => $poids,
-				'perimetre_bracial' => $perimetre_bracial,
-				'age_mois' => $age_mois,
-				'taille' => $taille,
-				'zscore' => $zscore,
-				'mois_grossesse' => $mois_grossesse,
-				'observation' => $this->post('observation'),
+				'id_suivi_menage_entete' => $this->post('id_suivi_menage_entete'),
 			);               
             if ($id == 0) {
                 if (!$data) 

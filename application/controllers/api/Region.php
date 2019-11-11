@@ -12,7 +12,7 @@ class Region extends REST_Controller {
         $this->load->model('region_model', 'RegionManager');
         $this->load->model('site_model', 'SiteManager');
     }
-
+    //recuperation region
     public function index_get() {
         $id = $this->get('id');
         $cle_etrangere = $this->get('cle_etrangere');
@@ -27,6 +27,7 @@ class Region extends REST_Controller {
                 $data['id'] = $region->id;
                 $data['code'] = $region->code;
                 $data['nom'] = $region->nom;
+                $data['chef_lieu'] = $region->chef_lieu;
                 
             } else {
                 $region = $this->RegionManager->findAll();
@@ -36,6 +37,7 @@ class Region extends REST_Controller {
                         $data[$key]['id'] = $value->id;
                         $data[$key]['code'] = $value->code;
                         $data[$key]['nom'] = $value->nom;
+                        $data[$key]['chef_lieu'] = $value->chef_lieu;
                         
                     };
                 } else
@@ -56,6 +58,7 @@ class Region extends REST_Controller {
             ], REST_Controller::HTTP_OK);
         }
     }
+    //insertion,modification,suppression region
     public function index_post() {
         $id = $this->post('id') ;
         $supprimer = $this->post('supprimer') ;
@@ -63,7 +66,8 @@ class Region extends REST_Controller {
             if ($id == 0) {
                 $data = array(
                     'code' => $this->post('code'),
-                    'nom' => $this->post('nom')
+                    'nom' => $this->post('nom'),
+                    'chef_lieu' => $this->post('chef_lieu'),
                 );               
                 if (!$data) {
                     $this->response([
