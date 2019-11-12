@@ -69,7 +69,7 @@ class Environment_demo_socio extends REST_Controller {
             
             
         }*/
-        if ($menu =='effectif_sexe_age')
+        if ($menu =='effectif_population_petitenfan_agesco_agetrava_agee_region_dist_comm')
         {
             $individu = array();
             $district = array();
@@ -153,7 +153,7 @@ class Environment_demo_socio extends REST_Controller {
                     }
                 } 
         }
-        elseif ($menu =='effectif_menage_enfant')
+        elseif ($menu =='effectif_menage_enfant_menagenfan_menagescolai_region_dist_comm')
         {
             $individu = array();
             $district = array();

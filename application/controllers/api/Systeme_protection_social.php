@@ -13,6 +13,7 @@ class Systeme_protection_social extends REST_Controller {
         $this->load->model('region_model', 'RegionManager');
         $this->load->model('district_model', 'DistrictManager');
         $this->load->model('commune_model', 'CommuneManager');
+        $this->load->model('intervention_model', 'InterventionManager');
     }
 
     public function index_get() {
@@ -21,11 +22,13 @@ class Systeme_protection_social extends REST_Controller {
         $id_region= $this->get('id_region'); 
         $id_district= $this->get('id_district');
         $id_commune= $this->get('id_commune');
-        if ($menu =='beneficiaire_sexe_age')
+        $id_intervention= $this->get('id_intervention');
+        if ($menu =='req38_interven_petitenfan_agesco_agetrava_agee_region_dist_comm')
         {
             $individu = array();
             $district = array();
             $commune = array();
+            $intervention = array();
             $data = array();
             $now = date('Y-m-d');
             $enfant = date('Y-m-d', strtotime($now. ' -7 years +1 days'));
@@ -65,7 +68,13 @@ class Systeme_protection_social extends REST_Controller {
                         }
                         
                     } 
-                 }  
+                 }
+                 if ($id_intervention !='*' && $id_intervention!='undefined' && $id_intervention!='null')
+                {
+                    $intervention = $this->InterventionManager->findById($id_intervention) ;
+                }else{
+                    $intervention = $this->InterventionManager->findAll($id_region) ;
+                }  
              
             }
             
@@ -75,46 +84,61 @@ class Systeme_protection_social extends REST_Controller {
                 {
                     foreach ($object as $keycommune => $valuecommune)
                     {
-                       $tmp = $this->Systeme_protection_socialManager->findEffectif_sexe_age($this->generer_requete_filtre($id_region,$valuedistrict->id,$valuecommune->id),$enfant,$scolaire_min,$scolaire_max,$travail_min,$travail_max,$agee);
-                        if($tmp)
+                        foreach ($intervention as $keyintervention => $valueintervention)
                         {
-                            foreach ($tmp as $key => $value)
+                            $tmp = $this->Systeme_protection_socialManager->repartitionBeneficiaire_sexe_age($this->generer_requete_filtre($id_region,$valuedistrict->id,$valuecommune->id,$valueintervention->id),$enfant,$scolaire_min,$scolaire_max,$travail_min,$travail_max,$agee);
+                            if($tmp)
                             {
+                                foreach ($tmp as $key => $value)
+                                {
 
-                                $data[$indice]['nbr_enfant_fille'] = $value->nombre_enfant_individu_f + $value->nombre_enfant_menage_f;
-                                $data[$indice]['nbr_enfant_homme'] = $value->nombre_enfant_individu_h + $value->nombre_enfant_menage_h;
+                                    $data[$indice]['nbr_enfant_fille'] = $value->nombre_enfant_individu_f + $value->nombre_enfant_menage_f;
+                                    $data[$indice]['nbr_enfant_homme'] = $value->nombre_enfant_individu_h + $value->nombre_enfant_menage_h;
 
-                                $data[$indice]['nbr_agescolaire_fille'] = $value->nombre_agescolaire_individu_f + $value->nombre_agescolaire_menage_f;
-                                $data[$indice]['nbr_agescolaire_homme'] = $value->nombre_agescolaire_individu_h + $value->nombre_agescolaire_menage_h;
+                                    $data[$indice]['nbr_agescolaire_fille'] = $value->nombre_agescolaire_individu_f + $value->nombre_agescolaire_menage_f;
+                                    $data[$indice]['nbr_agescolaire_homme'] = $value->nombre_agescolaire_individu_h + $value->nombre_agescolaire_menage_h;
 
-                                $data[$indice]['nbr_agetravaille_fille'] = $value->nombre_agetravaille_individu_f + $value->nombre_agetravaille_menage_f;
-                                $data[$indice]['nbr_agetravaille_homme'] = $value->nombre_agetravaille_individu_h + $value->nombre_agetravaille_menage_h;
+                                    $data[$indice]['nbr_agetravaille_fille'] = $value->nombre_agetravaille_individu_f + $value->nombre_agetravaille_menage_f;
+                                    $data[$indice]['nbr_agetravaille_homme'] = $value->nombre_agetravaille_individu_h + $value->nombre_agetravaille_menage_h;
 
-                                $data[$indice]['nbr_agee_fille'] = $value->nombre_agee_individu_f + $value->nombre_agee_menage_f;
-                                $data[$indice]['nbr_agee_homme'] = $value->nombre_agee_individu_h + $value->nombre_agee_menage_h;
+                                    $data[$indice]['nbr_agee_fille'] = $value->nombre_agee_individu_f + $value->nombre_agee_menage_f;
+                                    $data[$indice]['nbr_agee_homme'] = $value->nombre_agee_individu_h + $value->nombre_agee_menage_h;
+                                    $data[$indice]['intervention'] = $valueintervention->intitule;
 
-                                $data[$indice]['commune'] = $valuecommune->nom;
-                                $data[$indice]['district'] = $valuedistrict->nom;
-                                $data[$indice]['region'] = $value->nom_region;
-                                $indice++;
-                            }
+                                    $data[$indice]['commune'] = $valuecommune->nom;
+                                    $data[$indice]['district'] = $valuedistrict->nom;
+                                    $data[$indice]['region'] = $value->nom_region;
+                                    $indice++;
+                                }
+                            } 
                         }
+                       
 
                     }
                 } 
         }
-        elseif ($menu =='effectif_menage_enfant')
+        elseif ($menu =='req33_interven_nbrbenef_region_dist_comm')
         {
             $individu = array();
+            $region = array();
             $district = array();
             $commune = array();
-            $data = array();
-            $now = date('Y-m-d');
-            $enfant = date('Y-m-d', strtotime($now. ' -7 years +1 days'));
-            
-            $scolaire_max = date('Y-m-d', strtotime($now. ' -18 years +1 days'));
-            $scolaire_min = date('Y-m-d', strtotime($now. ' -7 years'));  
+            $intervention = array();
+            $data = array(); 
 
+            if ($id_intervention !='*' && $id_intervention!='undefined')
+            { 
+                $intervention = $this->InterventionManager->findById($id_intervention) ;
+            }else{
+                $intervention = $this->InterventionManager->findAll() ;
+            }
+           /* if ($id_region !='*' && $id_region!='undefined')
+            { 
+                $region = $this->RegionManager->findById($id_region) ;
+            }
+            else{
+                $region = $this->RegionManager->findAllByRegion($id_region) ;
+            }*/
             if ($id_region)
             {
                 if ($id_district !='*' && $id_district!='undefined' && $id_district!='null')
@@ -128,8 +152,7 @@ class Systeme_protection_social extends REST_Controller {
                     $commune = $this->CommuneManager->findById($id_commune); 
                 }
                 else
-                {   //$tm=array();
-                    
+                {                     
                     foreach ($district as $k => $v)
                     {
                         $comm = $this->CommuneManager->findAllByDistrict($v->id);
@@ -146,23 +169,25 @@ class Systeme_protection_social extends REST_Controller {
                     } 
                  }  
              
-            }
-            
-            $object = json_decode(json_encode($commune), FALSE);
+            }  
+             
+           
+            $commun = json_decode(json_encode($commune), FALSE);
             $indice = 0;
-               foreach ($district as $keydistrict => $valuedistrict)
+            foreach ($intervention as $keyintervention => $valueintervention)
+            {
+                foreach ($district as $keydistrict => $valuedistrict)
                 {
                    //$data[$keydistrict]['azez'] = $valuedistrict->id;
-                    foreach ($object as $keycommune => $valuecommune)
+                    foreach ($commun as $keycommune => $valuecommune)
                     {
-                       $tmp = $this->Systeme_protection_socialManager->findEffectif_menage_enfant($this->generer_requete_filtre($id_region,$valuedistrict->id,$valuecommune->id),$enfant,$scolaire_min,$scolaire_max);
+                       $tmp = $this->Systeme_protection_socialManager->findNbr_cumule_beneficiaire($this->generer_requete_filtre($id_region,$valuedistrict->id,$valuecommune->id,$valueintervention->id));
                         if($tmp)
                         {
                             foreach ($tmp as $key => $value)
                             {
-
-                                $data[$indice]['nbr_menage_enfant'] = $value->nombre_menage_enfant;
-                                $data[$indice]['nbr_menage_agescollaire'] = $value->nombre_menage_agescollaire;
+                                $data[$indice]['intervention'] = $valueintervention->intitule;
+                                $data[$indice]['nbr_beneficiaire'] = $value->nombre_individu + $value->nombre_menage;
 
                                 $data[$indice]['commune'] = $valuecommune->nom;
                                 $data[$indice]['district'] = $valuedistrict->nom;
@@ -173,6 +198,85 @@ class Systeme_protection_social extends REST_Controller {
 
                     }
                 }
+            }
+               
+        }
+        elseif ($menu =='effectif_beneficiaire_handicape')
+        {
+            $individu = array();
+            $region = array();
+            $district = array();
+            $commune = array();
+            $intervention = array();
+            $data = array(); 
+
+            if ($id_intervention !='*' && $id_intervention!='undefined')
+            { 
+                $intervention = $this->InterventionManager->findById($id_intervention) ;
+            }else{
+                $intervention = $this->InterventionManager->findAll() ;
+            }
+            if ($id_region)
+            {
+                if ($id_district !='*' && $id_district!='undefined' && $id_district!='null')
+                {
+                    $district = $this->DistrictManager->findById($id_district) ;
+                }else{
+                    $district = $this->DistrictManager->findAllByRegion($id_region) ;
+                }
+                if ($id_commune !='*' && $id_commune!='undefined' && $id_commune!='null')
+                {   
+                    $commune = $this->CommuneManager->findById($id_commune); 
+                }
+                else
+                {                     
+                    foreach ($district as $k => $v)
+                    {
+                        $comm = $this->CommuneManager->findAllByDistrict($v->id);
+                        foreach ($comm as $ke => $val)
+                        {
+                            $tm['id']=$val->id;
+                            $tm['code']=$val->code;
+                            $tm['nom']=$val->nom;
+                            $tm['district_id']=$val->district_id;
+                            array_push($commune, $tm);
+                            
+                        }
+                        
+                    } 
+                 }  
+             
+            }  
+             
+           
+            $commun = json_decode(json_encode($commune), FALSE);
+            $indice = 0;
+            foreach ($intervention as $keyintervention => $valueintervention)
+            {
+                foreach ($district as $keydistrict => $valuedistrict)
+                {
+                   //$data[$keydistrict]['azez'] = $valuedistrict->id;
+                    foreach ($commun as $keycommune => $valuecommune)
+                    {
+                       $tmp = $this->Systeme_protection_socialManager->findEffectif_beneficiaire_handicape($this->generer_requete_filtre($id_region,$valuedistrict->id,$valuecommune->id,$valueintervention->id));
+                        if($tmp)
+                        {
+                            foreach ($tmp as $key => $value)
+                            {
+                                $data[$indice]['intervention'] = $valueintervention->intitule;
+                                $data[$indice]['nbr_beneficiaire'] = $value->nombre_individu + $value->nombre_menage;
+
+                                $data[$indice]['commune'] = $valuecommune->nom;
+                                $data[$indice]['district'] = $valuedistrict->nom;
+                                $data[$indice]['region'] = $value->nom_region;
+                                $indice++;
+                            }
+                        }
+
+                    }
+                }
+            }
+               
         } 
         else {
             /*if ($id) {
@@ -210,7 +314,7 @@ class Systeme_protection_social extends REST_Controller {
             ], REST_Controller::HTTP_OK);
         }
     }
-    public function generer_requete_filtre($id_region,$id_district,$id_commune)
+    public function generer_requete_filtre($id_region,$id_district,$id_commune,$id_intervention)
     {
         $requete = "region.id='".$id_region."'";
        /* if ($date_debut!=$date_debut) 
@@ -226,6 +330,10 @@ class Systeme_protection_social extends REST_Controller {
         if (($id_commune!='*')&&($id_commune!='undefined')) 
         {
             $requete = $requete." AND commune.id='".$id_commune."'" ;
+        }
+        if (($id_intervention!='*')&&($id_intervention!='undefined')) 
+        {
+            $requete = $requete." AND intervention.id='".$id_intervention."'" ;
         }
 
         return $requete;
