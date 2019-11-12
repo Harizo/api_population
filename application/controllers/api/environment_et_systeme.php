@@ -23,11 +23,20 @@ class Environment_et_systeme extends REST_Controller {
         $id_region= $this->get('id_region'); 
         $id_district= $this->get('id_district');
         $id_commune= $this->get('id_commune');
-        $id_intervention= $this->get('id_intervention');
+        $id_intervention= $this->get('id_intervention');$now = date('Y-m-d');
+
+        $scolaire_max = date('Y-m-d', strtotime($now. ' -18 years +1 days'));
+            $scolaire_min = date('Y-m-d', strtotime($now. ' -7 years')); 
+            $agee = date('Y-m-d', strtotime($now. ' -60 years'));
+
+            $travail_max = date('Y-m-d', strtotime($now. ' -60 years +1 days'));
+            $travail_min = date('Y-m-d', strtotime($now. ' -18 years'));
+             $enfant = date('Y-m-d', strtotime($now. ' -7 years +1 days'));
 
         if ($menu =='req1theme1_petitenfan_agesco_agetrava_agee_region_dist_comm')
         {
-            $individu = array();
+            $data = $this->Environment_demo_socioManager->andranaaaa($this->generer_requete_filtre($id_region,$id_district,$id_commune),$enfant,$scolaire_min,$scolaire_max,$travail_min,$travail_max,$agee);
+            /*$individu = array();
             $district = array();
             $commune = array();
             $data = array();
@@ -107,7 +116,7 @@ class Environment_et_systeme extends REST_Controller {
                         }
 
                     }
-                } 
+                } */
         }
         elseif ($menu =='req3theme1_menagenfan_menagscolai_region_dist_comm')
         {
@@ -380,6 +389,8 @@ class Environment_et_systeme extends REST_Controller {
                     $data = array();
             }*/
         }
+
+
         if (count($data)>0) {
             $this->response([
                 'status' => TRUE,

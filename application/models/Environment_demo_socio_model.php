@@ -60,6 +60,65 @@ class Environment_demo_socio_model extends CI_Model
         }                 
     }
 
+
+    public function andranaaaa($requete,$enfant,$scolaire_min,$scolaire_max,$travail_min,$travail_max,$agee)
+    {
+      $this->db->select("region.id as id_reg, region.nom as nom_region, district.id as id_dist, district.nom as nom_dist, commune.nom as nom_com, commune.id as id_com ");
+        
+       $this->db ->select("((select count(ind.id) from individu as ind inner join fokontany as fok on ind.id_fokontany= fok.id inner join commune as com on com.id= fok.id_commune inner join district as dist on com.district_id= dist.id where com.id=commune.id and ind.date_naissance >= '".$enfant."' and ind.sexe = 'F')) as nombre_enfant_individu_f",false);
+
+       $this->db ->select("((select count(ind.id) from individu as ind inner join fokontany as fok on ind.id_fokontany= fok.id inner join commune as com on com.id= fok.id_commune inner join district as dist on com.district_id= dist.id where com.id=commune.id and ind.date_naissance >= '".$enfant."' and ind.sexe = 'H')) as nombre_enfant_individu_h",false);
+
+       /*$this->db ->select("((select count(individu.id) from individu inner join fokontany on individu.id_fokontany= fokontany.id inner join commune on commune.id= fokontany.id_commune inner join district on commune.district_id= district.id where  ".$requete." and date_naissance >= '".$enfant."' and individu.sexe = 'H')) as nombre_enfant_individu_h",false);
+
+       $this->db ->select("((select count(individu.id) from individu inner join fokontany on individu.id_fokontany= fokontany.id inner join commune on commune.id= fokontany.id_commune inner join district on commune.district_id= district.id where  ".$requete." and date_naissance BETWEEN '".$scolaire_max."' AND '".$scolaire_min."' and individu.sexe = 'F')) as nombre_agescolaire_individu_f",false);
+
+        $this->db ->select("((select count(individu.id) from individu inner join fokontany on individu.id_fokontany= fokontany.id inner join commune on commune.id= fokontany.id_commune inner join district on commune.district_id= district.id where  ".$requete." and date_naissance BETWEEN '".$scolaire_max."' AND '".$scolaire_min."' and individu.sexe = 'H')) as nombre_agescolaire_individu_h",false); 
+
+       $this->db ->select("((select count(individu.id) from individu inner join fokontany on individu.id_fokontany= fokontany.id inner join commune on commune.id= fokontany.id_commune inner join district on commune.district_id= district.id where  ".$requete." and date_naissance BETWEEN '".$travail_max."' AND '".$travail_min."' and individu.sexe = 'F')) as nombre_agetravaille_individu_f",false);
+
+       $this->db ->select("((select count(individu.id) from individu inner join fokontany on individu.id_fokontany= fokontany.id inner join commune on commune.id= fokontany.id_commune inner join district on commune.district_id= district.id where  ".$requete." and date_naissance BETWEEN '".$travail_max."' AND '".$travail_min."' and individu.sexe = 'H')) as nombre_agetravaille_individu_h",false);
+
+       $this->db ->select("((select count(individu.id) from individu inner join fokontany on individu.id_fokontany= fokontany.id inner join commune on commune.id= fokontany.id_commune inner join district on commune.district_id= district.id where  ".$requete." and date_naissance <= '".$agee."' and individu.sexe = 'F')) as nombre_agee_individu_f",false);
+
+       $this->db ->select("((select count(individu.id) from individu inner join fokontany on individu.id_fokontany= fokontany.id inner join commune on commune.id= fokontany.id_commune inner join district on commune.district_id= district.id where  ".$requete." and date_naissance <= '".$agee."' and individu.sexe = 'H')) as nombre_agee_individu_h",false);
+
+       $this->db ->select("((select count(menage.id) from menage inner join fokontany on menage.id_fokontany= fokontany.id inner join commune on commune.id= fokontany.id_commune inner join district on commune.district_id= district.id where  ".$requete." and date_naissance >= '".$enfant."' and menage.sexe = 'F')) as nombre_enfant_menage_f",false);
+
+       $this->db ->select("((select count(menage.id) from menage inner join fokontany on menage.id_fokontany= fokontany.id inner join commune on commune.id= fokontany.id_commune inner join district on commune.district_id= district.id where  ".$requete." and date_naissance >= '".$enfant."' and menage.sexe = 'H')) as nombre_enfant_menage_h",false);
+
+       $this->db ->select("((select count(menage.id) from menage inner join fokontany on menage.id_fokontany= fokontany.id inner join commune on commune.id= fokontany.id_commune inner join district on commune.district_id= district.id where  ".$requete." and date_naissance BETWEEN '".$scolaire_max."' AND '".$scolaire_min."' and menage.sexe = 'F')) as nombre_agescolaire_menage_f",false);
+
+       $this->db ->select("((select count(menage.id) from menage inner join fokontany on menage.id_fokontany= fokontany.id inner join commune on commune.id= fokontany.id_commune inner join district on commune.district_id= district.id where  ".$requete." and date_naissance BETWEEN '".$scolaire_max."' AND '".$scolaire_min."' and menage.sexe = 'H')) as nombre_agescolaire_menage_h",false); 
+
+       $this->db ->select("((select count(menage.id) from menage inner join fokontany on menage.id_fokontany= fokontany.id inner join commune on commune.id= fokontany.id_commune inner join district on commune.district_id= district.id where  ".$requete." and date_naissance BETWEEN '".$travail_max."' AND '".$travail_min."' and menage.sexe = 'F')) as nombre_agetravaille_menage_f",false);
+
+       $this->db ->select("((select count(menage.id) from menage inner join fokontany on menage.id_fokontany= fokontany.id inner join commune on commune.id= fokontany.id_commune inner join district on commune.district_id= district.id where  ".$requete." and date_naissance BETWEEN '".$travail_max."' AND '".$travail_min."' and menage.sexe = 'H')) as nombre_agetravaille_menage_h",false);
+
+       $this->db ->select("((select count(menage.id) from menage inner join fokontany on menage.id_fokontany= fokontany.id inner join commune on commune.id= fokontany.id_commune inner join district on commune.district_id= district.id where  ".$requete." and date_naissance <= '".$agee."' and menage.sexe = 'F')) as nombre_agee_menage_f",false);
+
+       $this->db ->select("((select count(menage.id) from menage inner join fokontany on menage.id_fokontany= fokontany.id inner join commune on commune.id= fokontany.id_commune inner join district on commune.district_id= district.id where  ".$requete." and date_naissance <= '".$agee."' and menage.sexe = 'H')) as nombre_agee_menage_h",false);*/
+
+        $result =  $this->db->from('region,commune,district ,individu,fokontany')
+                    
+                    ->where('region.id = district.region_id')
+                    ->where('district.id = commune.district_id')
+                    ->where('commune.id = fokontany.id_commune')
+                    ->where('individu.id_fokontany = fokontany.id')
+                    ->where($requete)
+                    ->group_by('id_reg,id_dist,id_com')
+                                       
+                    ->get()
+                    ->result();                              
+
+        if($result)
+        {
+            return $result;
+        }else{
+            return null;
+        }            
+    }
+
     public function findEffectif_menage_enfant($requete,$enfant,$scolaire_min,$scolaire_max)
     {
        $this->db->select("region.id as id_reg,region.nom as nom_region,district.id as id_dist,commune.id as id_com ");
