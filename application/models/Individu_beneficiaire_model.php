@@ -24,7 +24,8 @@ class Individu_beneficiaire_model extends CI_Model {
     public function _set($individu_beneficiaire)  {
         return array(
             'id_individu'   =>  $individu_beneficiaire['id_individu'],
-            'id_intervention'  =>  $individu_beneficiaire['id_intervention']                      
+            'id_intervention'  =>  $individu_beneficiaire['id_intervention'],                      
+            'date_sortie'  =>  $individu_beneficiaire['date_sortie'],                      
         );
     }
     public function delete($id)  {

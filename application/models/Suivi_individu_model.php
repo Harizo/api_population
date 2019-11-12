@@ -5,6 +5,8 @@ class Suivi_individu_model extends CI_Model
     protected $table = 'suivi_individu';
 
 
+	// TABLE CONCERNEE DANS LA BDD : suivi_individu
+	// Cette fonction ajoute un enregistrement dans la table
     public function add($suivi_individu)
     {
         $this->db->set($this->_set($suivi_individu))
@@ -17,7 +19,7 @@ class Suivi_individu_model extends CI_Model
         }                    
     }
 
-
+	// Cette fonction met à jour un enregistrement dans la table
     public function update($id, $suivi_individu)
     {
         $this->db->set($this->_set($suivi_individu))
@@ -31,19 +33,17 @@ class Suivi_individu_model extends CI_Model
         }                      
     }
 
+	// Cette fonction affecte les données  d'un enregistrement via controleur php avant d'être passée en paramètre
+	// dans la fonction add ou fontion update
     public function _set($suivi_individu)
     {
        return array(
             'id_individu'       => $suivi_individu['id_individu'],
-            'id_intervention'    => $suivi_individu['id_intervention'],                      
-            'date_suivi'        => $suivi_individu['date_suivi'],                      
-            'montant'           => $suivi_individu['montant'],                      
-            'observation'       => $suivi_individu['observation'],                      
-            'id_type_transfert' => $suivi_individu['id_type_transfert'],                      
+            'id_suivi_individu_entete'    => $suivi_individu['id_suivi_individu_entete'],                      
         );
     }
 
-
+	// Cette fonction permet de supprimer un enregitrement dans la table
     public function delete($id)
     {
         $this->db->where('id', (int) $id)->delete($this->table);
@@ -54,7 +54,7 @@ class Suivi_individu_model extends CI_Model
             return null;
         }  
     }
-
+	// Cette fonction récupère toutes les données dans la table
     public function findAll()
     {
         $result =  $this->db->select('*')
@@ -69,7 +69,7 @@ class Suivi_individu_model extends CI_Model
             return null;
         }                 
     }
-
+	// Cette fonction récupère les enregistrement dans la table par id_programme
     public function findAllByProgramme($id_interventions)
     {
         $result =  $this->db->select('menage.id as id_individu,
@@ -93,8 +93,8 @@ class Suivi_individu_model extends CI_Model
             return null;
         }                  
     }
-
-    public function findAllByMenage($id_individu)
+	// Cette fonction récupère les enregistrement dans la table par id_individu
+    public function findAllByIndividu($id_individu)
     {
         
         $this->db->where("id_individu", $id_individu);
@@ -104,7 +104,7 @@ class Suivi_individu_model extends CI_Model
         }
         return null;  
     }
-
+	// Cette fonction récupère un enregistrement dans la table par id = clé primaire de la table	
     public function findById($id)
     {
         $this->db->where("id", $id);
@@ -114,6 +114,7 @@ class Suivi_individu_model extends CI_Model
         }
         return null;
     }
+	// Cette fonction récupère les enregistrement dans la table par id_programme et par id_individu
     public function findAllByProgrammeAndIndividu($id_interventions,$id_individu)
     {
 		$requete="select sm.id,sm.id_individu,i.nom,i.prenom,i.date_naissance,"

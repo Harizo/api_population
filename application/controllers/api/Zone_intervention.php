@@ -21,9 +21,9 @@ class Zone_intervention extends REST_Controller {
         $cle_etrangere = $this->get('cle_etrangere');
 		$data = array();
 		if ($id) {
-			$tmp = $this->ZoneinterventionManager->findById($id);
-			if($tmp) {
-				$data=$tmp;
+			$temporaire = $this->ZoneinterventionManager->findById($id);
+			if($temporaire) {
+				$data=$temporaire;
 			}
 			$ou=1;
 		} else if($cle_etrangere){			
@@ -97,15 +97,25 @@ class Zone_intervention extends REST_Controller {
         $id = $this->post('id') ;
         $supprimer = $this->post('supprimer') ;
 		$id_fokontany=null;
-		$tmp=$this->post('id_fokontany');
-		if(isset($tmp) && $tmp !="" && intval($tmp) >0) {
-			$id_fokontany=$tmp;
+		$temporaire=$this->post('id_fokontany');
+		if(isset($temporaire) && $temporaire !="" && intval($temporaire) >0) {
+			$id_fokontany=$temporaire;
+		}
+		$menage_beneficiaire_prevu=null;
+		$temporaire=$this->post('menage_beneficiaire_prevu');
+		if(isset($temporaire) && $temporaire !="" && intval($temporaire) >0) {
+			$menage_beneficiaire_prevu=$temporaire;
+		}
+		$individu_beneficiaire_prevu=null;
+		$temporaire=$this->post('individu_beneficiaire_prevu');
+		if(isset($temporaire) && $temporaire !="" && intval($temporaire) >0) {
+			$individu_beneficiaire_prevu=$temporaire;
 		}
  		$data = array(
 			'id_intervention'             => $this->post('id_intervention'),
 			'id_fokontany'                => $id_fokontany,
-			'menage_beneficiaire_prevu'   => $this->post('menage_beneficiaire_prevu'),
-			'individu_beneficiaire_prevu' => $this->post('individu_beneficiaire_prevu'),
+			'menage_beneficiaire_prevu'   => $menage_beneficiaire_prevu,
+			'individu_beneficiaire_prevu' => $individu_beneficiaire_prevu,
 		);               
         if ($supprimer == 0) {
             if ($id == 0) {

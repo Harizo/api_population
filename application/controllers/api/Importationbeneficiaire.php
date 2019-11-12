@@ -1,14 +1,13 @@
 <?php
 
 defined('BASEPATH') OR exit('No direct script access allowed');
-//harizo
-// afaka fafana refa ts ilaina
 // require APPPATH . '/libraries/REST_Controller.php';
 
 class Importationbeneficiaire extends CI_Controller {
     public function __construct() {
         parent::__construct();
         $this->load->model('importationbeneficiaire_model', 'ImportationbeneficiaireManager');
+        $this->load->model('validationbeneficiaire_model', 'ValidationbeneficiaireManager');
         $this->load->model('region_model', 'RegionManager');
         $this->load->model('district_model', 'DistrictManager');
         $this->load->model('commune_model', 'CommuneManager');
@@ -16,8 +15,12 @@ class Importationbeneficiaire extends CI_Controller {
         $this->load->model('acteur_model', 'ActeurManager');        
         $this->load->model('intervention_model', 'InterventionManager');        
         $this->load->model('menage_model', 'MenageManager');        
+        $this->load->model('menage_beneficiaire_model', 'MenagebeneficiaireManager');        
         $this->load->model('individu_model', 'IndividuManager');        
+        $this->load->model('individu_beneficiaire_model', 'IndividubeneficiaireManager');        
     }
+	// Fonction qui récupère le fichier envoyé par l'acteur pour l'neregistrer dans le repertoire dédié dans le serveur
+	// Structure repertoire donneesimportees/beneficiaire/'nom_acteur'/'nom de fichier.sxlsx'
 	public function upload_importationdonneesbeneficiaire() {	
 		$erreur="aucun";
 		$replace=array('e','e','e','a','o','c','_','_','_');
@@ -69,37 +72,36 @@ class Importationbeneficiaire extends CI_Controller {
 		} 
 		echo json_encode($valeur_retour);
 	}  
-	public function importer_donnees_beneficiaire_test() {	
-		require_once 'Classes/PHPExcel.php';
-		require_once 'Classes/PHPExcel/IOFactory.php';
-		set_time_limit(0);
-		$repertoire= $_POST['repertoire'];
-		$nomfichier= $_POST['nom_fichier'];
-		//The name of the directory that we need to create.
-		$directoryName = dirname(__FILE__) ."/../../../../" .$repertoire;
-		$chemin=dirname(__FILE__) . "/../../../../".$repertoire;
-		$lien_vers_mon_document_excel = $chemin . $nomfichier;
-		$array_data = array();
-		if(strpos($lien_vers_mon_document_excel,"xlsx") >0) {
-			// pour mise à jour après : G4 = id_fiche_paiement <=> déjà importé => à ignorer
-			$objet_read_write = PHPExcel_IOFactory::createReader('Excel2007');
-			$excel = $objet_read_write->load($lien_vers_mon_document_excel);			 
-			$sheet = $excel->getSheet(0);
-			// pour lecture début - fin seulement
-			$XLSXDocument = new PHPExcel_Reader_Excel2007();
-		} else {
-			$objet_read_write = PHPExcel_IOFactory::createReader('Excel2007');
-			$excel = $objet_read_write->load($lien_vers_mon_document_excel);			 
-			$sheet = $excel->getSheet(0);
-			$XLSXDocument = new PHPExcel_Reader_Excel5();
+	// Récupération nombre fichier non importés : bénéficiaire et intervention en même temps : pour affichage SUR le MENU
+	public function recuperer_nombre_liste_fichier_non_importes() {	
+		$total_non_validees =0;
+		$retour_1 = $this->ImportationbeneficiaireManager->recuperer_nombre_liste_fichier_non_importes_beneficiaire();
+		$retour_2 = $this->ImportationbeneficiaireManager->recuperer_nombre_liste_fichier_non_importes_intervention();
+		foreach($retour_1 as $k=>$v) {
+			$total_non_validees = $total_non_validees + $v->nombre_beneficiaire_non_importes;
 		}
-		$valeur_retour=array();
-		$valeur_retour["nom_fichier"] = $nomfichier;
-		$valeur_retour["repertoire"] = $repertoire;
-		$valeur_retour["reponse"] = "OK";
-		$valeur_retour["lien_document"] = $lien_vers_mon_document_excel;
-		$valeur_retour["nombre_erreur"] = 0;
-		echo json_encode($valeur_retour);
+		foreach($retour_2 as $k=>$v) {
+			$total_non_validees = $total_non_validees + $v->nombre_intervention_non_importes;
+		}
+		echo json_encode($total_non_validees);
+	}
+	// Récupération nombre fichier non importés bénéficiaire  : pour affichage SUR le MENU
+	public function recuperer_nombre_liste_beneficiaire_non_importes() {	
+		$total_non_validees =0;
+		$retour_1 = $this->ImportationbeneficiaireManager->recuperer_nombre_liste_fichier_non_importes_beneficiaire();
+		foreach($retour_1 as $k=>$v) {
+			$total_non_validees = $total_non_validees + $v->nombre_beneficiaire_non_importes;
+		}
+		echo json_encode($total_non_validees);
+	}
+	// Récupération nombre fichier non importés intervention  : pour affichage SUR le MENU
+	public function recuperer_nombre_liste_intervention_non_importes() {	
+		$total_non_validees =0;
+		$retour_1 = $this->ImportationbeneficiaireManager->recuperer_nombre_liste_fichier_non_importes_intervention();
+		foreach($retour_1 as $k=>$v) {
+			$total_non_validees = $total_non_validees + $v->nombre_beneficiaire_non_importes;
+		}
+		echo json_encode($total_non_validees);
 	}
 	public function importer_donnees_beneficiaire() {	
 		require_once 'Classes/PHPExcel.php';
@@ -132,6 +134,10 @@ class Importationbeneficiaire extends CI_Controller {
 		$nombre_erreur=0;
 		$remplacer=array('&eacute;','e','e','a','o','c','_');
 		$trouver= array('é','è','ê','à','ö','ç',' ');
+		$nombre_cas_1=0;
+		$nombre_cas_2=0;
+		$nombre_cas_3=0;
+		$id_fokontany = null;
 		foreach($rowIterator as $row) {
 			$ligne = $row->getRowIndex ();
 			if($ligne >=2) {
@@ -182,7 +188,7 @@ class Importationbeneficiaire extends CI_Controller {
 					// c'est-à-dire : recherche dans la table menage ou table individu
 					$menage_ou_individu = strtolower($menage_ou_individu);
 					if($menage_ou_individu=="ménage" || $menage_ou_individu=="menage") {
-						$menage_ou_individu="ménage";
+						$menage_ou_individu="menage";
 					} else {
 						$menage_ou_individu="individu";
 					}
@@ -207,6 +213,8 @@ class Importationbeneficiaire extends CI_Controller {
 						 }	else if('H' == $cell->getColumn()) {
 								$nom_fokontany =$cell->getValue();
 								$nom_fokontany_original =$cell->getValue();
+						 }	else if('I' == $cell->getColumn()) {
+								$fokontany_id =$cell->getValue();
 						 }
 					}
 					// Controle region,district,commune : si tout est ok =>
@@ -234,7 +242,6 @@ class Importationbeneficiaire extends CI_Controller {
 					$id_region=null;
 					$id_district=null;
 					$id_commune=null;
-					$id_fokontany = null;
 					$code_fokontany = "";
 					$code_commune='';
 					$reg=array();
@@ -291,7 +298,7 @@ class Importationbeneficiaire extends CI_Controller {
 													}
 												} else {													
 													// Pas de fokontany : marquer fokontany 
-													$id_fokontany = null;
+													// $id_fokontany = null;
 													$code_fokontany = "????";
 												}												
 											}
@@ -398,202 +405,438 @@ class Importationbeneficiaire extends CI_Controller {
 							}								 							 
 						 }
 					}
-					// Le contrôle n'est pas du tout necessaire car il a été déjà fait auparavant : ici 
-					// c'est intégration de données seulement
-					// Insértion Chef ménage	
-					if(strtolower($chef_menage)=='o' && $menage_ou_individu=="ménage") {
-						// Attribution identifiant unique
-						$retour = $this->ImportationbeneficiaireManager->AttributionIdentifiantUniqueMenage();
-						foreach($retour as $k=>$v) {
-							$valeur=$v->nombre;
-						}
-						// identifiant_unique : 8 caractères
-						if(strlen($valeur)==1) {
-							$identifiant_unique ="0000000".$valeur;
-						} else if(strlen($valeur)==2) {
-							$identifiant_unique ="000000".$valeur;							
-						} else if(strlen($valeur)==3) {
-							$identifiant_unique ="00000".$valeur;							
-						} else if(strlen($valeur)==4) {
-							$identifiant_unique ="0000".$valeur;							
-						} else if(strlen($valeur)==5) {
-							$identifiant_unique ="000".$valeur;							
-						} else if(strlen($valeur)==6) {
-							$identifiant_unique ="00".$valeur;							
-						} else if(strlen($valeur)==7) {
-							$identifiant_unique ="0".$valeur;							
-						} else {
-							$identifiant_unique =$valeur;
-						}	 
-						$data = array(
-							'identifiant_unique'     => $identifiant_unique,
-							'identifiant_appariement'=> $identifiant_appariement,
-							'numero_sequentiel'      => null,
-							'lieu_residence'         => null,
-							'surnom_chefmenage'      => null,
-							'nom'                    => $nom,
-							'prenom'                 => $prenom,
-							'cin'                    => $cin,
-							'chef_menage'            => 'O',
-							'adresse'                => null,
-							'date_naissance'         => $date_naissance,
-							'profession'             => $profession,
-							'id_situation_matrimoniale' => null,
-							'sexe'                   => $sexe,
-							'date_inscription'       => $date_inscription,
-							'nom_prenom_pere'         => null,
-							'nom_prenom_mere'         => null,
-							'telephone'               => null,
-							'statut'                  => null,
-							'date_sortie'            => null,
-							'nom_enqueteur'            => null,
-							'date_enquete'            => null,
-							'nom_superviseur_enquete' => null,
-							'date_supervision' => null,
-							'flag_integration_donnees' => 1,
-							'nouvelle_integration' => true,
-							'commentaire' => null,
-							'revenu_mensuel'         => null,
-							'depense_mensuel'        => null,
-							'id_fokontany'           => $id_fokontany,
-							'id_acteur'              => $id_acteur,
-							'id_type_beneficiaire'   => 1
-						);
-						$id_menage = $this->MenageManager->addchefmenage($data);
-						$sheet->setCellValue("AC".$ligne, $code_region."-".$code_district."-".$code_commune."-".$code_fokontany."-".$identifiant_unique);
-					} else if($menage_ou_individu=="ménage" && (strtolower($chef_menage)=='n' || $chef_menage=='')){
-						// Insértion Individu rattaché à un ménage
-						// Attribution identifiant unique
-						$retour = $this->ImportationbeneficiaireManager->AttributionIdentifiantUniqueIndividu();
-						foreach($retour as $k=>$v) {
-							$valeur=$v->nombre;
-						}
-						// identifiant_unique : 8 caractères
-						if(strlen($valeur)==1) {
-							$identifiant_unique ="0000000".$valeur;
-						} else if(strlen($valeur)==2) {
-							$identifiant_unique ="000000".$valeur;							
-						} else if(strlen($valeur)==3) {
-							$identifiant_unique ="00000".$valeur;							
-						} else if(strlen($valeur)==4) {
-							$identifiant_unique ="0000".$valeur;							
-						} else if(strlen($valeur)==5) {
-							$identifiant_unique ="000".$valeur;							
-						} else if(strlen($valeur)==6) {
-							$identifiant_unique ="00".$valeur;							
-						} else if(strlen($valeur)==7) {
-							$identifiant_unique ="0".$valeur;							
-						} else {
-							$identifiant_unique =$valeur;
-						}	 
-						$data= array(
-							'id_menage'                => $id_menage,
-							'identifiant_unique'       => $identifiant_unique,
-							'identifiant_appariement'  => $identifiant_appariement,
-							'date_enregistrement'      => null,
-							'numero_ordre'             => null,
-							'numero_ordre_pere'        => null,
-							'numero_ordre_mere'        => null,
-							'inscription_etatcivil'    => null,
-							'numero_extrait_naissance' => null,
-							'id_groupe_appartenance'   => null,
-							'frequente_ecole'          => null,
-							'avait_frequente_ecole'    => null,
-							'nom_ecole'                => null,
-							'occupation'                => null,
-							'statut'                   => null,
-							'date_sortie'              => null,
-							'flag_integration_donnees' => 1,
-							'nouvelle_integration'     => true,
-							'commentaire'              => null,
-							'possede_cin'              => null,
-							'nom'                      => $nom,
-							'prenom'                   => $prenom,
-							'cin'                      => $cin,
-							'date_naissance'           => $date_naissance,
-							'sexe'                     => $sexe,
-							'id_liendeparente'         => null,
-							'id_handicap_visuel'       => null,
-							'id_handicap_parole'       => null,
-							'id_handicap_auditif'      => null,
-							'id_handicap_mental'       => null,
-							'id_handicap_moteur'       => null,
-							'id_type_ecole'            => null,
-							'id_niveau_de_classe'      => null,
-							'langue'                   => null,
-							'id_situation_matrimoniale' => null,
-							'id_fokontany'              => $id_fokontany,
-							'id_acteur'                 => $id_acteur,
-						);
-						$id_individu = $this->IndividuManager->add($data);
-						$sheet->setCellValue("AC".$ligne, $code_region."-".$code_district."-".$code_commune."-".$code_fokontany."-".$identifiant_unique);
+					/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+					// Si bénéficiaire déjà existant das la table menage ou individu 
+					// Alors insertion seulement dans la table menage_beneficiaire ou individu_beneficiaire avec id_intervention
+					// Sinon DEUX insertion : dans la table (menage_beneficiaire ou individu_beneficiaire avec id_intervention )
+					// ET dans la table (menage ou individu) selon le cas du fichier envoyé : menage ou individu (voir ci-bas)
+					$beneficiaire_existant=false;
+					if($menage_ou_individu=="individu") {
+						// Individu tout court
+						$parametre_table="individu";
+						$table ="individu";
+					} else if(strtolower($chef_menage) =="o" && $menage_ou_individu=="menage") {
+						// Si chef ménage
+						$parametre_table="menage";
+						$table ="menage";
 					} else {
-						// Insértion Individu tout court sans ménage apparenté
-						// Attribution identifiant unique
-						$retour = $this->ImportationbeneficiaireManager->AttributionIdentifiantUniqueIndividu();
-						foreach($retour as $k=>$v) {
-							$valeur=$v->nombre;
-						}
-						// identifiant_unique : 8 caractères
-						if(strlen($valeur)==1) {
-							$identifiant_unique ="0000000".$valeur;
-						} else if(strlen($valeur)==2) {
-							$identifiant_unique ="000000".$valeur;							
-						} else if(strlen($valeur)==3) {
-							$identifiant_unique ="00000".$valeur;							
-						} else if(strlen($valeur)==4) {
-							$identifiant_unique ="0000".$valeur;							
-						} else if(strlen($valeur)==5) {
-							$identifiant_unique ="000".$valeur;							
-						} else if(strlen($valeur)==6) {
-							$identifiant_unique ="00".$valeur;							
-						} else if(strlen($valeur)==7) {
-							$identifiant_unique ="0".$valeur;							
-						} else {
-							$identifiant_unique =$valeur;
-						}	 
-						$data= array(
-							'id_menage'                => null,
-							'identifiant_unique'       => $identifiant_unique,
-							'identifiant_appariement'  => $identifiant_appariement,
-							'date_enregistrement'      => null,
-							'numero_ordre'             => null,
-							'numero_ordre_pere'        => null,
-							'numero_ordre_mere'        => null,
-							'inscription_etatcivil'    => null,
-							'numero_extrait_naissance' => null,
-							'id_groupe_appartenance'   => null,
-							'frequente_ecole'          => null,
-							'avait_frequente_ecole'    => null,
-							'nom_ecole'                => null,
-							'occupation'                => $profession,
-							'statut'                   => null,
-							'date_sortie'              => null,
-							'flag_integration_donnees' => 1,
-							'nouvelle_integration'     => true,
-							'commentaire'              => null,
-							'possede_cin'              => null,
-							'nom'                      => $nom,
-							'prenom'                   => $prenom,
-							'cin'                      => $cin,
-							'date_naissance'           => $date_naissance,
-							'sexe'                     => $sexe,
-							'id_liendeparente'         => null,
-							'id_handicap_visuel'       => null,
-							'id_handicap_parole'       => null,
-							'id_handicap_auditif'      => null,
-							'id_handicap_mental'       => null,
-							'id_handicap_moteur'       => null,
-							'id_type_ecole'            => null,
-							'id_niveau_de_classe'      => null,
-							'langue'                   => null,
-							'id_situation_matrimoniale' => null,
-							'id_fokontany'              => $id_fokontany,
-							'id_acteur'                 => $id_acteur,
-						);
-						$id_individu = $this->IndividuManager->add($data);
-						$sheet->setCellValue("AC".$ligne, $code_region."-".$code_district."-".$code_commune."-".$code_fokontany."-".$identifiant_unique);
+						// Individu appartenant à un ménage
+						$parametre_table="individu";
+						$table ="individu";
 					}
+					if($menage_ou_individu=="menage") {
+						if(strtolower($chef_menage) =="o") {
+							// 1- Recherche par identifiant_appariement = $identifiant_appariement et $id_acteur stocké auparavant CHEF MENAGE
+							$retour=$this->ValidationbeneficiaireManager->RechercheParIdentifiantActeur($table,$identifiant_appariement,$id_acteur);
+							$nombre=0;
+							foreach($retour as $k=>$v) {
+								$nombre = $v->nombre;
+							}
+							// Ménage déjà existant => id_menage à stocker
+							if($nombre >0) {								
+								$retour=$this->ValidationbeneficiaireManager->RechercheFokontanyMenageParIdentifiantActeur($identifiant_appariement,$id_acteur);
+								$code_region="????";
+								$code_district="????";
+								$code_commune="????";
+								$code_fokontany="????";
+								$id_menage=null;
+								if($retour) {
+									 foreach($retour as $k=>$v) {
+										 $code_region=$v->code_region;
+										 $code_district=$v->code_district;
+										 $code_commune=$v->code_commune;
+										 $code_fokontany=$v->code_fokontany;							 
+										 $identifiant_unique=$v->identifiant_unique;
+										$id_menage=$v->id_menage; 
+									 }
+									$sheet->setCellValue("AC".$ligne, $code_region."-".$code_district."-".$code_commune."-".$code_fokontany."-".$identifiant_unique);
+									$beneficiaire_existant=true;
+								}	 
+							}
+						} else {
+							// 2- Recherche individu appartenant à un ménage
+							if(intval($fokontany_id) >0) {
+								$id_fokontany=$fokontany_id;
+							}
+							$retour=$this->ValidationbeneficiaireManager->RechercheFokontanyParNomPrenomCIN_Fokontany_Acteur($parametre_table,$identifiant_appariement,$id_acteur,$nom,$prenom,$cin,$id_fokontany);
+							$nombre=0;
+							foreach($retour as $k=>$v) {
+								$nombre = $v->nombre;
+							}							
+						}	
+					} else {
+						// 3- Recherche individu sans attache ménage
+						$retour=$this->ValidationbeneficiaireManager->RechercheParIdentifiantActeur($table,$identifiant_appariement,$id_acteur);
+						$nombre=0;
+						foreach($retour as $k=>$v) {
+							$nombre = $v->nombre;
+						}
+					}	
+					if($nombre >0) {
+						if( $menage_ou_individu=="menage") {
+							if(strtolower($chef_menage) =="o") {
+								// Chef ménage
+								$retour=$this->ValidationbeneficiaireManager->RechercheFokontanyMenageParIdentifiantActeur($identifiant_appariement,$id_acteur);
+								$code_region="????";
+								$code_district="????";
+								$code_commune="????";
+								$code_fokontany="????";
+								$id_menage=null;
+								if($retour) {
+									 foreach($retour as $k=>$v) {
+										 $code_region=$v->code_region;
+										 $code_district=$v->code_district;
+										 $code_commune=$v->code_commune;
+										 $code_fokontany=$v->code_fokontany;							 
+										 $identifiant_unique=$v->identifiant_unique;
+										$id_menage=$v->id_menage; 
+									 }
+									$sheet->setCellValue("AC".$ligne, $code_region."-".$code_district."-".$code_commune."-".$code_fokontany."-".$identifiant_unique);
+									$beneficiaire_existant=true;
+								}	 
+							} else {
+								// Individu membre ménage
+								$retour=$this->ValidationbeneficiaireManager->RechercheFokontanyIndividuParMenageNomPrenomActeur($id_menage,$nom,$prenom,$id_acteur);
+								 $code_region="????";
+								 $code_district="????";
+								 $code_commune="????";
+								 $code_fokontany="????";
+								 $id_individu=null;
+								if($retour) {
+									 foreach($retour as $k=>$v) {
+										$code_region=$v->code_region;
+										$code_district=$v->code_district;
+										$code_commune=$v->code_commune;
+										$code_fokontany=$v->code_fokontany;							 
+										$identifiant_unique=$v->identifiant_unique;
+										$id_individu=$v->id_individu; 
+									 }
+									$sheet->setCellValue("AC".$ligne, $code_region."-".$code_district."-".$code_commune."-".$code_fokontany."-".$identifiant_unique);
+									$beneficiaire_existant=true;
+								}	 								
+							}	
+						} else {
+							$retour=$this->ValidationbeneficiaireManager->RechercheFokontanyIndividuParIdentifiantActeur($identifiant_appariement,$id_acteur);
+							$code_region="????";
+							$code_district="????";
+							$code_commune="????";
+							$code_fokontany="????";
+							$id_individu=null;
+							if($retour) {
+								 foreach($retour as $k=>$v) {
+									$code_region=$v->code_region;
+									$code_district=$v->code_district;
+									$code_commune=$v->code_commune;
+									$code_fokontany=$v->code_fokontany;							 
+									$identifiant_unique=$v->identifiant_unique;
+									$id_individu=$v->id_individu; 
+								 }
+								$sheet->setCellValue("AC".$ligne, $code_region."-".$code_district."-".$code_commune."-".$code_fokontany."-".$identifiant_unique);
+								$beneficiaire_existant=true;
+							}	 
+						}	
+					} else {
+						// 2- Recherche par nom , prenom , CIN, id_fokontany , id_acteur
+						// Recherche selon le cas : liste par ménage ou individu
+						// De plus si la liste est ménage; il faut chercher dans la table menage si chef_menage = "O"
+						// sinon recherche dans la table individu
+						if($menage_ou_individu=="menage") {
+							if(strtolower($chef_menage) =="o") {
+								// 1- CHEF MENAGE
+								if(intval($fokontany_id) >0) {
+									$id_fokontany=$fokontany_id;
+								}
+								$retour=$this->ValidationbeneficiaireManager->RechercheMenageParNomPrenomCIN_Fokontany_Acteur($identifiant_appariement,$id_acteur,$nom,$prenom,$cin,$id_fokontany);
+								$code_region="????";
+								$code_district="????";
+								$code_commune="????";
+								$code_fokontany="????";
+								$id_menage=null;
+								if($retour) {
+									 foreach($retour as $k=>$v) {
+										$code_region=$v->code_region;
+										$code_district=$v->code_district;
+										$code_commune=$v->code_commune;
+										$code_fokontany=$v->code_fokontany;							 
+										$identifiant_unique=$v->identifiant_unique;
+										$id_menage=$v->id_menage; 
+									 }
+									$sheet->setCellValue("AC".$ligne, $code_region."-".$code_district."-".$code_commune."-".$code_fokontany."-".$identifiant_unique);
+									$beneficiaire_existant=true;
+								}	 
+							} else {
+								// 2- Recherche individu appartenant à un ménage
+								$retour=$this->ValidationbeneficiaireManager->RechercheIndividuMenageParNomPrenomCIN_Fokontany_Acteur($identifiant_appariement,$id_acteur,$nom,$prenom,$cin,$id_fokontany);
+								$code_region="????";
+								$code_district="????";
+								$code_commune="????";
+								$code_fokontany="????";
+								$id_individu=null;
+								
+								if($retour) {
+									 foreach($retour as $k=>$v) {
+										$code_region=$v->code_region;
+										$code_district=$v->code_district;
+										$code_commune=$v->code_commune;
+										$code_fokontany=$v->code_fokontany;							 
+										$identifiant_unique=$v->identifiant_unique;
+										$id_menage=$v->id_menage; 
+										$id_individu=$v->id_individu; 
+									 }
+									$sheet->setCellValue("AC".$ligne, $code_region."-".$code_district."-".$code_commune."-".$code_fokontany."-".$identifiant_unique);
+									$beneficiaire_existant=true;
+								}	 
+							}	
+						} else {
+							// 3- Recherche individu sans attache ménage
+							$retour=$this->ValidationbeneficiaireManager->RechercheIndividuParNomPrenomCIN_Fokontany_Acteur($identifiant_appariement,$id_acteur,$nom,$prenom,$cin,$id_fokontany);
+							$code_region="????";
+							$code_district="????";
+							$code_commune="????";
+							$code_fokontany="????";
+							$id_individu=null;
+							if($retour) {
+								 foreach($retour as $k=>$v) {
+									$code_region=$v->code_region;
+									$code_district=$v->code_district;
+									$code_commune=$v->code_commune;
+									$code_fokontany=$v->code_fokontany;							 
+									$identifiant_unique=$v->identifiant_unique;
+									$id_individu=$v->id_individu; 
+								 }
+								$sheet->setCellValue("AC".$ligne, $code_region."-".$code_district."-".$code_commune."-".$code_fokontany."-".$identifiant_unique);
+								$beneficiaire_existant=true;
+							}	 
+						}							
+					} 					
+					/////////////////////////////////////////////////////////////////////////////////////////////////////////////////	
+					// La variable $id_menage est retenu mais son usage diffère selon le cas : elle peut être id_individu si 
+					// le fichier envoyé concerne seulement des individus
+					if(!$beneficiaire_existant) {	
+						// Veut dire : pas encore bénéficiaire et il faut l'insérer dans la table menage ou indidividu
+						// Insértion Chef ménage	
+						if($menage_ou_individu=="menage") {
+							if(strtolower($chef_menage)=='o') {
+								$nombre_cas_1=	$nombre_cas_1 + 1;
+								// Attribution identifiant unique
+								$retour = $this->ImportationbeneficiaireManager->AttributionIdentifiantUniqueMenage();
+								foreach($retour as $k=>$v) {
+									$valeur=$v->nombre;
+								}
+								// identifiant_unique : 8 caractères
+								if(strlen($valeur)==1) {
+									$identifiant_unique ="0000000".$valeur;
+								} else if(strlen($valeur)==2) {
+									$identifiant_unique ="000000".$valeur;							
+								} else if(strlen($valeur)==3) {
+									$identifiant_unique ="00000".$valeur;							
+								} else if(strlen($valeur)==4) {
+									$identifiant_unique ="0000".$valeur;							
+								} else if(strlen($valeur)==5) {
+									$identifiant_unique ="000".$valeur;							
+								} else if(strlen($valeur)==6) {
+									$identifiant_unique ="00".$valeur;							
+								} else if(strlen($valeur)==7) {
+									$identifiant_unique ="0".$valeur;							
+								} else {
+									$identifiant_unique =$valeur;
+								}	 
+								$data = array(
+									'identifiant_unique'     => $identifiant_unique,
+									'identifiant_appariement'=> $identifiant_appariement,
+									'numero_sequentiel'      => null,
+									'lieu_residence'         => null,
+									'surnom_chefmenage'      => null,
+									'nom'                    => $nom,
+									'prenom'                 => $prenom,
+									'cin'                    => $cin,
+									'chef_menage'            => 'O',
+									'adresse'                => null,
+									'date_naissance'         => $date_naissance,
+									'profession'             => $profession,
+									'id_situation_matrimoniale' => null,
+									'sexe'                   => $sexe,
+									'date_inscription'       => $date_inscription,
+									'nom_prenom_pere'         => null,
+									'nom_prenom_mere'         => null,
+									'telephone'               => null,
+									'statut'                  => null,
+									'date_sortie'            => null,
+									'nom_enqueteur'            => null,
+									'date_enquete'            => null,
+									'nom_superviseur_enquete' => null,
+									'date_supervision' => null,
+									'flag_integration_donnees' => 1,
+									'nouvelle_integration' => true,
+									'commentaire' => null,
+									'revenu_mensuel'         => null,
+									'depense_mensuel'        => null,
+									'id_fokontany'           => $id_fokontany,
+									'id_acteur'              => $id_acteur,
+									'id_type_beneficiaire'   => 1
+								);
+								$id_menage = $this->MenageManager->addchefmenage($data);
+								$sheet->setCellValue("AC".$ligne, $code_region."-".$code_district."-".$code_commune."-".$code_fokontany."-".$identifiant_unique);
+							} else {
+								// Insértion Individu rattaché à un ménage
+								// Attribution identifiant unique
+								$nombre_cas_2=	$nombre_cas_2 + 1;
+								$retour = $this->ImportationbeneficiaireManager->AttributionIdentifiantUniqueIndividu();
+								foreach($retour as $k=>$v) {
+									$valeur=$v->nombre;
+								}
+								// identifiant_unique : 8 caractères
+								if(strlen($valeur)==1) {
+									$identifiant_unique ="0000000".$valeur;
+								} else if(strlen($valeur)==2) {
+									$identifiant_unique ="000000".$valeur;							
+								} else if(strlen($valeur)==3) {
+									$identifiant_unique ="00000".$valeur;							
+								} else if(strlen($valeur)==4) {
+									$identifiant_unique ="0000".$valeur;							
+								} else if(strlen($valeur)==5) {
+									$identifiant_unique ="000".$valeur;							
+								} else if(strlen($valeur)==6) {
+									$identifiant_unique ="00".$valeur;							
+								} else if(strlen($valeur)==7) {
+									$identifiant_unique ="0".$valeur;							
+								} else {
+									$identifiant_unique =$valeur;
+								}	 
+								$data= array(
+									'id_menage'                => $id_menage,
+									'identifiant_unique'       => $identifiant_unique,
+									'identifiant_appariement'  => $identifiant_appariement,
+									'date_enregistrement'      => null,
+									'numero_ordre'             => null,
+									'numero_ordre_pere'        => null,
+									'numero_ordre_mere'        => null,
+									'inscription_etatcivil'    => null,
+									'numero_extrait_naissance' => null,
+									'id_groupe_appartenance'   => null,
+									'frequente_ecole'          => null,
+									'avait_frequente_ecole'    => null,
+									'nom_ecole'                => null,
+									'occupation'                => null,
+									'statut'                   => null,
+									'date_sortie'              => null,
+									'flag_integration_donnees' => 1,
+									'nouvelle_integration'     => true,
+									'commentaire'              => null,
+									'possede_cin'              => null,
+									'nom'                      => $nom,
+									'prenom'                   => $prenom,
+									'cin'                      => $cin,
+									'date_naissance'           => $date_naissance,
+									'sexe'                     => $sexe,
+									'id_liendeparente'         => null,
+									'id_handicap_visuel'       => null,
+									'id_handicap_parole'       => null,
+									'id_handicap_auditif'      => null,
+									'id_handicap_mental'       => null,
+									'id_handicap_moteur'       => null,
+									'id_type_ecole'            => null,
+									'id_niveau_de_classe'      => null,
+									'langue'                   => null,
+									'id_situation_matrimoniale' => null,
+									'id_fokontany'              => $id_fokontany,
+									'id_acteur'                 => $id_acteur,
+								);
+								$id_individu = $this->IndividuManager->add($data);
+								$sheet->setCellValue("AC".$ligne, $code_region."-".$code_district."-".$code_commune."-".$code_fokontany."-".$identifiant_unique);								
+							}	
+						} else {
+							// Insértion Individu tout court sans ménage apparenté
+							// Attribution identifiant unique
+								$nombre_cas_3=	$nombre_cas_3 + 1;
+							$retour = $this->ImportationbeneficiaireManager->AttributionIdentifiantUniqueIndividu();
+							foreach($retour as $k=>$v) {
+								$valeur=$v->nombre;
+							}
+							// identifiant_unique : 8 caractères
+							if(strlen($valeur)==1) {
+								$identifiant_unique ="0000000".$valeur;
+							} else if(strlen($valeur)==2) {
+								$identifiant_unique ="000000".$valeur;							
+							} else if(strlen($valeur)==3) {
+								$identifiant_unique ="00000".$valeur;							
+							} else if(strlen($valeur)==4) {
+								$identifiant_unique ="0000".$valeur;							
+							} else if(strlen($valeur)==5) {
+								$identifiant_unique ="000".$valeur;							
+							} else if(strlen($valeur)==6) {
+								$identifiant_unique ="00".$valeur;							
+							} else if(strlen($valeur)==7) {
+								$identifiant_unique ="0".$valeur;							
+							} else {
+								$identifiant_unique =$valeur;
+							}	 
+							$data= array(
+								'id_menage'                => null,
+								'identifiant_unique'       => $identifiant_unique,
+								'identifiant_appariement'  => $identifiant_appariement,
+								'date_enregistrement'      => null,
+								'numero_ordre'             => null,
+								'numero_ordre_pere'        => null,
+								'numero_ordre_mere'        => null,
+								'inscription_etatcivil'    => null,
+								'numero_extrait_naissance' => null,
+								'id_groupe_appartenance'   => null,
+								'frequente_ecole'          => null,
+								'avait_frequente_ecole'    => null,
+								'nom_ecole'                => null,
+								'occupation'                => $profession,
+								'statut'                   => null,
+								'date_sortie'              => null,
+								'flag_integration_donnees' => 1,
+								'nouvelle_integration'     => true,
+								'commentaire'              => null,
+								'possede_cin'              => null,
+								'nom'                      => $nom,
+								'prenom'                   => $prenom,
+								'cin'                      => $cin,
+								'date_naissance'           => $date_naissance,
+								'sexe'                     => $sexe,
+								'id_liendeparente'         => null,
+								'id_handicap_visuel'       => null,
+								'id_handicap_parole'       => null,
+								'id_handicap_auditif'      => null,
+								'id_handicap_mental'       => null,
+								'id_handicap_moteur'       => null,
+								'id_type_ecole'            => null,
+								'id_niveau_de_classe'      => null,
+								'langue'                   => null,
+								'id_situation_matrimoniale' => null,
+								'id_fokontany'              => $id_fokontany,
+								'id_acteur'                 => $id_acteur,
+							);
+							$id_menage = $this->IndividuManager->add($data);
+							$sheet->setCellValue("AC".$ligne, $code_region."-".$code_district."-".$code_commune."-".$code_fokontany."-".$identifiant_unique);
+						}
+					}
+					// TOUJOURS : Insertion dans la table menage_beneficiaire ou individu_beneficiaire
+					// La valeur de la variable $id_menage est donnée par : le controle ci-dessus OU BIEN après insertion 
+					// dans la table menage ou individu si la variable $beneficiaire_existant==false
+						if($menage_ou_individu=="menage") {
+							// Insérer dans la BDD le chef de ménage seulement (les membres sont ignorés)
+							if(strtolower($chef_menage)=='o') {
+								$data= array(
+									'id_menage'       => $id_menage,
+									'id_intervention' => $id_intervention,
+									'date_sortie' => null,
+								);
+								// Insertion dans la table menage_beneficiaire
+								$id_menage_intervention = $this->MenagebeneficiaireManager->add($data);
+							}	
+						} else {
+							$data= array(
+								'id_individu'     => $id_menage,
+								'id_intervention' => $id_intervention,
+								'date_sortie' => null,
+							);
+							// Insertion dans la table individu_beneficiaire
+							$id_individu_intervention = $this->IndividubeneficiaireManager->add($data);
+						}	
 				}	
 				$ligne = $ligne + 1;
 			}		
@@ -619,6 +862,9 @@ class Importationbeneficiaire extends CI_Controller {
 		} else {
 			$val_ret["reponse"] = "OK";
 			$val_ret["nombre_erreur"] = 0;			
+			$val_ret["nombre_cas_1"] = $nombre_cas_1;			
+			$val_ret["nombre_cas_2"] = $nombre_cas_2;			
+			$val_ret["nombre_cas_3"] = $nombre_cas_3;			
 		}
 		echo json_encode($val_ret);
 	}	

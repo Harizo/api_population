@@ -8,7 +8,8 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 class Validationbeneficiaire extends CI_Controller {
     public function __construct() {
         parent::__construct();
-        $this->load->model('validationbeneficiaire_model', 'ImportationbeneficiaireManager');
+		// Modèle utilisés lor de la validation des données
+        $this->load->model('validationbeneficiaire_model', 'ValidationbeneficiaireManager');
         $this->load->model('region_model', 'RegionManager');
         $this->load->model('district_model', 'DistrictManager');
         $this->load->model('commune_model', 'CommuneManager');
@@ -16,41 +17,40 @@ class Validationbeneficiaire extends CI_Controller {
         $this->load->model('acteur_model', 'ActeurManager');        
         $this->load->model('intervention_model', 'InterventionManager');        
     }
-	public function save_upload_file() {	
-		$erreur="aucun";
-		$replace=array('e','e','e','a','o','c','_');
-		$search= array('é','è','ê','à','ö','ç',' ');
-		$repertoire= $_POST['repertoire'];
-
-		$repertoire=str_replace($search,$replace,$repertoire);
-		//The name of the directory that we need to create.
-		$directoryName = dirname(__FILE__) ."/../../../../" .$repertoire;
-		//Check if the directory already exists.
-		if(!is_dir($directoryName)){
-			//Directory does not exist, so lets create it.
-			mkdir($directoryName, 0777,true);
-		}				
-
-		$emplacement=array();
-		$emplacement[0]=dirname(__FILE__) ."/../../../../" .$repertoire;
-		$config['upload_path']          = dirname(__FILE__) ."/../../../../".$repertoire;
-		$config['allowed_types'] = 'gif|jpg|png|xls|xlsx|doc|docx|pdf';
-		$config['max_size'] = 222048;
-		$config['overwrite'] = TRUE;
-		if (isset($_FILES['file']['tmp_name'])) {
-			$name=$_FILES['file']['name'];
-			$name1=str_replace($search,$replace,$name);
-			$emplacement[1]=$name1;
-			$emplacement[2]=$repertoire;
-			$config['file_name'] = $name1;
-			$this->load->library('upload', $config);
-			$this->upload->initialize($config);
-			$ff=$this->upload->do_upload('file');
-		} else {
-            echo 'File upload not found';
-		} 
-		echo json_encode($emplacement);
-	}  
+	// Récupération nombre fichier non validées : bénéficiaire et intervention en même temps : pour affichage SUR le MENU
+	public function recuperer_nombre_liste_fichier_non_valides() {	
+		$total_non_validees =0;
+		$retour_1 = $this->ValidationbeneficiaireManager->recuperer_nombre_liste_fichier_non_valides_beneficiaire();
+		$retour_2 = $this->ValidationbeneficiaireManager->recuperer_nombre_liste_fichier_non_valides_intervention();
+		foreach($retour_1 as $k=>$v) {
+			$total_non_validees = $total_non_validees + $v->nombre_beneficiaire_non_valides;
+		}
+		foreach($retour_2 as $k=>$v) {
+			$total_non_validees = $total_non_validees + $v->nombre_intervention_non_valides;
+		}
+		echo json_encode($total_non_validees);
+	}
+	// Récupération nombre fichier non validées bénéficiaire  : pour affichage SUR le MENU
+	public function recuperer_nombre_liste_beneficiaire_non_valides() {	
+		$total_non_validees =0;
+		$retour_1 = $this->ValidationbeneficiaireManager->recuperer_nombre_liste_fichier_non_valides_beneficiaire();
+		foreach($retour_1 as $k=>$v) {
+			$total_non_validees = $total_non_validees + $v->nombre_beneficiaire_non_valides;
+		}
+		echo json_encode($total_non_validees);
+	}
+	// Récupération nombre fichier non validées intervention  : pour affichage SUR le MENU
+	public function recuperer_nombre_liste_intervention_non_valides() {	
+		$total_non_validees =0;
+		$retour_1 = $this->ValidationbeneficiaireManager->recuperer_nombre_liste_fichier_non_valides_intervention();
+		foreach($retour_1 as $k=>$v) {
+			$total_non_validees = $total_non_validees + $v->nombre_beneficiaire_non_valides;
+		}
+		echo json_encode($total_non_validees);
+	}
+	// Fonction qui récupère le fichier envoyé par l'acteur pour l'neregistrer dans le repertoire dédié dans le serveur
+	// Structure repertoire validationdonnees/beneficiaire/'nom_acteur'/'nom de fichier.sxlsx'
+	// APPEL DE LA FONCTION controler_donnees_beneficiaire  : pour controler les données envoyées
 	public function upload_validationdonneesbeneficiaire() {	
 		$erreur="aucun";
 		$replace=array('e','e','e','a','o','c','_','_','_');
@@ -84,6 +84,7 @@ class Validationbeneficiaire extends CI_Controller {
 			$this->load->library('upload', $config);
 			$this->upload->initialize($config);
 			$ff=$this->upload->do_upload('file');
+			// UNE FOIS LE FICHIER ENREGISTRE DANS LE SERVEUR => Controler les données
 			// Contrôler les données envoyés par l'acteur
 			$retour = $this->controler_donnees_beneficiaire($emplacement[1],$emplacement[2]);
 			$valeur_retour=array();
@@ -91,6 +92,8 @@ class Validationbeneficiaire extends CI_Controller {
 			$valeur_retour["repertoire"] = $emplacement[2];
 			$valeur_retour["reponse"] = $retour["reponse"];
 			$valeur_retour["nombre_erreur"] = $retour["nombre_erreur"];
+			$valeur_retour["tao_ve"] = $retour["tao_ve"];
+			$valeur_retour["id_fokontany"] = $retour["id_fokontany"];
 		} else {
 			$valeur_retour=array();
 			$valeur_retour["nom_fichier"] = "inexistant";
@@ -165,7 +168,7 @@ class Validationbeneficiaire extends CI_Controller {
 					 $rowIndex = $row->getRowIndex ();
 					foreach ($cellIterator as $cell) {
 						if('B' == $cell->getColumn()) {
-							$nom_partenaire =$cell->getValue();
+							$nom_acteur =$cell->getValue();
 						} else if('D' == $cell->getColumn()) {
 							$intitule_intervention =$cell->getValue();	
 						} else if('F' == $cell->getColumn()) {
@@ -182,7 +185,7 @@ class Validationbeneficiaire extends CI_Controller {
 						}	 
 					}
 					// Si donnée incorrect : coleur cellule en rouge
-					if($nom_partenaire=="") {
+					if($nom_acteur=="") {
 						$nombre_erreur = $nombre_erreur + 1;						
 						$sheet->getStyle("B2")->getFill()->applyFromArray(
 								 array('type'       => PHPExcel_Style_Fill::FILL_SOLID,'rotation'   => 0,
@@ -191,9 +194,9 @@ class Validationbeneficiaire extends CI_Controller {
 								 )
 						 );													
 					} else {
-						// Vérifier si nom_partenaire existe dans la BDD
-						$nom_partenaire=strtolower($nom_partenaire);
-						$retour = $this->ActeurManager->findByNom($nom_partenaire);
+						// Vérifier si nom_acteur existe dans la BDD
+						$nom_acteur=strtolower($nom_acteur);
+						$retour = $this->ActeurManager->findByNom($nom_acteur);
 						if(count($retour) >0) {
 							// $id_acteur : à utiliser ultérieurement si tout est OK pour Deuxième vérification
 							foreach($retour as $k=>$v) {
@@ -219,6 +222,7 @@ class Validationbeneficiaire extends CI_Controller {
 						 );													
 					} else {
 						// Vérifier si intitule_intervention existe dans la BDD
+						$id_intervention = null;  // A utliser ultérieurement pour controle doublon bénéficiaire intervention
 						$retour = $this->InterventionManager->findByIntitule($intitule_intervention);
 						if(!$retour) {
 							$sheet->getStyle("D2")->getFill()->applyFromArray(
@@ -228,6 +232,10 @@ class Validationbeneficiaire extends CI_Controller {
 									 )
 							 );		
 							$nombre_erreur = $nombre_erreur + 1; 
+						} else {
+							foreach($retour as $k=>$v) {
+								$id_intervention = $v->id;
+							}
 						}
 					}
 					if(!$date_enquete) {
@@ -252,7 +260,9 @@ class Validationbeneficiaire extends CI_Controller {
 						// c'est-à-dire : recherche dans la table menage ou table individu
 						$menage_ou_individu = strtolower($menage_ou_individu);
 						if($menage_ou_individu=="ménage" || $menage_ou_individu=="menage") {
-							$menage_ou_individu="ménage";
+							$menage_ou_individu="menage";
+						} else {
+							$menage_ou_individu="individu";
 						}
 					}	
 				}	
@@ -309,9 +319,9 @@ class Validationbeneficiaire extends CI_Controller {
 					$reg=array();
 					if($nom_region >'') {
 						if($amoron_mania==false) {
-							$reg = $this->ImportationbeneficiaireManager->selectionregion($nom_region);
+							$reg = $this->ValidationbeneficiaireManager->selectionregion($nom_region);
 						} else {
-							$reg = $this->ImportationbeneficiaireManager->selectionregionparid(5);
+							$reg = $this->ValidationbeneficiaireManager->selectionregionparid(5);
 						}	
 						if(count($reg) >0) {
 							foreach($reg as $indice=>$v) {
@@ -349,7 +359,7 @@ class Validationbeneficiaire extends CI_Controller {
 						if(intval($id_region) >0) {
 							if($nom_district >'') {
 								$region_ok = true;
-								$dis = $this->ImportationbeneficiaireManager->selectiondistrict($nom_district,$id_region);
+								$dis = $this->ValidationbeneficiaireManager->selectiondistrict($nom_district,$id_region);
 								if(count($dis) >0) {
 									foreach($dis as $indice=>$v) {
 										$id_district = $v->id;
@@ -380,7 +390,7 @@ class Validationbeneficiaire extends CI_Controller {
 								if(intval($id_district) >0) {
 									if($nom_commune >'') {
 										$district_ok = true;
-										$comm = $this->ImportationbeneficiaireManager->selectioncommune($nom_commune,$id_district);
+										$comm = $this->ValidationbeneficiaireManager->selectioncommune($nom_commune,$id_district);
 										if(count($comm) >0) {
 											foreach($comm as $indice=>$v) {
 												$id_commune = $v->id;
@@ -404,13 +414,14 @@ class Validationbeneficiaire extends CI_Controller {
 										}	
 										if(intval($id_commune) >0) {
 											if($nom_fokontany >'') {
-												$fkt = $this->ImportationbeneficiaireManager->selectionfokontany($nom_fokontany,$id_commune);
+												$fkt = $this->ValidationbeneficiaireManager->selectionfokontany($nom_fokontany,$id_commune);
 												if(count($fkt) >0) {
 													foreach($fkt as $indice=>$v) {
 														// A utliser ultérieurement lors de la deuxième vérification : id_fokontany
 														$id_fokontany = $v->id;
 														$code_fokontany = $v->code;
 													}
+													$sheet->setCellValue("I3", $id_fokontany);
 												} else {													
 													// Pas de fokontany : marquer fokontany 
 													$sheet->getStyle("H3")->getFill()->applyFromArray(
@@ -895,6 +906,7 @@ class Validationbeneficiaire extends CI_Controller {
 				// Le controle se fait en 2 étapes
 				// 1- Par identifiant_appariement
 				// 2- Par nom,prenom CIN / Fokontany
+				$beneficiaire_existant = false; // Si bénéficiaire déjà repertorié => Vérifier si déjà bénéficiaire de l'intervention =>Doublon
 				$ligne = $row->getRowIndex ();
 				if($ligne >=5) {
 					// Contrôle de toutes les cellules à partir de la ligne 5
@@ -979,55 +991,278 @@ class Validationbeneficiaire extends CI_Controller {
 							}								 							 
 						 }
 					}
-					//$id_acteur
-					// 1- Recherche par identifiant_appariement = $identifiant_appariement et $id_acteur stocké auparavant
-					 $retour=$this->ImportationbeneficiaireManager->RechercheParIdentifiantActeur($identifiant_appariement,$id_acteur);
+					$beneficiaire_existant=false;
+					if($menage_ou_individu=="individu") {
+						// Individu tout court
+						$parametre_table="individu";
+						$table ="individu";
+						$table_controle ="individu_beneficiaire"; // Pour controler si un individu est déjà bénéficiaire de l'intervention
+					} else if(strtolower($chef_menage) =="o") {
+						// Si chef ménage
+						$parametre_table="menage";
+						$table ="menage";
+						$table_controle ="menage_beneficiaire"; // Pour controler si un ménage est déjà bénéficiaire de l'intervention
+					} else {
+						// Individu apprtenant à un ménage
+						$parametre_table="individu";
+						$table ="individu";
+						$table_controle ="menage_beneficiaire"; // Pour controler si un ménage est déjà bénéficiaire de l'intervention
+					}
+					
+					///////////////////ETO
+					if($menage_ou_individu=="menage") {
+						if(strtolower($chef_menage) =="o") {
+							// 1- Recherche par identifiant_appariement = $identifiant_appariement et $id_acteur stocké auparavant CHEF MENAGE
+							$retour=$this->ValidationbeneficiaireManager->RechercheParIdentifiantActeur($table,$identifiant_appariement,$id_acteur);
+							$nombre=0;
+							foreach($retour as $k=>$v) {
+								$nombre = $v->nombre;
+							}
+							// Ménage déjà existant => id_menage à stocker
+							if($nombre >0) {								
+								$retour=$this->ValidationbeneficiaireManager->RechercheFokontanyMenageParIdentifiantActeur($identifiant_appariement,$id_acteur);
+								$code_region="????";
+								$code_district="????";
+								$code_commune="????";
+								$code_fokontany="????";
+								$id_menage=null;
+								if($retour) {
+									 foreach($retour as $k=>$v) {
+										 $code_region=$v->code_region;
+										 $code_district=$v->code_district;
+										 $code_commune=$v->code_commune;
+										 $code_fokontany=$v->code_fokontany;							 
+										 $identifiant_unique=$v->identifiant_unique;
+										$id_menage=$v->id_menage; 
+									 }
+									$sheet->setCellValue("AC".$ligne, $code_region."-".$code_district."-".$code_commune."-".$code_fokontany."-".$identifiant_unique);
+									$beneficiaire_existant=true;
+								}	 
+							}
+						} else {
+							// 2- Recherche individu appartenant à un ménage
+							$retour=$this->ValidationbeneficiaireManager->RechercheFokontanyParNomPrenomCIN_Fokontany_Acteur($parametre_table,$identifiant_appariement,$id_acteur,$nom,$prenom,$cin,$id_fokontany);
+							$nombre=0;
+							foreach($retour as $k=>$v) {
+								$nombre = $v->nombre;
+							}							
+						}	
+					} else {
+						// 3- Recherche individu sans attache ménage
+						$retour=$this->ValidationbeneficiaireManager->RechercheParIdentifiantActeur($table,$identifiant_appariement,$id_acteur);
 						$nombre=0;
 						foreach($retour as $k=>$v) {
 							$nombre = $v->nombre;
 						}
+					}	
 					if($nombre >0) {
-						 // Doublon : ERREUR Marquage colonne AC par Doblon de couleur Jaune
-						$sheet->getStyle("AC".$ligne)->getFill()->applyFromArray(
-								 array('type'       => PHPExcel_Style_Fill::FILL_SOLID,'rotation'   => 0,
-									 'startcolor' => array('rgb' => 'FFFF66'),
-									 'endcolor'   => array('argb' => 'FFFF66')
-								 )
-						 );	
-						 $sheet->setCellValue("AC".$ligne, 'Doblon');
-						$nombre_erreur = $nombre_erreur + 1;						
+						if( $menage_ou_individu=="menage") {
+							if(strtolower($chef_menage) =="o") {
+								// Chef ménage
+								$retour=$this->ValidationbeneficiaireManager->RechercheFokontanyMenageParIdentifiantActeur($identifiant_appariement,$id_acteur);
+								$code_region="????";
+								$code_district="????";
+								$code_commune="????";
+								$code_fokontany="????";
+								$id_menage=null;
+								if($retour) {
+									 foreach($retour as $k=>$v) {
+										 $code_region=$v->code_region;
+										 $code_district=$v->code_district;
+										 $code_commune=$v->code_commune;
+										 $code_fokontany=$v->code_fokontany;							 
+										 $identifiant_unique=$v->identifiant_unique;
+										$id_menage=$v->id_menage; 
+									 }
+									$sheet->setCellValue("AC".$ligne, $code_region."-".$code_district."-".$code_commune."-".$code_fokontany."-".$identifiant_unique);
+									$beneficiaire_existant=true;
+								}	 
+								// Vérification si déjà bénéficiaire de l'intervention
+								$nombre=0;
+								$retour=$this->ValidationbeneficiaireManager->ControlerSiBeneficiaireIntervention($table_controle,$id_menage,$id_intervention);
+								foreach($retour as $k=>$v) {
+									 $nombre=$v->nombre;
+								}
+								// Bénéficiaire existant et bénéficie déjà de l'intervention =>ERREUR DOUBLON
+								if($nombre >0) {
+									// Doublon : ERREUR Marquage colonne AD par Doublon de couleur Jaune
+									$sheet->getStyle("AD".$ligne)->getFill()->applyFromArray(
+											 array('type'       => PHPExcel_Style_Fill::FILL_SOLID,'rotation'   => 0,
+												 'startcolor' => array('rgb' => 'FFFF66'),
+												 'endcolor'   => array('argb' => 'FFFF66')
+											 )
+									 );	
+									$sheet->setCellValue("AD".$ligne, "Doublon : Déjà bénéficiaire de l'intervention");
+									$nombre_erreur = $nombre_erreur + 1;	
+								}						
+							} else {
+								// Individu membre ménage
+								$retour=$this->ValidationbeneficiaireManager->RechercheFokontanyIndividuParMenageNomPrenomActeur($id_menage,$nom,$prenom,$id_acteur);
+								 $code_region="????";
+								 $code_district="????";
+								 $code_commune="????";
+								 $code_fokontany="????";
+								 $id_individu=null;
+								if($retour) {
+									 foreach($retour as $k=>$v) {
+										$code_region=$v->code_region;
+										$code_district=$v->code_district;
+										$code_commune=$v->code_commune;
+										$code_fokontany=$v->code_fokontany;							 
+										$identifiant_unique=$v->identifiant_unique;
+										$id_individu=$v->id_individu; 
+									 }
+									$sheet->setCellValue("AC".$ligne, $code_region."-".$code_district."-".$code_commune."-".$code_fokontany."-".$identifiant_unique);
+									$beneficiaire_existant=true;
+								}	 								
+							}	
+						} else {
+							// Bénéficiaire individu tout court
+							$retour=$this->ValidationbeneficiaireManager->RechercheFokontanyIndividuParIdentifiantActeur($identifiant_appariement,$id_acteur);
+							$code_region="????";
+							$code_district="????";
+							$code_commune="????";
+							$code_fokontany="????";
+							$id_individu=null;
+							if($retour) {
+								 foreach($retour as $k=>$v) {
+									$code_region=$v->code_region;
+									$code_district=$v->code_district;
+									$code_commune=$v->code_commune;
+									$code_fokontany=$v->code_fokontany;							 
+									$identifiant_unique=$v->identifiant_unique;
+									$id_individu=$v->id_individu; 
+								 }
+								$sheet->setCellValue("AC".$ligne, $code_region."-".$code_district."-".$code_commune."-".$code_fokontany."-".$identifiant_unique);
+								$beneficiaire_existant=true;
+							}	 
+							// Vérification si déjà bénéficiaire de l'intervention
+							$nombre=0;
+							$retour=$this->ValidationbeneficiaireManager->ControlerSiBeneficiaireIntervention($table_controle,$id_menage,$id_intervention);
+							foreach($retour as $k=>$v) {
+								 $nombre=$v->nombre;
+							}
+							// Bénéficiaire existant et bénéficie déjà de l'intervention =>ERREUR DOUBLON
+							if($nombre >0) {
+								// Doublon : ERREUR Marquage colonne AD par Doublon de couleur Jaune
+								$sheet->getStyle("AD".$ligne)->getFill()->applyFromArray(
+										 array('type'       => PHPExcel_Style_Fill::FILL_SOLID,'rotation'   => 0,
+											 'startcolor' => array('rgb' => 'FFFF66'),
+											 'endcolor'   => array('argb' => 'FFFF66')
+										 )
+								 );	
+								$sheet->setCellValue("AD".$ligne, "Doublon : Déjà bénéficiaire de l'intervention");
+								$nombre_erreur = $nombre_erreur + 1;	
+							}						
+						}	
 					} else {
 						// 2- Recherche par nom , prenom , CIN, id_fokontany , id_acteur
 						// Recherche selon le cas : liste par ménage ou individu
 						// De plus si la liste est ménage; il faut chercher dans la table menage si chef_menage = "O"
 						// sinon recherche dans la table individu
-						if($menage_ou_individu=="individu") {
-							// Individu tout court
-							$parametre_table="individu";
-						} else if(strtolower($chef_menage) =="o") {
-							// Si chef ménage
-							$parametre_table="menage";
+						if($menage_ou_individu=="menage") {
+							if(strtolower($chef_menage) =="o") {
+								// 1- CHEF MENAGE
+								$retour=$this->ValidationbeneficiaireManager->RechercheMenageParNomPrenomCIN_Fokontany_Acteur($identifiant_appariement,$id_acteur,$nom,$prenom,$cin,$id_fokontany);
+								$code_region="????";
+								$code_district="????";
+								$code_commune="????";
+								$code_fokontany="????";
+								$id_menage=null;
+								if($retour) {
+									 foreach($retour as $k=>$v) {
+										$code_region=$v->code_region;
+										$code_district=$v->code_district;
+										$code_commune=$v->code_commune;
+										$code_fokontany=$v->code_fokontany;							 
+										$identifiant_unique=$v->identifiant_unique;
+										$id_menage=$v->id_menage; 
+									 }
+									$sheet->setCellValue("AC".$ligne, $code_region."-".$code_district."-".$code_commune."-".$code_fokontany."-".$identifiant_unique);
+									$beneficiaire_existant=true;
+									// Vérification si déjà bénéficiaire de l'intervention
+									$nombre=0;
+									$retour=$this->ValidationbeneficiaireManager->ControlerSiBeneficiaireIntervention($table_controle,$id_menage,$id_intervention);
+									foreach($retour as $k=>$v) {
+										 $nombre=$v->nombre;
+									}
+									// Bénéficiaire existant et bénéficie déjà de l'intervention =>ERREUR DOUBLON
+									if($nombre >0) {
+										// Doublon : ERREUR Marquage colonne AD par Doublon de couleur Jaune
+										$sheet->getStyle("AD".$ligne)->getFill()->applyFromArray(
+												 array('type'       => PHPExcel_Style_Fill::FILL_SOLID,'rotation'   => 0,
+													 'startcolor' => array('rgb' => 'FFFF66'),
+													 'endcolor'   => array('argb' => 'FFFF66')
+												 )
+										 );	
+										$sheet->setCellValue("AD".$ligne, "Doublon : Déjà bénéficiaire de l'intervention");
+										$nombre_erreur = $nombre_erreur + 1;	
+									}						
+								}	 
+							} else {
+								// 2- Recherche individu appartenant à un ménage
+								$retour=$this->ValidationbeneficiaireManager->RechercheIndividuMenageParNomPrenomCIN_Fokontany_Acteur($identifiant_appariement,$id_acteur,$nom,$prenom,$cin,$id_fokontany);
+								$code_region="????";
+								$code_district="????";
+								$code_commune="????";
+								$code_fokontany="????";
+								$id_individu=null;
+								
+								if($retour) {
+									 foreach($retour as $k=>$v) {
+										$code_region=$v->code_region;
+										$code_district=$v->code_district;
+										$code_commune=$v->code_commune;
+										$code_fokontany=$v->code_fokontany;							 
+										$identifiant_unique=$v->identifiant_unique;
+										$id_menage=$v->id_menage; 
+										$id_individu=$v->id_individu; 
+									 }
+									$sheet->setCellValue("AC".$ligne, $code_region."-".$code_district."-".$code_commune."-".$code_fokontany."-".$identifiant_unique);
+									$beneficiaire_existant=true;
+								}	 
+							}	
 						} else {
-							// Individu apprtenant à un ménage
-							$parametre_table="individu_menage";
-						}
-						$retour=$this->ImportationbeneficiaireManager->RechercheParNomPrenomCIN_Fokontany_Acteur($parametre_table,$identifiant_appariement,$id_acteur,$nom,$prenom,$cin,$id_fokontany);
-						$nombre=0;
-						foreach($retour as $k=>$v) {
-							$nombre = $v->nombre;
-						}
-						if($nombre >0) {
-							 // Doublon : ERREUR Marquage colonne AC par Doblon de couleur Jaune
-							$sheet->getStyle("AC".$ligne)->getFill()->applyFromArray(
-									 array('type'       => PHPExcel_Style_Fill::FILL_SOLID,'rotation'   => 0,
-										 'startcolor' => array('rgb' => 'FFFF66'),
-										 'endcolor'   => array('argb' => 'FFFF66')
-									 )
-							 );	
-							 $sheet->setCellValue('AC'.$ligne, 'Doblon');
-							$nombre_erreur = $nombre_erreur + 1;						
-						}
-					}
+							// 3- Recherche individu sans attache ménage
+							$retour=$this->ValidationbeneficiaireManager->RechercheIndividuParNomPrenomCIN_Fokontany_Acteur($identifiant_appariement,$id_acteur,$nom,$prenom,$cin,$id_fokontany);
+							$code_region="????";
+							$code_district="????";
+							$code_commune="????";
+							$code_fokontany="????";
+							$id_individu=null;
+							if($retour) {
+								 foreach($retour as $k=>$v) {
+									$code_region=$v->code_region;
+									$code_district=$v->code_district;
+									$code_commune=$v->code_commune;
+									$code_fokontany=$v->code_fokontany;							 
+									$identifiant_unique=$v->identifiant_unique;
+									$id_individu=$v->id_individu; 
+								 }
+								$sheet->setCellValue("AC".$ligne, $code_region."-".$code_district."-".$code_commune."-".$code_fokontany."-".$identifiant_unique);
+								$beneficiaire_existant=true;
+								// Vérification si déjà bénéficiaire de l'intervention
+								$nombre=0;
+								$retour=$this->ValidationbeneficiaireManager->ControlerSiBeneficiaireIntervention($table_controle,$id_individu,$id_intervention);
+								foreach($retour as $k=>$v) {
+									 $nombre=$v->nombre;
+								}
+								// Bénéficiaire existant et bénéficie déjà de l'intervention =>ERREUR DOUBLON
+								if($nombre >0) {
+									// Doublon : ERREUR Marquage colonne AD par Doublon de couleur Jaune
+									$sheet->getStyle("AD".$ligne)->getFill()->applyFromArray(
+											 array('type'       => PHPExcel_Style_Fill::FILL_SOLID,'rotation'   => 0,
+												 'startcolor' => array('rgb' => 'FFFF66'),
+												 'endcolor'   => array('argb' => 'FFFF66')
+											 )
+									 );	
+									$sheet->setCellValue("AD".$ligne, "Doublon : Déjà bénéficiaire de l'intervention");
+									$nombre_erreur = $nombre_erreur + 1;	
+								}						
+							}	 
+						}							
+					} 					
+					////////////////// HATRETO
 					if(null==$date_naissance) {
 						// Calcul date_naissance par défaut
 						$date_actuelle  = new DateTime();
@@ -1039,6 +1274,7 @@ class Validationbeneficiaire extends CI_Controller {
 						$date_naissance = $date_par_defaut->sub(DateInterval::createFromDateString("'".$age." year'"));
 						$date_naissance=$date_naissance->format("d/m/Y");
 						$sheet->setCellValue('F'.$ligne, $date_naissance);
+						$sheet->setCellValue('I3', $id_fokontany);
 					}
 				}	
 				$ligne = $ligne + 1;
@@ -1053,7 +1289,9 @@ class Validationbeneficiaire extends CI_Controller {
 				unset($objWriter);
 			} else {
 				$val_ret["reponse"] = "OK";			
-				$val_ret["nombre_erreur"] = 0;				
+				$val_ret["nombre_erreur"] = 0;	
+				$val_ret["tao_ve"] = "IE";	
+				$val_ret["id_fokontany"] = $id_fokontany;				
 				$objWriter = PHPExcel_IOFactory::createWriter($excel, 'Excel2007');
 				$objWriter->save(dirname(__FILE__) . "/../../../../" .$repertoire. $nomfichier);
 			}

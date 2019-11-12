@@ -91,18 +91,19 @@ class Detail_type_transfert_intervention_model extends CI_Model {
 		} else {
 			return null;
 		}
-     /*   $result =  $this->db->select('*')
-                        ->from($this->table)
-                        ->where("id_intervention", $id_intervention)
-                        ->where("id_detail_type_transfert", $id_detail_type_transfert)
-                        ->order_by('id', 'asc')
-                        ->get()
-                        ->result();
-        if($result) {
-            return $result;
-        }else{
-            return null;
-        }  */               
     }
+	public function findByInterventionParConcatenation($id_intervention) {
+		$requete="select concat_ws(' ',dtt.description,dtintv.valeur_quantite,um.description) as detail_transfert"
+			." from detail_type_transfert_intervention as dtintv"
+			." left outer join detail_type_transfert as dtt on dtt.id=dtintv.id_detail_type_transfert"
+			." left outer join unite_mesure as um on um.id=dtt.id_unite_mesure"
+			." where dtintv.id_intervention=".$id_intervention;
+			$query = $this->db->query($requete)->result();
+			if($query) {
+			return $query;
+			} else {
+				return null;
+			}
+	}
 }
 ?>

@@ -3,26 +3,37 @@
 class Acteur_model extends CI_Model {
     protected $table = 'acteur';
 
-    public function add($acteur)  {
+    public function add($acteur)  //Fonction pour l'ajout
+    {
         $this->db->set($this->_set($acteur))
                             ->insert($this->table);
-        if($this->db->affected_rows() === 1)  {
+        if($this->db->affected_rows() === 1)  
+        {
             return $this->db->insert_id();
-        }else{
+        }
+        else
+        {
             return null;
         }                    
     }
-    public function update($id, $acteur)  {
+
+    public function update($id, $acteur)  //Fonction pour la mise à jour
+    {
         $this->db->set($this->_set($acteur))
                             ->where('id', (int) $id)
                             ->update($this->table);
-        if($this->db->affected_rows() === 1)  {
+        if($this->db->affected_rows() === 1)  
+        {
             return true;
-        }else{
+        }
+        else
+        {
             return null;
         }                      
     }
-    public function _set($acteur) {
+
+    public function _set($acteur) //Initialisation du tableau pour l'ajout et la modification
+    {
         return array(
             'nom' => $acteur['nom'],
             'nif' => $acteur['nif'],
@@ -37,27 +48,39 @@ class Acteur_model extends CI_Model {
             'id_type_acteur' => $acteur['id_type_acteur'],
         );
     }
-    public function delete($id) {
+
+    public function delete($id) //Fonction pour suppression de données
+    {
         $this->db->where('id', (int) $id)->delete($this->table);
-        if($this->db->affected_rows() === 1)  {
+        if($this->db->affected_rows() === 1)  
+        {
             return true;
-        }else{
+        }
+        else
+        {
             return null;
         }  
     }
-    public function findAll() {
+
+    public function findAll() //Fonction pour la récupération de tous les enregistrement de la table "acteur"
+    {
         $result =  $this->db->select('*')
                         ->from($this->table)
                         ->order_by('nom')
                         ->get()
                         ->result();
-        if($result) {
+        if($result) 
+        {
             return $result;
-        }else{
+        }
+        else
+        {
             return null;
         }                 
     }
-    public function findById($id) {
+
+    public function findById($id) //Fonction pour la récupération d'un enregistrement par Id
+    {
         $result =  $this->db->select('*')
                         ->from($this->table)
                         ->where("id", $id)
@@ -70,7 +93,9 @@ class Acteur_model extends CI_Model {
             return null;
         }                 
     }
-    public function findByNom($nom) {
+
+    public function findByNom($nom) //Fonction pour la récupération d'un enregistrement par nom
+    {
 		$requete= "select * from acteur where lower(nom) like '%".$nom."%'";
 		$query = $this->db->query($requete);
         $result= $query->result();				
