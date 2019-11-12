@@ -116,11 +116,13 @@ class Action_strategique extends REST_Controller {
 
                 //Début Etat de sortie
                 if (!is_null($dataId)) //Si insérer avec succes
+                {
                     $this->response([
                         'status' => TRUE,
                         'response' => $dataId,
                         'message' => 'Data insert success'
                             ], REST_Controller::HTTP_OK);
+                
                 } 
                 else 
                 {

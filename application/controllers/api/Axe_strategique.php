@@ -35,7 +35,8 @@ class Axe_strategique extends REST_Controller {
 		}
 
         //Début Etat de sortie
-        if (count($data)>0) //S'il y a des données dans la table,retourne le tableau $data
+        if (count($data)>0)
+        { //S'il y a des données dans la table,retourne le tableau $data
                 $this->response([
                 'status' => TRUE,
                 'response' => $data,
