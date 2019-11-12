@@ -93,6 +93,7 @@ class Intervention extends REST_Controller {
                     $data[$key]['typetransfert'] = $typetransfert;
                     $data[$key]['id_frequence_transfert'] = $value->id_frequence_transfert;
                     $data[$key]['frequencetransfert'] = $frequencetransfert;
+                    //$data[$key]['montant_transfert'] = $value->montant_transfert;
                     $data[$key]['flag_integration_donnees'] = $value->flag_integration_donnees;
                     $data[$key]['nouvelle_integration'] = $value->nouvelle_integration;
                     $data[$key]['commentaire'] = $value->commentaire;
