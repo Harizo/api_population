@@ -6,7 +6,7 @@ class Environment_demo_socio_model extends CI_Model
 
     public function findEffectif_sexe_age($requete,$enfant,$scolaire_min,$scolaire_max,$travail_min,$travail_max,$agee)
     {
-      $this->db->select("region.id as id_reg, region.nom as nom_region, district.id as id_dist, district.nom as nom_dist, commune.nom as nom_com, commune.id as id_com ");
+        $this->db->select("region.id as id_reg, region.nom as nom_region, district.id as id_dist, district.nom as nom_dist, commune.nom as nom_com, commune.id as id_com ");
 
        $this->db ->select("((select count(indi.id) from individu as indi inner join fokontany as foko on indi.id_fokontany= foko.id inner join commune as com on com.id= foko.id_commune inner join district as dist on com.district_id= dist.id where com.id=commune.id and".$requete." and indi.date_naissance >= '".$enfant."' and indi.sexe = 'F')) as nbr_enfant_fille",false);
        
