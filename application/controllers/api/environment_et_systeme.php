@@ -23,190 +23,41 @@ class Environment_et_systeme extends REST_Controller {
         $id_region= $this->get('id_region'); 
         $id_district= $this->get('id_district');
         $id_commune= $this->get('id_commune');
-        $id_intervention= $this->get('id_intervention');$now = date('Y-m-d');
+        $id_intervention= $this->get('id_intervention');
+        $now = date('Y-m-d');
 
         $scolaire_max = date('Y-m-d', strtotime($now. ' -18 years +1 days'));
-            $scolaire_min = date('Y-m-d', strtotime($now. ' -7 years')); 
-            $agee = date('Y-m-d', strtotime($now. ' -60 years'));
+        $scolaire_min = date('Y-m-d', strtotime($now. ' -7 years')); 
+        $agee = date('Y-m-d', strtotime($now. ' -60 years'));
 
-            $travail_max = date('Y-m-d', strtotime($now. ' -60 years +1 days'));
-            $travail_min = date('Y-m-d', strtotime($now. ' -18 years'));
-             $enfant = date('Y-m-d', strtotime($now. ' -7 years +1 days'));
+        $travail_max = date('Y-m-d', strtotime($now. ' -60 years +1 days'));
+        $travail_min = date('Y-m-d', strtotime($now. ' -18 years'));
+        $enfant = date('Y-m-d', strtotime($now. ' -7 years +1 days'));
 
         if ($menu =='req1theme1_petitenfan_agesco_agetrava_agee_region_dist_comm')
         {
-            $data = $this->Environment_demo_socioManager->andranaaaa($this->generer_requete_filtre($id_region,$id_district,$id_commune),$enfant,$scolaire_min,$scolaire_max,$travail_min,$travail_max,$agee);
-            /*$individu = array();
-            $district = array();
-            $commune = array();
-            $data = array();
-            $now = date('Y-m-d');
-            $enfant = date('Y-m-d', strtotime($now. ' -7 years +1 days'));
-            
-            $scolaire_max = date('Y-m-d', strtotime($now. ' -18 years +1 days'));
-            $scolaire_min = date('Y-m-d', strtotime($now. ' -7 years')); 
-
-            $travail_max = date('Y-m-d', strtotime($now. ' -60 years +1 days'));
-            $travail_min = date('Y-m-d', strtotime($now. ' -18 years'));
-            $agee = date('Y-m-d', strtotime($now. ' -60 years')); 
-
-            if ($id_region)
-            {
-                if ($id_district !='*' && $id_district!='undefined' && $id_district!='null')
-                {
-                    $district = $this->DistrictManager->findById($id_district) ;
-                }else{
-                    $district = $this->DistrictManager->findAllByRegion($id_region) ;
-                }
-                if ($id_commune !='*' && $id_commune!='undefined' && $id_commune!='null')
-                {   
-                    $commune = $this->CommuneManager->findById($id_commune); 
-                }
-                else
-                {   //$tm=array();
-                    
-                    foreach ($district as $k => $v)
-                    {
-                        $comm = $this->CommuneManager->findAllByDistrict($v->id);
-                        foreach ($comm as $ke => $val)
-                        {
-                            $tm['id']=$val->id;
-                            $tm['code']=$val->code;
-                            $tm['nom']=$val->nom;
-                            $tm['district_id']=$val->district_id;
-                            array_push($commune, $tm);
-                            
-                        }
-                        
-                    } 
-                }  
-             
-            }
-            
-            $object = json_decode(json_encode($commune), FALSE);
-            $indice = 0;
-               foreach ($district as $keydistrict => $valuedistrict)
-                {
-                   //$data[$keydistrict]['azez'] = $valuedistrict->id;
-                    foreach ($object as $keycommune => $valuecommune)
-                    {
-                       $tmp = $this->Environment_demo_socioManager->findEffectif_sexe_age($this->generer_requete_filtre($id_region,$valuedistrict->id,$valuecommune->id),$enfant,$scolaire_min,$scolaire_max,$travail_min,$travail_max,$agee);
-                        if($tmp)
-                        {
-                            foreach ($tmp as $key => $value)
-                            {
-
-                                $data[$indice]['nbr_enfant_fille'] = $value->nombre_enfant_individu_f + $value->nombre_enfant_menage_f;
-                                $data[$indice]['nbr_enfant_homme'] = $value->nombre_enfant_individu_h + $value->nombre_enfant_menage_h;
-
-                                $data[$indice]['nbr_agescolaire_fille'] = $value->nombre_agescolaire_individu_f + $value->nombre_agescolaire_menage_f;
-                                $data[$indice]['nbr_agescolaire_homme'] = $value->nombre_agescolaire_individu_h + $value->nombre_agescolaire_menage_h;
-
-                                $data[$indice]['nbr_agetravaille_fille'] = $value->nombre_agetravaille_individu_f + $value->nombre_agetravaille_menage_f;
-                                $data[$indice]['nbr_agetravaille_homme'] = $value->nombre_agetravaille_individu_h + $value->nombre_agetravaille_menage_h;
-
-                                $data[$indice]['nbr_agee_fille'] = $value->nombre_agee_individu_f + $value->nombre_agee_menage_f;
-                                $data[$indice]['nbr_agee_homme'] = $value->nombre_agee_individu_h + $value->nombre_agee_menage_h;
-
-                                $data[$indice]['commune'] = $valuecommune->nom;
-                                $data[$indice]['district'] = $valuedistrict->nom;
-                                $data[$indice]['region'] = $value->nom_region;
-                                $indice++;
-                            }
-                        }
-
-                    }
-                } */
+            $data = $this->Environment_demo_socioManager->findEffectif_sexe_age($this->generer_requete_filtre($id_region,$id_district,$id_commune),$enfant,$scolaire_min,$scolaire_max,$travail_min,$travail_max,$agee);
+           
         }
         elseif ($menu =='req3theme1_menagenfan_menagscolai_region_dist_comm')
-        {
-            $individu = array();
-            $district = array();
-            $commune = array();
-            $data = array();
-            $now = date('Y-m-d');
-            $enfant = date('Y-m-d', strtotime($now. ' -7 years +1 days'));
-            
-            $scolaire_max = date('Y-m-d', strtotime($now. ' -18 years +1 days'));
-            $scolaire_min = date('Y-m-d', strtotime($now. ' -7 years'));  
-
-            if ($id_region)
-            {
-                if ($id_district !='*' && $id_district!='undefined' && $id_district!='null')
-                {
-                    $district = $this->DistrictManager->findById($id_district) ;
-                }else{
-                    $district = $this->DistrictManager->findAllByRegion($id_region) ;
-                }
-                if ($id_commune !='*' && $id_commune!='undefined' && $id_commune!='null')
-                {   
-                    $commune = $this->CommuneManager->findById($id_commune); 
-                }
-                else
-                {   //$tm=array();
-                    
-                    foreach ($district as $k => $v)
-                    {
-                        $comm = $this->CommuneManager->findAllByDistrict($v->id);
-                        foreach ($comm as $ke => $val)
-                        {
-                            $tm['id']=$val->id;
-                            $tm['code']=$val->code;
-                            $tm['nom']=$val->nom;
-                            $tm['district_id']=$val->district_id;
-                            array_push($commune, $tm);
-                            
-                        }
-                        
-                    } 
-                 }  
-             
-            }
-            
-            $object = json_decode(json_encode($commune), FALSE);
-            $indice = 0;
-               foreach ($district as $keydistrict => $valuedistrict)
-                {
-                   //$data[$keydistrict]['azez'] = $valuedistrict->id;
-                    foreach ($object as $keycommune => $valuecommune)
-                    {
-                       $tmp = $this->Environment_demo_socioManager->findEffectif_menage_enfant($this->generer_requete_filtre($id_region,$valuedistrict->id,$valuecommune->id),$enfant,$scolaire_min,$scolaire_max);
-                        if($tmp)
-                        {
-                            foreach ($tmp as $key => $value)
-                            {
-
-                                $data[$indice]['nbr_menage_enfant'] = $value->nombre_menage_enfant;
-                                $data[$indice]['nbr_menage_agescollaire'] = $value->nombre_menage_agescollaire;
-
-                                $data[$indice]['commune'] = $valuecommune->nom;
-                                $data[$indice]['district'] = $valuedistrict->nom;
-                                $data[$indice]['region'] = $value->nom_region;
-                                $indice++;
-                            }
-                        }
-
-                    }
-                }
+        {            
+            $data = $this->Environment_demo_socioManager->findEffectif_menage_enfant($this->generer_requete_filtre($id_region,$id_district,$id_commune),$enfant,$scolaire_min,$scolaire_max);         
+           
         }
         elseif ($menu =='req38theme2_interven_petitenfan_agesco_agetrava_agee_region_dist_comm')
         {
-            $individu = array();
-            $district = array();
-            $commune = array();
-            $intervention = array();
-            $data = array();
-            $now = date('Y-m-d');
-            $enfant = date('Y-m-d', strtotime($now. ' -7 years +1 days'));
-            
-            $scolaire_max = date('Y-m-d', strtotime($now. ' -18 years +1 days'));
-            $scolaire_min = date('Y-m-d', strtotime($now. ' -7 years')); 
+            $data=array();
+            $tmp = $this->Systeme_protection_socialManager->repartitionBeneficiaire_sexe_age($this->generer_requete_filtre($id_region,$id_district,$id_commune,$id_intervention),$enfant,$scolaire_min,$scolaire_max,$travail_min,$travail_max,$agee);
+            if($tmp)
+            {
+                foreach ($tmp as $key => $value)
+                                {
+                                    $data[$key]['nbr_agescolaire_homme'] = $value->nombre_agescolaire_individu_h;
+                                   $data[$key]['nbr_agescolaire_homme2'] = $value->nombre_agescolaire_menage_h;
+                                }
+                            } 
 
-            $travail_max = date('Y-m-d', strtotime($now. ' -60 years +1 days'));
-            $travail_min = date('Y-m-d', strtotime($now. ' -18 years'));
-            $agee = date('Y-m-d', strtotime($now. ' -60 years')); 
-
-            if ($id_region)
+           /* if ($id_region)
             {
                 if ($id_district !='*' && $id_district!='undefined' && $id_district!='null')
                 {
@@ -257,8 +108,8 @@ class Environment_et_systeme extends REST_Controller {
                             {
                                 foreach ($tmp as $key => $value)
                                 {
-
-                                    $data[$indice]['nbr_enfant_fille'] = $value->nombre_enfant_individu_f + $value->nombre_enfant_menage_f;
+                                    $data[$indice]['nbr_enfant_fille'] = $value->nombre_enfant_individu_f;
+                                    /*$data[$indice]['nbr_enfant_fille'] = $value->nombre_enfant_individu_f + $value->nombre_enfant_menage_f;
                                     $data[$indice]['nbr_enfant_homme'] = $value->nombre_enfant_individu_h + $value->nombre_enfant_menage_h;
 
                                     $data[$indice]['nbr_agescolaire_fille'] = $value->nombre_agescolaire_individu_f + $value->nombre_agescolaire_menage_f;
@@ -281,7 +132,7 @@ class Environment_et_systeme extends REST_Controller {
                        
 
                     }
-                } 
+                }*/ 
         }
         elseif ($menu =='req33theme2_interven_nbrbenef_region_dist_comm')
         {
@@ -407,7 +258,7 @@ class Environment_et_systeme extends REST_Controller {
     }
     public function generer_requete_filtre($id_region,$id_district,$id_commune)
     {
-        $requete = "region.id='".$id_region."'";
+        $requete = " region.id='".$id_region."'";
        /* if ($date_debut!=$date_debut) 
         {
             $requete = $requete."date_naissance BETWEEN '".$date_debut."' AND '".$date_fin."' " ;
