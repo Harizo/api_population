@@ -47,15 +47,18 @@ class Environment_et_systeme extends REST_Controller {
         elseif ($menu =='req38theme2_interven_petitenfan_agesco_agetrava_agee_region_dist_comm')
         {
             $data=array();
-            $tmp = $this->Systeme_protection_socialManager->repartitionBeneficiaire_sexe_age($this->generer_requete_filtre($id_region,$id_district,$id_commune,$id_intervention),$enfant,$scolaire_min,$scolaire_max,$travail_min,$travail_max,$agee);
-            if($tmp)
+
+            //HARIZO
+            $data = $this->Systeme_protection_socialManager->repartitionBeneficiaire_sexe_age($this->generer_requete_filtre($id_region,$id_district,$id_commune,$id_intervention),$enfant,$scolaire_min,$scolaire_max,$travail_min,$travail_max,$agee);
+            //HARIZO
+            /*if($tmp)
             {
                 foreach ($tmp as $key => $value)
-                                {
-                                    $data[$key]['nbr_agescolaire_homme'] = $value->nombre_agescolaire_individu_h;
-                                   $data[$key]['nbr_agescolaire_homme2'] = $value->nombre_agescolaire_menage_h;
-                                }
-                            } 
+                {
+                    $data[$key]['nbr_agescolaire_homme'] = $value->nombre_agescolaire_individu_h;
+                   $data[$key]['nbr_agescolaire_homme2'] = $value->nombre_agescolaire_menage_h;
+                }
+            } */
 
            /* if ($id_region)
             {
