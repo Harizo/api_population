@@ -40,8 +40,10 @@ class Individu extends REST_Controller {
             if (!$data)
                 $data = array();
 			$ou=1;
-        } else if($cle_etrangere) {
-			 $menu = $this->IndividuManager->findAllByMenage($cle_etrangere);
+        } 
+        else if($cle_etrangere) 
+        {
+			$menu = $this->IndividuManager->findAllByMenage($cle_etrangere);
 			$ou=2;
 		} else {	
 			$ou=2;
@@ -52,10 +54,10 @@ class Individu extends REST_Controller {
                 foreach ($menu as $key => $value) {
 					$ga = $this->EnquetemenageManager->findById($value->id_groupe_appartenance,"groupe_appartenance");
                     $acteur = array();
-                    $acteur_temp = $this->ActeurManager->findById($value->id_type_beneficiaire);
+                    /*$acteur_temp = $this->ActeurManager->findById($value->id_type_beneficiaire);
 					if(count($acteur_temp) >0) {
 						$acteur=$acteur_temp;
-					}	
+					}	*/
                     $fokontany = array();
                     $type_emp = $this->FokontanyManager->findById($value->id_fokontany);
 					if(count($type_emp) >0) {
@@ -230,7 +232,7 @@ class Individu extends REST_Controller {
 			'id_handicap_moteur'       => $id_handicap_moteur,
 			'id_type_ecole'            => $id_type_ecole,
 			'id_niveau_de_classe'      => $id_niveau_de_classe,
-			'langue'                   => $langue,
+			//'langue'                   => $langue,
 			'id_situation_matrimoniale' => $id_situation_matrimoniale,
 			'id_fokontany'             => $id_fokontany,
 			'id_acteur'                => $id_acteur,
