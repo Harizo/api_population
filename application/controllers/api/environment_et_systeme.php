@@ -33,24 +33,23 @@ class Environment_et_systeme extends REST_Controller {
         $travail_max = date('Y-m-d', strtotime($now. ' -60 years +1 days'));
         $travail_min = date('Y-m-d', strtotime($now. ' -18 years'));
         $enfant = date('Y-m-d', strtotime($now. ' -7 years +1 days'));
-
         if ($menu =='req1theme1_petitenfan_agesco_agetrava_agee_region_dist_comm')
         {
-            $data = $this->Environment_demo_socioManager->findEffectif_sexe_age($this->generer_requete_filtre($id_region,$id_district,$id_commune),$enfant,$scolaire_min,$scolaire_max,$travail_min,$travail_max,$agee);
+            $data = $this->Environment_demo_socioManager->findEffectif_sexe_age($this->generer_requete_filtre($id_region,$id_district,$id_commune,'*'),$enfant,$scolaire_min,$scolaire_max,$travail_min,$travail_max,$agee);
            
         }
-        elseif ($menu =='req3theme1_menagenfan_menagscolai_region_dist_comm')
+        if ($menu =='req3theme1_menagenfan_menagscolai_region_dist_comm')
         {            
-            $data = $this->Environment_demo_socioManager->findEffectif_menage_enfant($this->generer_requete_filtre($id_region,$id_district,$id_commune),$enfant,$scolaire_min,$scolaire_max);      
+            $data = $this->Environment_demo_socioManager->findEffectif_menage_enfant($this->generer_requete_filtre($id_region,$id_district,$id_commune,'*'),$enfant,$scolaire_min,$scolaire_max);      
            
         }
-        elseif ($menu =='req38theme2_interven_petitenfan_agesco_agetrava_agee_region_dist_comm')
+        if ($menu =='req38theme2_interven_petitenfan_agesco_agetrava_agee_region_dist_comm')
         {
             $data = $this->Systeme_protection_socialManager->repartitionBeneficiaireIndividu_sexe_age($this->generer_requete_filtre($id_region,$id_district,$id_commune,$id_intervention),$enfant,$scolaire_min,$scolaire_max,$travail_min,$travail_max,$agee);
             
             
         }
-        elseif ($menu =='req33theme2_interven_nbrbenef_region_dist_comm')
+        if ($menu =='req33theme2_interven_nbrbenef_region_dist_comm')
         {
             $individu = array();
             $region = array();
@@ -133,29 +132,55 @@ class Environment_et_systeme extends REST_Controller {
                 }
             }
                
-        } 
-        else {
-            /*if ($id) {
-                $data = array();
-                $region = $this->RegionManager->findById($id);
-                $data['id'] = $region->id;
-                $data['code'] = $region->code;
-                $data['nom'] = $region->nom;
-                
-            } else {
-                $region = $this->RegionManager->findAll();
-                if ($region) {
-                    foreach ($region as $key => $value) {
-                        
-                        $data[$key]['id'] = $value->id;
-                        $data[$key]['code'] = $value->code;
-                        $data[$key]['nom'] = $value->nom;
-                        
-                    };
-                } else
-                    $data = array();
-            }*/
         }
+        //Bruce
+        if ($menu=='req7theme2_budgetinit_budgetmodif_situation')
+        {
+            $tmp = $this->Systeme_protection_socialManager->req7theme2_budgetinit_budgetmodif_situation();
+            if($tmp)
+            {
+                $data=$tmp;
+            }else $data = array();
+        }
+
+        if ($menu=='req8theme2_budgetinit_budgetmodif_situation_source')
+        {
+            $tmp = $this->Systeme_protection_socialManager->req8theme2_budgetinit_budgetmodif_situation_source();
+            if($tmp)
+            {
+                $data=$tmp;
+            }else $data = array();
+        }
+
+        if ($menu=='req9theme2_budgetinit_budgetmodif_situation_tutelle')
+        {
+            $tmp = $this->Systeme_protection_socialManager->req9theme2_budgetinit_budgetmodif_situation_tutelle();
+            if($tmp)
+            {
+                $data=$tmp;
+            }else $data = array();
+        }
+
+        if ($menu=='req31theme2_interven_nbrinter_program_beneparan_beneprevu_region')
+        {
+            $tmp = $this->Systeme_protection_socialManager->req31theme2_interven_nbrinter_program_beneparan_beneprevu_region($this->generer_requete_sql($id_region,'*','*',$id_intervention));
+            if($tmp)
+            {
+                $data=$tmp;
+            }else $data = array();
+
+        }
+
+        if ($menu=='req34theme2_program_interven_nbrbene_nbrinter_tauxinter_region')
+        {
+            $tmp = $this->Systeme_protection_socialManager->req34theme2_program_interven_nbrbene_nbrinter_tauxinter_region($this->generer_requete_sql($id_region,'*','*',$id_intervention));
+            if($tmp)
+            {
+                $data=$tmp;
+            }else $data = array();
+
+        }
+        //Bruce
 
 
         if (count($data)>0) {
@@ -172,7 +197,8 @@ class Environment_et_systeme extends REST_Controller {
             ], REST_Controller::HTTP_OK);
         }
     }
-    public function generer_requete_filtre($id_region,$id_district,$id_commune)
+    //misy amboarina le intervention
+    public function generer_requete_filtre($id_region,$id_district,$id_commune,$id_intervention)
     {
         $requete = " region.id='".$id_region."'";
        /* if ($date_debut!=$date_debut) 
@@ -188,6 +214,21 @@ class Environment_et_systeme extends REST_Controller {
         if (($id_commune!='*')&&($id_commune!='undefined')) 
         {
             $requete = $requete." AND commune.id='".$id_commune."'" ;
+        }
+        if (($id_intervention!='*')&&($id_intervention!='undefined')) 
+        {
+            $requete = $requete." AND intervention.id='".$id_intervention."'" ;
+        }
+
+        return $requete;
+    }
+    
+    public function generer_requete_sql($id_region,$id_district,$id_commune,$id_intervention)
+    {
+        $requete = " reg.id='".$id_region."'";
+        if (($id_intervention!='*')&&($id_intervention!='undefined')) 
+        {
+            $requete = $requete." AND interven.id='".$id_intervention."'" ;
         }
 
         return $requete;
