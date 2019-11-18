@@ -167,7 +167,7 @@ class Environment_et_systeme extends REST_Controller {
 
         
 
-        }
+        
         //Bruce
         if ($menu=='req7theme2_budgetinit_budgetmodif_situation')
         {
