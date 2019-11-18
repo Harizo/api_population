@@ -24,6 +24,12 @@ class Environment_et_systeme extends REST_Controller {
         $id_district= $this->get('id_district');
         $id_commune= $this->get('id_commune');
         $id_intervention= $this->get('id_intervention');
+
+        //CODE HARIZO
+        $id_type_transfert= $this->get('id_type_transfert');
+        $date_debut= $this->get('date_debut');
+        $date_fin= $this->get('date_fin');
+        //FIN CODE HARIZO
         $now = date('Y-m-d');
 
         $scolaire_max = date('Y-m-d', strtotime($now. ' -18 years +1 days'));
@@ -39,18 +45,19 @@ class Environment_et_systeme extends REST_Controller {
             $data = $this->Environment_demo_socioManager->findEffectif_sexe_age($this->generer_requete_filtre($id_region,$id_district,$id_commune),$enfant,$scolaire_min,$scolaire_max,$travail_min,$travail_max,$agee);
            
         }
-        elseif ($menu =='req3theme1_menagenfan_menagscolai_region_dist_comm')
+        if ($menu =='req3theme1_menagenfan_menagscolai_region_dist_comm')
         {            
             $data = $this->Environment_demo_socioManager->findEffectif_menage_enfant($this->generer_requete_filtre($id_region,$id_district,$id_commune),$enfant,$scolaire_min,$scolaire_max);      
            
         }
-        elseif ($menu =='req38theme2_interven_petitenfan_agesco_agetrava_agee_region_dist_comm')
+        if ($menu =='req38theme2_interven_petitenfan_agesco_agetrava_agee_region_dist_comm')
         {
             $data = $this->Systeme_protection_socialManager->repartitionBeneficiaireIndividu_sexe_age($this->generer_requete_filtre($id_region,$id_district,$id_commune,$id_intervention),$enfant,$scolaire_min,$scolaire_max,$travail_min,$travail_max,$agee);
             
             
         }
-        elseif ($menu =='req33theme2_interven_nbrbenef_region_dist_comm')
+
+        if ($menu =='req33theme2_interven_nbrbenef_region_dist_comm')
         {
             $individu = array();
             $region = array();
@@ -134,31 +141,33 @@ class Environment_et_systeme extends REST_Controller {
             }
                
         } 
-        else {
-            /*if ($id) {
-                $data = array();
-                $region = $this->RegionManager->findById($id);
-                $data['id'] = $region->id;
-                $data['code'] = $region->code;
-                $data['nom'] = $region->nom;
-                
-            } else {
-                $region = $this->RegionManager->findAll();
-                if ($region) {
-                    foreach ($region as $key => $value) {
-                        
-                        $data[$key]['id'] = $value->id;
-                        $data[$key]['code'] = $value->code;
-                        $data[$key]['nom'] = $value->nom;
-                        
-                    };
-                } else
-                    $data = array();
-            }*/
+
+        //CODE HARIZO
+        if ($menu == 'req41_theme2') 
+        {
+            $data = $this->Systeme_protection_socialManager->beneficiare_sortie_programme() ;
         }
 
+        if ($menu == 'req40_theme2') 
+        {
+            $data = $this->Systeme_protection_socialManager->nombre_beneficiaire_handicap() ;
+        }
 
-        if (count($data)>0) {
+        if ($menu == 'req42_theme2') 
+        {
+            $data = $this->Systeme_protection_socialManager->Moyenne_transfert($id_type_transfert, $date_debut, $date_fin) ;
+        }
+
+        if ($menu == 'req43_theme2') 
+        {
+            $data = $this->Systeme_protection_socialManager->total_transfert($id_type_transfert, $date_debut, $date_fin) ;
+        }
+        //FIN CODE HARIZO
+
+        
+
+
+        if (($data)) {
             $this->response([
                 'status' => TRUE,
                 'response' => $data,

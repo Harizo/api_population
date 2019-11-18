@@ -94,6 +94,226 @@ class Systeme_protection_social_model extends CI_Model
         }                 
     }
 
+
+    //CODE HARIZO
+
+        public function beneficiare_sortie_programme()//effectif beneficiaire sorti du programme (41)
+        {
+
+                $sql = "select sum(principale.nombre_menage)  as nombre_menage, 
+                         sum(principale.nombre_individu) as nombre_individu,
+                         principale.intervention,
+                         principale.sexe
+
+
+                    FROM (select count(mb.id) as nombre_menage, 0 as nombre_individu, m.sexe as sexe ,
+                            it.intitule as intervention
+                            from menage as m
+                            join menage_beneficiaire as mb on mb.id_menage = m.id
+                            join intervention as it on it.id = mb.id_intervention  
+                        where mb.date_sortie is not null
+                        group by it.id, m.sexe 
+
+                        UNION 
+
+                        select 0 as nombre_menage, count(ib.id) as nombre_individu, i.sexe as sexe ,
+                                it.intitule as intervention
+
+                            from individu as i
+                            join individu_beneficiaire as ib on ib.id_individu=i.id
+                            join intervention as it on it.id=ib.id_intervention
+                        where ib.date_sortie is not null
+                        group by it.id, i.sexe 
+
+                         ) principale
+
+                group by 
+                        principale.intervention, principale.sexe" ;
+
+
+            return $this->db->query($sql)->result();
+
+      
+        }
+
+
+        public function nombre_beneficiaire_handicap()//Effectif beneficiaire handicapés(40)
+        {
+             $sql = "select sum(principale.nbr_hand_visu) as nbr_hand_visu,
+                            sum(principale.nbr_hand_paro) as nbr_hand_paro,
+                            sum(principale.nbr_hand_audi) as nbr_hand_audi,
+                            sum(principale.nbr_hand_ment) as nbr_hand_ment,
+                            sum(principale.nbr_hand_mote) as nbr_hand_mote,
+                            principale.intervention
+
+
+                    FROM (
+
+                            select count(enq_ind.id) as nbr_hand_visu,
+                                   0 as nbr_hand_paro,
+                                   0 as nbr_hand_audi,
+                                   0 as nbr_hand_ment,
+                                   0 as nbr_hand_mote,
+                                   int.intitule as intervention
+
+                            from enquete_individu as enq_ind
+
+                                join individu as i on i.id = enq_ind.id_individu
+                                join individu_beneficiaire as indiv_bene on i.id = indiv_bene.id_individu
+                                join intervention as int on int.id = indiv_bene.id_intervention
+                                
+                                where enq_ind.id_handicap_visuel is not null
+                                and ((select count(*) from individu_beneficiaire as indiv_bene where indiv_bene.id_individu = enq_ind.id_individu) > 0)
+
+                                group by int.id
+
+                            UNION
+
+                            select 0 as nbr_hand_visu, 
+                                   count(enq_ind.id) as nbr_hand_paro,
+                                   0 as nbr_hand_audi,
+                                   0 as nbr_hand_ment,
+                                   0 as nbr_hand_mote,
+                                   int.intitule as intervention
+
+                            from enquete_individu as enq_ind
+
+                                join individu as i on i.id = enq_ind.id_individu
+                                join individu_beneficiaire as indiv_bene on i.id = indiv_bene.id_individu
+                                join intervention as int on int.id = indiv_bene.id_intervention
+
+                                where enq_ind.id_handicap_parole is not null
+                                and ((select count(*) from individu_beneficiaire as indiv_bene where indiv_bene.id_individu = enq_ind.id_individu) > 0)
+                                group by int.id
+
+                            UNION
+
+                            select 0 as nbr_hand_visu, 
+                                   0 as nbr_hand_paro,
+                                   count(enq_ind.id) as nbr_hand_audi,
+                                   0 as nbr_hand_ment,
+                                   0 as nbr_hand_mote,
+                                   int.intitule as intervention
+
+                            from enquete_individu as enq_ind
+
+                                join individu as i on i.id = enq_ind.id_individu
+                                join individu_beneficiaire as indiv_bene on i.id = indiv_bene.id_individu
+                                join intervention as int on int.id = indiv_bene.id_intervention
+
+                                where enq_ind.id_handicap_auditif is not null
+                                and ((select count(*) from individu_beneficiaire as indiv_bene where indiv_bene.id_individu = enq_ind.id_individu) > 0)
+                                group by int.id
+
+                            UNION
+
+                            select 0 as nbr_hand_visu, 
+                                   0 as nbr_hand_paro,
+                                   0 as nbr_hand_audi,
+                                   count(enq_ind.id) as nbr_hand_ment,
+                                   0 as nbr_hand_mote,
+                                   int.intitule as intervention
+
+                            from enquete_individu as enq_ind
+
+                                join individu as i on i.id = enq_ind.id_individu
+                                join individu_beneficiaire as indiv_bene on i.id = indiv_bene.id_individu
+                                join intervention as int on int.id = indiv_bene.id_intervention
+
+                                where enq_ind.id_handicap_mental is not null
+                                and ((select count(*) from individu_beneficiaire as indiv_bene where indiv_bene.id_individu = enq_ind.id_individu) > 0)
+                                group by int.id
+
+
+                            UNION
+
+                            select 0 as nbr_hand_visu, 
+                                   0 as nbr_hand_paro,
+                                   0 as nbr_hand_audi,
+                                   0 as nbr_hand_ment,
+                                   count(enq_ind.id) as nbr_hand_mote,
+                                   int.intitule as intervention
+
+                            from enquete_individu as enq_ind
+
+                                join individu as i on i.id = enq_ind.id_individu
+                                join individu_beneficiaire as indiv_bene on i.id = indiv_bene.id_individu
+                                join intervention as int on int.id = indiv_bene.id_intervention
+
+                                where enq_ind.id_handicap_moteur is not null
+                                and ((select count(*) from individu_beneficiaire as indiv_bene where indiv_bene.id_individu = enq_ind.id_individu) > 0)
+                                group by int.id
+                            
+
+                         ) principale
+
+                    group by principale.intervention
+
+                " ;
+
+                return $this->db->query($sql)->result();
+        }
+
+        public function total_transfert($id_type_transfert, $date_debut, $date_fin)
+        {
+            $sql = "
+
+                    select int.intitule as intitule_intervention,
+                           sum(smdt.valeur_quantite) as quantite,
+                           um.description as unite_mesure,
+                           dtt.description as detail_type_transfert
+
+
+                    from suivi_menage_detail_transfert as smdt
+
+                            join suivi_menage_entete as sme on sme.id = smdt.id_suivi_menage_entete
+                            join intervention as int on int.id = sme.id_intervention
+                            join detail_type_transfert as dtt on dtt.id = smdt.id_detail_type_transfert
+                            join unite_mesure as um on um.id = dtt.id_unite_mesure
+                            join type_transfert as tt on tt.id = dtt.id_type_transfert
+                    where tt.id = ".$id_type_transfert." and sme.date_suivi BETWEEN '".$date_debut."' AND '".$date_fin."'
+
+                    group by um.id, int.id, dtt.id,int.id
+
+
+
+            " ;
+
+            return $this->db->query($sql)->result();
+        }
+
+
+        public function Moyenne_transfert($id_type_transfert, $date_debut, $date_fin)
+        {
+            $sql = "
+
+                    select int.intitule as intitule_intervention,
+                           (sum(smdt.valeur_quantite)/count(smdt.id)) as moyenne,
+                           um.description as unite_mesure,
+                           dtt.description as detail_type_transfert
+
+
+                    from suivi_menage_detail_transfert as smdt
+
+                            join suivi_menage_entete as sme on sme.id = smdt.id_suivi_menage_entete
+                            join intervention as int on int.id = sme.id_intervention
+                            join detail_type_transfert as dtt on dtt.id = smdt.id_detail_type_transfert
+                            join unite_mesure as um on um.id = dtt.id_unite_mesure
+                            join type_transfert as tt on tt.id = dtt.id_type_transfert
+                    where tt.id = ".$id_type_transfert." and sme.date_suivi BETWEEN '".$date_debut."' AND '".$date_fin."'
+
+                    group by um.id, int.id, dtt.id,int.id
+
+
+
+            " ;
+
+            return $this->db->query($sql)->result();
+        }
+
+       
+    //FIN CODE HARIZO
+
     /* public function repartitionBeneficiaire_sexe_age($requete,$enfant,$scolaire_min,$scolaire_max,$travail_min,$travail_max,$agee)
     {
       $this->db->select("intervention.id as id_int, intervention.intitule as intitule_intervention");
