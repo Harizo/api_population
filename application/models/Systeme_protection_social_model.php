@@ -79,6 +79,191 @@ class Systeme_protection_social_model extends CI_Model
         }                 
     }
 
+//*****Bruce***********
+    //requete Répartition financement par programme
+    public function req7theme2_budgetinit_budgetmodif_situation()
+    {        
+       $result = $this->db ->select('sum(financement_programme.budget_initial) as budget_initial, sum(financement_programme.budget_modifie) as budget_modifie,programme.situation_intervention as situation')
+                    ->from('financement_programme')
+                    ->join('programme','programme.id= financement_programme.id_programme')
+                    ->group_by('programme.situation_intervention')                                      
+                    ->get()
+                    ->result();                              
+
+        if($result)
+        {
+            return $result;
+        }else{
+            return null;
+        } 
+
+    }
+
+    //requete Répartition financement par source
+    public function req8theme2_budgetinit_budgetmodif_situation_source()
+    {        
+       $result = $this->db ->select('sum(financement_programme.budget_initial) as budget_initial, sum(financement_programme.budget_modifie) as budget_modifie,programme.situation_intervention as situation,source_financement.nom as nom_source')
+                    ->from('financement_programme')
+                    ->join('programme','programme.id= financement_programme.id_programme')
+                    ->join('source_financement','source_financement.id= financement_programme.id_source_financement')
+                    ->group_by('programme.situation_intervention,source_financement.id')                                      
+                    ->get()
+                    ->result();                              
+
+        if($result)
+        {
+            return $result;
+        }else{
+            return null;
+        } 
+
+    }
+
+    //requete Répartition financement par tutele
+    public function req9theme2_budgetinit_budgetmodif_situation_tutelle()
+    {        
+       $result = $this->db ->select('sum(financement_programme.budget_initial) as budget_initial, sum(financement_programme.budget_modifie) as budget_modifie,programme.situation_intervention as situation, tutelle.nom as nom_tutelle')
+                    ->from('financement_programme')
+                    ->join('programme','programme.id= financement_programme.id_programme')
+                    ->join('tutelle','tutelle.id= programme.id_tutelle')
+                    ->group_by('programme.situation_intervention, tutelle.id')                                      
+                    ->get()
+                    ->result();                              
+
+        if($result)
+        {
+            return $result;
+        }else{
+            return null;
+        } 
+
+    }
+
+    //requete Nombre des bénéficiaires prévus
+   public function req31theme2_interven_nbrinter_program_beneparan_beneprevu_region($requete)
+    {
+      $result = $this->db->query( "select detail.id_region,detail.nom_region,detail.intitule_interven as intitule_intervention,detail.intitule_prog as intitule_programme,
+        sum(detail.intervention_prevu) as total_intervention_prevu,sum(detail.programme_an_prevu) as nbr_an_programme,sum(detail.programme_prevu) as nbr_total_prevu
+FROM 
+        (select reg.id as id_region,reg.nom as nom_region,
+        interven.intitule as intitule_interven,prog.id as id_program,prog.intitule as intitule_prog,
+        sum(zone_inter.menage_beneficiaire_prevu + zone_inter.individu_beneficiaire_prevu) as intervention_prevu,0 as programme_prevu, 0 as programme_an_prevu
+        from zone_intervention as zone_inter
+        join fokontany as foko on foko.id=zone_inter.id_fokontany
+        join commune as com on com.id=foko.id_commune
+        join district as dist on dist.id=com.district_id
+        join region as reg on reg.id=dist.region_id
+        join intervention as interven on interven.id=zone_inter.id_intervention
+        join programme as prog on prog.id=interven.id_programme
+        where  ".$requete."
+        group by  reg.id,reg.nom,interven.id,interven.intitule,prog.id,prog.intitule
+        
+        UNION
+
+        select reg.id as id_region,reg.nom as nom_region,
+        interven.intitule as intitule_interven,prog.id as id_program,prog.intitule as intitule_prog,0 as intervention_prevu,
+        sum(zone_inter_pro.menage_beneficiaire_prevu + zone_inter_pro.individu_beneficiaire_prevu) as programme_prevu,
+        CASE WHEN 
+                DATE_PART('year', prog.date_fin::date)-DATE_PART('year', prog.date_debut::date) =0 THEN sum(zone_inter_pro.menage_beneficiaire_prevu + zone_inter_pro.individu_beneficiaire_prevu)
+        ELSE 
+              (sum(zone_inter_pro.menage_beneficiaire_prevu + zone_inter_pro.individu_beneficiaire_prevu)/(DATE_PART('year', prog.date_fin::date)-DATE_PART('year', prog.date_debut::date)))
+        END as programme_an_prevu
+        from zone_intervention_programme as zone_inter_pro
+        join region as reg on reg.id=zone_inter_pro.id_region
+        join programme as prog on prog.id=zone_inter_pro.id_programme
+        join intervention as interven on interven.id_programme=prog.id
+        where  ".$requete."
+        group by  reg.id,reg.nom,interven.id,interven.intitule,prog.id,prog.intitule) as detail
+
+group by detail.id_region,detail.nom_region,detail.intitule_interven,detail.intitule_prog
+order by detail.id_region,detail.nom_region,detail.intitule_interven
+        ")
+      ->result();
+      if($result)
+        {
+            return $result;
+        }else{
+            return null;
+        }
+
+    }
+
+     //requete Taux d’atteinte des résultats
+   public function req34theme2_program_interven_nbrbene_nbrinter_tauxinter_region($requete)
+    {  
+       $result = $this->db->query( "select detail.id_region,detail.nom_region,detail.intitule_interven as intitule_intervention,detail.intitule_prog as intitule_programme,
+        sum(detail.nbr_mena+detail.nbr_ind) as total_bene,
+        CASE WHEN 
+                sum(detail.intervention_prevu) =0 THEN 100
+        ELSE 
+              ((sum(detail.nbr_mena)*100)/sum(detail.intervention_prevu))
+        END as taux_intervention,
+        CASE WHEN 
+                sum(detail.intervention_prevu) =0 THEN 100
+        ELSE 
+              ((sum(detail.nbr_mena)*100)/sum(detail.intervention_prevu))
+        END as taux_programme,
+        sum(detail.intervention_prevu) as total_intervention_prevu
+FROM 
+        (select reg.id as id_region,reg.nom as nom_region,
+        interven.intitule as intitule_interven,prog.id as id_program,prog.intitule as intitule_prog,
+        count(mena_bene.id) as nbr_mena, 0 as nbr_ind,0 as intervention_prevu
+        from menage_beneficiaire as mena_bene
+        join menage as men on men.id=mena_bene.id_menage
+        join fokontany as foko on foko.id=men.id_fokontany
+        join commune as com on com.id=foko.id_commune
+        join district as dist on dist.id=com.district_id
+        join region as reg on reg.id=dist.region_id
+        join intervention as interven on interven.id=mena_bene.id_intervention
+        join programme as prog on prog.id=interven.id_programme
+        where  ".$requete."
+        group by  reg.id,reg.nom,interven.id,interven.intitule,prog.id,prog.intitule
+
+        UNION
+
+        select reg.id as id_region,reg.nom as nom_region,
+        interven.intitule as intitule_interven,prog.id as id_program,prog.intitule as intitule_prog,0 as nbr_mena,
+        count(ind_bene.id) as nbr_ind,0 as intervention_prevu
+        from individu_beneficiaire as ind_bene
+        join individu as ind on ind.id=ind_bene.id_individu
+        join fokontany as foko on foko.id=ind.id_fokontany
+        join commune as com on com.id=foko.id_commune
+        join district as dist on dist.id=com.district_id
+        join region as reg on reg.id=dist.region_id
+        join intervention as interven on interven.id=ind_bene.id_intervention
+        join programme as prog on prog.id=interven.id_programme
+        where  ".$requete."
+        group by  reg.id,reg.nom,interven.id,interven.intitule,prog.id,prog.intitule
+
+        UNION
+
+        select reg.id as id_region,reg.nom as nom_region,
+        interven.intitule as intitule_interven,prog.id as id_program,prog.intitule as intitule_prog, 0 as nbr_mena,0 as nbr_ind,
+        sum(zone_inter.menage_beneficiaire_prevu + zone_inter.individu_beneficiaire_prevu) as intervention_prevu
+        from zone_intervention as zone_inter
+        join fokontany as foko on foko.id=zone_inter.id_fokontany
+        join commune as com on com.id=foko.id_commune
+        join district as dist on dist.id=com.district_id
+        join region as reg on reg.id=dist.region_id
+        join intervention as interven on interven.id=zone_inter.id_intervention
+        join programme as prog on prog.id=interven.id_programme
+        where  ".$requete."
+        group by  reg.id,reg.nom,interven.id,interven.intitule,prog.id,prog.intitule) as detail
+        
+group by detail.id_region,detail.nom_region,detail.intitule_interven,detail.intitule_prog
+order by detail.id_region,detail.nom_region,detail.intitule_interven
+        ")
+      ->result();
+      if($result)
+        {
+            return $result;
+        }else{
+            return null;
+        }
+
+    }
+//*********Bruce**********
+
     public function findEffectif_beneficiaire_handicape($requete)
     {
        $result =  $this->db->select('count(DISTINCT(individu_beneficiaire.id_individu)) as nombre_individu')
