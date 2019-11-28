@@ -215,6 +215,26 @@ class Environment_et_systeme extends REST_Controller {
             }else $data = array();
 
         }
+
+        if ($menu=='req14theme2_interven_nbrinter_budgetinit_peffectif_pcout_region_district')
+        {
+            $tmp = $this->Systeme_protection_socialManager->req14theme2_interven_nbrinter_budgetinit_peffectif_pcout_region_district($this->generer_requete_sql($id_region,$id_district,'*',$id_intervention));
+            if($tmp)
+            {
+                $data=$tmp;
+            }else $data = array();
+
+        }
+
+        if ($menu=='req19theme2_interven_pourcenenfan_pourcensco_pourcentra_pourcenage_pcout')
+        {
+            $tmp = $this->Systeme_protection_socialManager->req19theme2_interven_pourcenenfan_pourcensco_pourcentra_pourcenage_pcout($enfant,$scolaire_min,$scolaire_max,$travail_min,$travail_max,$agee);
+            if($tmp)
+            {
+                $data=$tmp;
+            }else $data = array();
+
+        }
         //Bruce
 
 
