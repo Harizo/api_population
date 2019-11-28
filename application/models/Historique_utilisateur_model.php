@@ -4,7 +4,8 @@ class Historique_utilisateur_model extends CI_Model
 {
     protected $table = 'historique_utilisateur';
 
-
+	// Table concernée : historique_utilisateur
+	// Ajout historique
     public function add($historique_utilisateur)
     {
         $this->db->set($this->_set($historique_utilisateur))
@@ -18,6 +19,7 @@ class Historique_utilisateur_model extends CI_Model
         }                    
     }
 
+	// Mise à jour historique : inutile pour le moment (voir commentaire controlers : index_post)
 
     public function update($id, $historique_utilisateur)
     {
@@ -31,7 +33,7 @@ class Historique_utilisateur_model extends CI_Model
             return null;
         }                      
     }
-
+	// Affectation colonne de la table
     public function _set($historique_utilisateur)
     {
         return array(
@@ -41,7 +43,7 @@ class Historique_utilisateur_model extends CI_Model
         );
     }
 
-
+	// Suppression : inutilie pour le moment (voir commentaire controlers : index_post)
     public function delete($id)
     {
         $this->db->where('id', (int) $id)->delete($this->table);
@@ -52,7 +54,7 @@ class Historique_utilisateur_model extends CI_Model
             return null;
         }  
     }
-
+	// Récupération de tous les enregistrements de la table
     public function findAll()
     {
         $result =  $this->db->select('*')
@@ -69,7 +71,7 @@ class Historique_utilisateur_model extends CI_Model
     }
 
 
-
+	// Récupération par id
     public function findById($id)
     {
         $this->db->where("id", $id);
@@ -79,7 +81,8 @@ class Historique_utilisateur_model extends CI_Model
         }
         return null;
     }
-
+	// Récupération par date et par utilis
+	// Paramètre $requete : voir la définition dans controlers (function : generer_requete_filtre)
     public function findByDateUtilisateur($requete)
     {
         $result =  $this->db->select('*')

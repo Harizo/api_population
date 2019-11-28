@@ -2,7 +2,6 @@
 //harizo
 defined('BASEPATH') OR exit('No direct script access allowed');
 
-// afaka fafana refa ts ilaina
 require APPPATH . '/libraries/REST_Controller.php';
 
 class Historique_utilisateur extends REST_Controller {
@@ -13,7 +12,7 @@ class Historique_utilisateur extends REST_Controller {
         $this->load->model('historique_utilisateur_model', 'HistoriqueutilisateurManager');
         $this->load->model('site_model', 'SiteManager');
     }
-
+	// Cette classe définit tous les actions faites par les utlisateurs : ajout,suppression,modification,consultation
     //recuperation donnée
     public function index_get() {
         $id = $this->get('id');
@@ -21,7 +20,7 @@ class Historique_utilisateur extends REST_Controller {
         $date_debut = $this->get('date_debut'); 
         $date_fin = $this->get('date_fin'); 
         $id_utilisateur = $this->get('id_utilisateur');  
-
+		// Récupération des données par id_utilisateur
         if ($id) 
         {
             $data = array();
@@ -36,6 +35,7 @@ class Historique_utilisateur extends REST_Controller {
             }
             
         } 
+		// Récupération des données via menu : historique des utilisateurs
         elseif($menu=="filtrehistorique")
         {   $data = array();
             $historique = $this->HistoriqueutilisateurManager->findByDateUtilisateur($this->generer_requete_filtre($date_debut,$date_fin,$id_utilisateur));
@@ -53,6 +53,7 @@ class Historique_utilisateur extends REST_Controller {
             }
         }
         else {
+			// Récupération de tous les enregistrements de la table historique_utilisateur
             $menu = $this->HistoriqueutilisateurManager->findAll();
             if ($menu) {
                 foreach ($menu as $key => $value) {
@@ -93,7 +94,7 @@ class Historique_utilisateur extends REST_Controller {
         }
     }
 
-    //insertion,modification, suppression donnée
+    //insertion des données historique seulement, il n'y a pas de modif ou suppression
     public function index_post() {
 
         $id = $this->post('id') ;
@@ -136,66 +137,6 @@ class Historique_utilisateur extends REST_Controller {
 
     }
 
-    public function index_put($id) {
-        $data = array(
-            'code' => $this->put('code'),
-            'nom' => $this->put('nom'),
-            'district_id' => $this->put('district_id')
-        );
-
-        if (!$data || !$id) {
-            $this->response([
-                'status' => FALSE,
-                'response' => 0,
-                'message' => 'No request found'
-                    ], REST_Controller::HTTP_BAD_REQUEST);
-        }
-
-        $update = $this->HistoriqueutilisateurManager->update($id, $data);
-
-        if(!is_null($update))
-        {
-            $this->response([
-                'status' => TRUE,
-                'response' => 1,
-                'message' => 'Update data success'
-                    ], REST_Controller::HTTP_OK);
-        }
-        else
-        {
-            $this->response([
-                'status' => FALSE,
-                'message' => 'No request found'
-                    ], REST_Controller::HTTP_BAD_REQUEST);
-        }
-    }
-
-    public function index_delete($id) {
-        if (!$id) {
-            $this->response([
-                'status' => FALSE,
-                'response' => 0,
-                'message' => 'No request found'
-                    ], REST_Controller::HTTP_BAD_REQUEST);
-        }
-        $delete = $this->HistoriqueutilisateurManager->delete($id);
-        if (!is_null($delete)) {
-            $this->response([
-                'status' => TRUE,
-                'response' => 1,
-                'message' => "Delete data success"
-                    ], REST_Controller::HTTP_OK);
-        }
-        else
-        {
-            $this->response([
-                'status' => FALSE,
-                'response' => 0,
-                'message' => 'No request found'
-                    ], REST_Controller::HTTP_BAD_REQUEST);
-        }
-    }
-
     //requete du filtre 
     public function generer_requete_filtre($date_debut,$date_fin,$id_utilisateur)
     {
@@ -211,3 +152,4 @@ class Historique_utilisateur extends REST_Controller {
 
 /* End of file controllername.php */
 /* Location: ./application/controllers/controllername.php */
+?>

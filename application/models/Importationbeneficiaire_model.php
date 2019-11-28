@@ -86,15 +86,16 @@ class Importationbeneficiaire_model extends CI_Model
 	// Attribution Identifiant Unique Individu
 	public function AttributionIdentifiantUniqueIndividu() {
 			// Identifiant unique individu : départ à partir 10 000 001
-			$requete="select (count(*) + 10000000) as nombre from individu";
+			$requete="select (count(*) + 10000001) as nombre from individu";
 			$query = $this->db->query($requete);
 			return $query->result();						
 	}
 	// Marquage liste bénéficiaire validés : c'est-à-dire déjà importés dans la BDD (aucune manipulation n'est permise,seulement
 	// download le fichier si l'utilisateur veut voir les contenus)
-	public function MiseAJourListeValidationBeneficiaire($id_liste_validation_beneficiaire,$date_validation,$id_utilisateur_validation) {
+	public function MiseAJourListeValidationBeneficiaire($id_liste_validation_beneficiaire,$date_validation,$id_utilisateur_validation,$id_fokontany,$id_intervention) {
 			$requete="update liste_validation_beneficiaire set donnees_validees=1,date_validation='".$date_validation."',"
-					."id_utilisateur_validation=".$id_utilisateur_validation." where id=".$id_liste_validation_beneficiaire;
+					."id_utilisateur_validation=".$id_utilisateur_validation.",id_fokontany=".$id_fokontany.",id_intervention=".$id_intervention
+					." where id=".$id_liste_validation_beneficiaire;
 			$query = $this->db->query($requete);
 			return "OK";						
 	}
@@ -110,4 +111,23 @@ class Importationbeneficiaire_model extends CI_Model
 		$query = $this->db->query($requete);
 		return $query->result();				
 	}
+	// Recherche id liste variable
+	public function selectionlistevariable($description) {
+		$requete="select id,description,code from liste_variable where lower(description) like '%".$description."%' limit 1";
+		$query = $this->db->query($requete);
+        return $query->result();				
+	}
+	// Récupération d'un enregistrement par id liste variable et par description
+    public function findByIdlistevariableAndDescription($id_liste_variable,$description) {
+		$requete ="select id as id_variable from variable where id_liste_variable=".$id_liste_variable
+				." and lower(description) like '%".$description."%' limit 1";
+		$query = $this->db->query($requete);
+        $result= $query->result();				
+        if($result) {
+            return $result;
+        }else{
+            return null;
+        }                 
+    }		
+	
 }

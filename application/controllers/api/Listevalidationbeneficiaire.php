@@ -65,6 +65,8 @@ class Listevalidationbeneficiaire extends REST_Controller {
 					$data[$key]['date_validation'] = $value->date_validation;
 				}
 				$data[$key]['repertoire'] = $value->repertoire;
+				$data[$key]['id_fokontany'] = $value->id_fokontany;
+				$data[$key]['id_intervention'] = $value->id_intervention;
 				$data[$key]['id_utilisateur_validation'] = $value->id_utilisateur_validation;
 				$data[$key]['utilisateur_validation'] = $utilisateur_validation;
 				$data[$key]['nomutilisateurvalidation'] ="";
@@ -93,14 +95,24 @@ class Listevalidationbeneficiaire extends REST_Controller {
         $id = $this->post('id') ;
         $supprimer = $this->post('supprimer') ;
 		$id_utilisateur=null;
-		$tmp=$this->post('id_utilisateur');
-		if(isset($tmp) && $tmp !="" && intval($tmp) >0) {
-			$id_utilisateur=$tmp;
+		$temporaire=$this->post('id_utilisateur');
+		if(isset($temporaire) && $temporaire !="" && intval($temporaire) >0) {
+			$id_utilisateur=$temporaire;
 		}
 		$id_utilisateur_validation=null;
-		$tmp=$this->post('id_utilisateur_validation');
-		if(isset($tmp) && $tmp !="" && intval($tmp) >0) {
-			$id_utilisateur_validation=$tmp;
+		$temporaire=$this->post('id_utilisateur_validation');
+		if(isset($temporaire) && $temporaire !="" && intval($temporaire) >0) {
+			$id_utilisateur_validation=$temporaire;
+		}
+		$id_fokontany=null;
+		$temporaire=$this->post('id_fokontany');
+		if(isset($temporaire) && $temporaire !="" && intval($temporaire) >0) {
+			$id_fokontany=$temporaire;
+		}
+		$id_intervention=null;
+		$temporaire=$this->post('id_intervention');
+		if(isset($temporaire) && $temporaire !="" && intval($temporaire) >0) {
+			$id_intervention=$temporaire;
 		}
 		$date_reception = new DateTime; # $date_reception = DateTime::createFromFormat('H:i:s d/m/Y', $ladate);
 		$date_reception->add(new DateInterval('PT1H'));
@@ -113,6 +125,8 @@ class Listevalidationbeneficiaire extends REST_Controller {
 			'date_reception' => $date_reception,
 			'date_validation' => null,
 			'id_utilisateur_validation' => $id_utilisateur_validation,
+			'id_fokontany' => $id_fokontany,
+			'id_intervention' => $id_intervention,
 		);               
         if ($supprimer == 0) {
             if ($id == 0) {
