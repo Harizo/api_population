@@ -163,6 +163,27 @@ class Environment_et_systeme extends REST_Controller {
         {
             $data = $this->Systeme_protection_socialManager->total_transfert($id_type_transfert, $date_debut, $date_fin) ;
         }
+
+        if ($menu == 'req10_theme2') 
+        {
+            $data = $this->Systeme_protection_socialManager->decaissement_par_programme() ;
+        }
+        if ($menu == 'req11_theme2') 
+        {
+            $data = $this->Systeme_protection_socialManager->decaissement_par_tutelle() ;
+        }
+        if ($menu == 'req12_theme2') 
+        {
+            $data = $this->Systeme_protection_socialManager->decaissement_par_agence_execution() ;
+        }
+        if ($menu == 'req37_theme2') 
+        {
+            $data = $this->Systeme_protection_socialManager->montant_budget_non_consommee_par_programme() ;
+        }
+        if ($menu == 'req36_theme2') 
+        {
+            $data = $this->Systeme_protection_socialManager->taux_de_decaissement_par_programme() ;
+        }
         //FIN CODE HARIZO
 
         

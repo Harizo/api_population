@@ -496,6 +496,188 @@ order by detail.id_region,detail.nom_region,detail.intitule_interven
             return $this->db->query($sql)->result();
         }
 
+
+        public function decaissement_par_programme()
+        {
+            $this->db->select(" programme.id as id_prog, programme.intitule as intitule_programme,
+                                intervention.id as id_interv, intervention.intitule as intitule_intervention,
+                                sum(decaissement.montant_initial) as montant_init, sum(decaissement.montant_revise) as montant_revise,
+                                devise.id as id_devise, devise.description as devise");
+        
+            
+
+
+            $result =  $this->db->from('programme, intervention, financement_intervention, decaissement, devise')
+                        
+                        ->where('programme.id = intervention.id_programme')
+                        ->where('intervention.id = financement_intervention.id_intervention')
+                        ->where('financement_intervention.id = decaissement.id_financement_intervention')
+                        ->where('financement_intervention.id_devise = devise.id')
+
+
+                        ->group_by('id_prog,id_interv,devise.id')
+                                           
+                        ->get()
+                        ->result();                              
+
+            if($result)
+            {
+                return $result;
+            }else{
+                return null;
+            }          
+        }
+
+        public function decaissement_par_agence_execution()
+        {
+            /*$this->db->select(" acteur.id as id_act, acteur.nom as nom_acteur,
+                                intervention.id as id_interv, intervention.intitule as intitule_intervention,
+                                sum(decaissement.montant_initial) as montant_init, sum(decaissement.montant_revise) as montant_revise,
+                                devise.id as id_devise, devise.description as devise");*/
+            $this->db->select(" programme.id as id_prog, programme.intitule as intitule_programme,
+                                acteur.id as id_act, acteur.nom as nom_acteur,
+                                intervention.id as id_interv, intervention.intitule as intitule_intervention");
+        
+            
+
+
+            $result =  $this->db->from('acteur, intervention,programme')
+                        
+                        ->where('acteur.id = intervention.id_acteur')
+
+                        ->where('programme.id = intervention.id_programme')
+                        
+
+
+                        ->group_by('id_prog,id_act,id_interv')
+                                           
+                        ->get()
+                        ->result();                              
+
+            if($result)
+            {
+                return $result;
+            }else{
+                return null;
+            }          
+        }
+
+        public function decaissement_par_tutelle()
+        {
+            $this->db->select(" intervention.id as id_interv, intervention.intitule as intitule_intervention,intervention.ministere_tutelle as tutelle,
+                                sum(decaissement.montant_initial) as montant_init, sum(decaissement.montant_revise) as montant_revise,
+                                devise.id as id_devise, devise.description as devise");
+        
+            
+
+
+            $result =  $this->db->from(' intervention, financement_intervention, decaissement, devise')
+                        
+                      
+                        ->where('intervention.id = financement_intervention.id_intervention')
+                        ->where('financement_intervention.id = decaissement.id_financement_intervention')
+                        ->where('financement_intervention.id_devise = devise.id')
+
+
+                        ->group_by('tutelle,id_interv,devise.id')
+                                           
+                        ->get()
+                        ->result();                              
+
+            if($result)
+            {
+                return $result;
+            }else{
+                return null;
+            } 
+        }
+
+
+        public function montant_budget_non_consommee_par_programme()
+        {
+            $this->db->select(" programme.id as id_prog, programme.intitule as intitule_programme,
+                                devise.id as id_dev,devise.description as desc_devise,
+                                sum(financement_programme.budget_modifie) as budget_prevu");
+
+
+            $this->db ->select("(select sum(decais.montant_revise) from intervention as int 
+                                            inner join financement_intervention as fin_int on int.id = fin_int.id_intervention
+                                            inner join decaissement as decais on fin_int.id = decais.id_financement_intervention
+                                            inner join devise as dev on fin_int.id_devise = dev.id
+                                            where int.id_programme= programme.id and dev.id=devise.id) as somme_decaissement",false);
+
+            $this->db ->select("(sum(financement_programme.budget_modifie) - (select sum(decais.montant_revise) from intervention as int 
+                                                        inner join financement_intervention as fin_int on int.id = fin_int.id_intervention
+                                                        inner join decaissement as decais on fin_int.id = decais.id_financement_intervention
+                                                        inner join devise as dev on fin_int.id_devise = dev.id
+                                                        where int.id_programme= programme.id and dev.id=devise.id)) as budget_non_comnsommee",false);
+
+             $this->db ->select("(((select sum(decais.montant_revise) from intervention as int 
+                                                                      inner join financement_intervention as fin_int on int.id = fin_int.id_intervention
+                                                                      inner join decaissement as decais on fin_int.id = decais.id_financement_intervention
+                                                                      inner join devise as dev on fin_int.id_devise = dev.id
+                                                                      where int.id_programme= programme.id and dev.id=devise.id) * 100)/sum(financement_programme.budget_modifie)) as prop",false);
+                                 
+                                
+        
+            
+
+
+            $result =  $this->db->from('programme, financement_programme, devise')
+                        
+                       
+                        ->where('programme.id = financement_programme.id_programme')
+                        ->where('devise.id = financement_programme.id_devise')
+                        
+
+
+                        ->group_by('id_prog, id_dev')
+                                           
+                        ->get()
+                        ->result();                              
+
+            if($result)
+            {
+                return $result;
+            }else{
+                return null;
+            }          
+        }
+
+
+        public function taux_de_decaissement_par_programme()
+        {
+            $this->db->select(" programme.id as id_prog, programme.intitule as intitule_programme,
+                                intervention.id as id_interv, intervention.intitule as intitule_intervention,
+                                sum(financement_intervention.budget_modifie) as sum_financement_par_intervention_par_programme,
+                                sum(decaissement.montant_revise) as sum_decaissement,
+                                devise.id as id_devise, devise.description as devise,
+                                ((sum(decaissement.montant_revise)*100)/sum(financement_intervention.budget_modifie)) as prop");
+        
+            
+
+
+            $result =  $this->db->from('programme, intervention, financement_intervention, decaissement, devise')
+                        
+                        ->where('programme.id = intervention.id_programme')
+                        ->where('intervention.id = financement_intervention.id_intervention')
+                        ->where('financement_intervention.id = decaissement.id_financement_intervention')
+                        ->where('financement_intervention.id_devise = devise.id')
+
+
+                        ->group_by('id_prog,id_interv,devise.id')
+                                           
+                        ->get()
+                        ->result();                              
+
+            if($result)
+            {
+                return $result;
+            }else{
+                return null;
+            }          
+        }
+
        
     //FIN CODE HARIZO
 
