@@ -318,34 +318,51 @@
                     </tr>
                     <tr>
                         <td class="free-text">
-                            Lors de la vérification des données à importer dans la base de données, nous vous signalons par la présente mail qu'il y avait 
-							des données erronées.
-							Veuillez trouver ci-joint en fichier attaché le fichier signalant les erreurs.
-							Corriger les données (cellule) marquées en rouge avant de le renvoyer à nouveau.
-                            Merci
+                            Lors de la vérification des données<?php echo $type_fichier?>à importer dans la base de données, nous vous signalons par la présente qu'il y avait 
+							des données erronées ou incompl&egrave;tes dans le fichier :
                         </td>
                     </tr>
-                    <!--tr>
-                        <td class="mini-block-container">
-                            <table cellspacing="0" cellpadding="0" width="100%"  style="border-collapse:separate !important;">
-                                <tr>
-                                    <td>
-                                        <table cellpadding="0" cellspacing="0" width="100%">
-                                            <tr>
-                                                <td class="button">
-                                                    <div><a class="button-mobile"
-                                                            href="<?php// echo $confirmer; ?>"
-                                                            style="background-color:#4a89dc;border-radius:5px;color:#ffffff;display:inline-block;font-family:'Cabin', Helvetica, Arial, sans-serif;font-size:14px;font-weight:regular;line-height:45px;text-align:center;text-decoration:none;width:155px;-webkit-text-size-adjust:none;mso-hide:all;">
-                                                            Réinitialiser</a>
-                                                    </div>
-                                                </td>
-                                            </tr>
-                                        </table>
-                                    </td>
-                                </tr>
-                            </table>
+                    <tr>
+                        <td class="free-text">
+                            Région : <?php echo $region?>
                         </td>
-                    </tr-->
+                    </tr>
+                    <tr>
+                        <td class="free-text">
+                            District : <?php echo $district;?>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="free-text">
+                            Commune : <?php echo $commune;?>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="free-text">
+                            Fokontany : <?php echo $fokontany;?>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="free-text">
+                            Date inscription : <?php echo $date_inscription;?>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="free-text">
+                            Intervention : <?php echo $intervention;?>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="free-text">
+							Veuillez trouver ci-joint en fichier attaché le fichier signalant les erreurs.
+							Corriger les données (cellule) marquées en rouge avant de le renvoyer à nouveau.
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="free-text">
+                            Merci de votre collaboration
+                        </td>
+                    </tr>
                 </table>
             </center>
         </td>

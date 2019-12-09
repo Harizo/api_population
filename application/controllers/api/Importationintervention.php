@@ -2,6 +2,7 @@
 
 defined('BASEPATH') OR exit('No direct script access allowed');
 // require APPPATH . '/libraries/REST_Controller.php';
+require APPPATH . '/PHPMailer/PHPMailerAutoload.php';
 
 class Importationintervention extends CI_Controller {
     public function __construct() {
@@ -490,10 +491,20 @@ class Importationintervention extends CI_Controller {
 		if($nombre_erreur > 0) {
 			// Signaler les erreurs par mail
 			$val_ret["reponse"] = "ERREUR";
+			$val_ret["region"] = $nom_region_original;
+			$val_ret["district"] = $nom_district_original;
+			$val_ret["commune"] = $nom_commune_original;
+			$val_ret["fokontany"] = $nom_fokontany_original;
+			$val_ret["intervention"] = $intitule_intervention;
 			$val_ret["nombre_erreur"] = $nombre_erreur;
 			// Fermer fichier Excel
 		} else {
 			$val_ret["reponse"] = "OK";
+			$val_ret["region"] = $nom_region_original;
+			$val_ret["district"] = $nom_district_original;
+			$val_ret["commune"] = $nom_commune_original;
+			$val_ret["fokontany"] = $nom_fokontany_original;
+			$val_ret["intervention"] = $intitule_intervention;
 			$val_ret["nombre_erreur"] = 0;			
 		}
 		echo json_encode($val_ret);

@@ -4,59 +4,45 @@ class Validationbeneficiaire_model extends CI_Model
 {
     protected $table = 'region';
 
+	// Selection région par nom
 	public function selectionregion($nom) {
 		$requete="select id,nom,code from region where lower(nom) like '%".$nom."%' limit 1";
 		$query = $this->db->query($requete);
         return $query->result();				
 	}
+	// Selection région par id
 	public function selectionregionparid($id) {
 		$requete="select id,nom,code from region where id='".$id."'";
 		$query = $this->db->query($requete);
         return $query->result();				
 	}
+	// Selection district par nom et id_region
 	public function selectiondistrict($nom,$id_region) {
-		// if(intval($id_region)==5) {
-			// $requete="select id,nom,code from district where region_id ='".$id_region."' limit 1";
-		// } else {
-			// $requete="select id,nom,code from district where lower(nom)='".$nom."' and region_id ='".$id_region."' limit 1";
-			$requete="select id,nom,code from district where lower(nom) like '%".$nom."%' and region_id ='".$id_region."' limit 1";
-		// }	
+		$requete="select id,nom,code from district where lower(nom) like '%".$nom."%' and region_id ='".$id_region."' limit 1";
 		$query = $this->db->query($requete);
         return $query->result();				
 	}
+	// Selection district par id
 	public function selectiondistrictparid($id) {
 			$requete="select id,nom,code,region_id from district where id ='".$id."'";
 		$query = $this->db->query($requete);
         return $query->result();				
 	}
-	public function Coderegionsuivant() {
-		$requete="select count(*) as nombreregion from region";
-		$query = $this->db->query($requete);
-        return $query->result();				
-	}
+	// Selection commune par nom et id_district
 	public function selectioncommune($nom,$id_district) {
 		$requete="select id,nom,code from commune where lower(nom)='".$nom."' and district_id ='".$id_district."' limit 1";
 		$query = $this->db->query($requete);
         return $query->result();				
 	}
+	// Selection commune par id
 	public function selectioncommuneparid($id) {
 		$requete="select id,nom,code,district_id from commune where id='".$id."'";
 		$query = $this->db->query($requete);
         return $query->result();				
 	}
+	// Selection fokontany par nom et id_commune
 	public function selectionfokontany($nom,$id_commune) {
 		$requete="select id,nom,code from fokontany where lower(nom)='".$nom."' and id_commune ='".$id_commune."' limit 1";
-		$query = $this->db->query($requete);
-        return $query->result();				
-	}
-	public function RAZ_Fokontany() {
-		$requete="delete from fokontany;
-			ALTER SEQUENCE fokontany_id_seq RESTART WITH 1	";
-		$query = $this->db->query($requete);
-        return 'OK';				
-	}
-	public function selectionparametres($libelle,$nomdetable) {
-		$requete="select id,libelle from ".$nomdetable." where lower(libelle)='".$libelle."'";
 		$query = $this->db->query($requete);
         return $query->result();				
 	}
@@ -66,6 +52,7 @@ class Validationbeneficiaire_model extends CI_Model
 		$query = $this->db->query($requete);
         return $query->result();				
     }
+	// Comptage bénéficiaire par identifiant_appariement et id_acteur
     public function RechercheParIdentifiantActeur($table,$identifiant_appariement,$id_acteur) {
 		$requete= "select count(*) as nombre from ".$table." where identifiant_appariement='".$identifiant_appariement."' and id_acteur=".$id_acteur;
 		$query = $this->db->query($requete);
@@ -119,7 +106,7 @@ class Validationbeneficiaire_model extends CI_Model
 			return $query->result();				
 	}
 	// Recherche id_fokontany , code fokontany d'un individu apparenté à un ménage ...(découpage administratif) suivant les critères en paramètres (LIRE)
-	public function RechercheIndividuMenageParNomPrenomCIN_Fokontany_Acteur($identifiant_appariement,$id_acteur,$nom,$prenom,$cin,$id_fokontany) {
+	public function RechercheIndividuMenageParNomPrenomCIN_Fokontany_Acteur($identifiant_appariement,$id_acteur,$nom,$prenom,$cin,$id_fokontany,$id_menage) {
 			$requete= "select i.id as id_individu,i.id_menage,i.id_fokontany,f.code as code_fokontany,c.code as code_commune,d.code as code_district,r.code as code_region,i.identifiant_unique"
 			." from individu as i "
 			." left outer join fokontany as f on f.id=i.id_fokontany"
@@ -127,7 +114,8 @@ class Validationbeneficiaire_model extends CI_Model
 			." left outer join district as d on d.id=c.district_id"
 			." left outer join region as r on r.id=d.region_id"
 			." where i.identifiant_appariement='".$identifiant_appariement."' and i.id_acteur=".$id_acteur	
-			." and i.nom='".$nom."' and i.prenom='".$prenom."' and i.cin='".$cin."' and i.id_fokontany=".$id_fokontany;
+			." and i.nom='".$nom."' and i.prenom='".$prenom."' and i.cin='".$cin."' and i.id_fokontany=".$id_fokontany
+			." and i.id_menage=".$id_menage;
 			$query = $this->db->query($requete);
 			return $query->result();				
 	}
@@ -145,7 +133,7 @@ class Validationbeneficiaire_model extends CI_Model
 			return $query->result();				
 	}
 	// Recherche id_fokontany,code fokontany ....(découpage administratif)
-	public function RechercheFokontanyParNomPrenomCIN_Fokontany_Acteur($parametre_table,$identifiant_appariement,$id_acteur,$nom,$prenom,$cin,$id_fokontany) {
+	public function RechercheFokontanyParNomPrenomCIN_Fokontany_Acteur($parametre_table,$identifiant_appariement,$id_acteur,$nom,$prenom,$cin,$id_fokontany,$id_menage) {
 		if($parametre_table=="individu") {
 			// Individu tout court : sans considération clé étrangère id_menage
 			$requete= "select i.id_fokontany,f.code as code_fokontany,c.code as code_commune,d.code as code_district,r.code as code_region,i.identifiant_unique"
@@ -155,7 +143,8 @@ class Validationbeneficiaire_model extends CI_Model
 			." left outer join district as d on d.id=c.district_id"
 			." left outer join region as r on r.id=d.region_id"
 			." where i.identifiant_appariement='".$identifiant_appariement."' and i.id_acteur=".$id_acteur
-			." and i.nom='".$nom."' and i.prenom='".$prenom."' and i.cin='".$cin."' and i.id_fokontany=".$id_fokontany;
+			." and i.nom='".$nom."' and i.prenom='".$prenom."' and i.cin='".$cin."' and i.id_fokontany=".$id_fokontany
+			." and i.id_menage=".$id_menage;
 			$query = $this->db->query($requete);
 			return $query->result();				
 		} else if($parametre_table=="menage") {

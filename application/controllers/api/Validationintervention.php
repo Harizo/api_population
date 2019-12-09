@@ -1,9 +1,7 @@
 <?php
 
 defined('BASEPATH') OR exit('No direct script access allowed');
-//harizo
-// afaka fafana refa ts ilaina
-// require APPPATH . '/libraries/REST_Controller.php';
+require APPPATH . '/PHPMailer/PHPMailerAutoload.php';
 
 class Validationintervention extends CI_Controller {
     public function __construct() {
@@ -16,6 +14,7 @@ class Validationintervention extends CI_Controller {
         $this->load->model('fokontany_model', 'FokontanyManager');        
         $this->load->model('acteur_model', 'ActeurManager');        
         $this->load->model('intervention_model', 'InterventionManager');        
+        $this->load->model('listevalidationintervention_model', 'ListevalidationinterventionManager');
     }
 	// Fonction qui récupère le fichier envoyé par l'acteur pour l'neregistrer dans le repertoire dédié dans le serveur
 	// Structure repertoire validationdonnees/intervention/'nom_acteur'/'nom de fichier.sxlsx'
@@ -25,6 +24,7 @@ class Validationintervention extends CI_Controller {
 		$search= array('é','è','ê','à','ö','ç',' ','&','°');
 		$repertoire= $_POST['repertoire'];
 		$raison_sociale= $_POST['raison_sociale'];
+		$adresse_mail=$_POST['adresse_mail'];
 		$repertoire=str_replace($search,$replace,$repertoire);
 		$raison_sociale=str_replace($search,$replace,$raison_sociale);
 		$raison_sociale=strtolower($raison_sociale);
@@ -53,24 +53,36 @@ class Validationintervention extends CI_Controller {
 			$this->upload->initialize($config);
 			$ff=$this->upload->do_upload('file');
 			// Contrôler les données envoyés par l'acteur
-			$retour = $this->controler_donnees_intervention($emplacement[1],$emplacement[2]);
+			$retour = $this->controler_donnees_intervention($emplacement[1],$emplacement[2],$adresse_mail);
 			$valeur_retour=array();
 			$valeur_retour["nom_fichier"] = $emplacement[1];
 			$valeur_retour["repertoire"] = $emplacement[2];
 			$valeur_retour["reponse"] = $retour["reponse"];
+			$valeur_retour["region"] = $retour["region"];
+			$valeur_retour["district"] = $retour["district"];
+			$valeur_retour["commune"] = $retour["commune"];
+			$valeur_retour["fokontany"] = $retour["fokontany"];
+			$valeur_retour["intervention"] = $retour["intervention"];
+			$valeur_retour["date_inscription"] = $retour["date_inscription"];
 			$valeur_retour["nombre_erreur"] = $retour["nombre_erreur"];
 		} else {
 			$valeur_retour=array();
 			$valeur_retour["nom_fichier"] = "inexistant";
 			$valeur_retour["repertoire"] = "introuvable";
 			$valeur_retour["reponse"] = "ERREUR";
+			$valeur_retour["region"] = "";
+			$valeur_retour["district"] = "";
+			$valeur_retour["commune"] = "";
+			$valeur_retour["fokontany"] = "";
+			$valeur_retour["intervention"] = "";
+			$valeur_retour["date_inscription"] = "";
 			$valeur_retour["nombre_erreur"] = 9999999;
 			echo json_encode($valeur_retour);
             // echo 'File upload not found';
 		} 
 		echo json_encode($valeur_retour);
 	}  
-	public function controler_donnees_intervention($filename,$directory) {	
+	public function controler_donnees_intervention($filename,$directory,$adresse_mail) {	
 		require_once 'Classes/PHPExcel.php';
 		require_once 'Classes/PHPExcel/IOFactory.php';
 		// La vérification se fait en DEUX étapes :
@@ -141,9 +153,11 @@ class Validationintervention extends CI_Controller {
 							if(isset($date_intervention) && $date_intervention>"") {
 								if(PHPExcel_Shared_Date::isDateTime($cell)) {
 									 $date_intervention = date($format='Y-m-d', PHPExcel_Shared_Date::ExcelToPHP($date_intervention)); 
+									 $date_inscription = $date_intervention; 
 								}
 							} else {
 								$date_intervention=null;
+								$date_inscription=null;
 							}	
 						} else if('H' == $cell->getColumn()) {
 							$menage_ou_individu = $cell->getValue();
@@ -227,7 +241,7 @@ class Validationintervention extends CI_Controller {
 						// c'est-à-dire : recherche dans la table menage ou table individu
 						$menage_ou_individu = strtolower($menage_ou_individu);
 						if($menage_ou_individu=="ménage" || $menage_ou_individu=="menage") {
-							$menage_ou_individu="ménage";
+							$menage_ou_individu="menage";
 						}
 					}						
 				}	
@@ -524,6 +538,8 @@ class Validationintervention extends CI_Controller {
 				$ligne = $ligne + 1;
 			}		
 		}
+		$date_inscription = new DateTime($date_inscription); 
+		$date_inscription =$date_inscription->format('d/m/Y');				
 		$val_ret = array();
 		// Fermer fichier Excel
 			$sender = "ndrianaina.aime.bruno@gmail.com";
@@ -531,21 +547,34 @@ class Validationintervention extends CI_Controller {
 		if($nombre_erreur > 0) {
 			// Signaler les erreurs par mail
 			$val_ret["reponse"] = "ERREUR";
+			$val_ret["region"] = $nom_region_original;
+			$val_ret["district"] = $nom_district_original;
+			$val_ret["commune"] = $nom_commune_original;
+			$val_ret["fokontany"] = $nom_fokontany_original;
+			$val_ret["intervention"] = $intitule_intervention;
 			$val_ret["nombre_erreur"] = $nombre_erreur;
+			$val_ret["date_inscription"] = $date_inscription;
 			$objWriter = PHPExcel_IOFactory::createWriter($excel, 'Excel2007');
 			$objWriter->save(dirname(__FILE__) . "/../../../../" .$repertoire. $nomfichier);
-			// Fermer fichier Excel
-			// unset($excel);
-			// unset($objWriter);
-			/*
-			$sujet = 'Code de confirmation';
-			$corps = $this->load->view('mail/activation.php', $data, true);
+			// DEBUT ENVOI MAIL SIGNALANT LES ERREURS
+			$data["type_fichier"] = " interventions ";
+			$data["region"] = $nom_region_original;
+			$data["district"] = $nom_district_original;
+			$data["commune"] = $nom_commune_original;
+			$data["fokontany"] = $nom_fokontany_original;
+			$data["intervention"] = $intitule_intervention;
+			$val_ret["date_inscription"] = $date_inscription;
+			$sujet = 'Erreur lors de la validation de la liste des interventions';
+			$corps = $this->load->view('mail/signaler_erreur_import.php', $data, true);
 			$mail = new PHPMailer;
 			$mail->isSMTP();
 			$mail->Host = 'smtp.gmail.com';
 			$mail->SMTPAuth = true;
 			$mail->Username = $sender;
 			$mail->Password = $mdpsender;
+			$mail->From = "ndrianaina.aime.bruno@gmail.com"; // adresse mail de l’expéditeur
+			$mail->FromName = "Ministère de la population Malagasy"; // nom de l’expéditeur	
+			$mail->addReplyTo('ndrianaina.aime.bruno@gmail.com', 'Ministère de la population');
 			$mail->SMTPSecure = 'tls';
 			$mail->Port = 587;
 			$mail->SMTPOptions = array(
@@ -555,8 +584,9 @@ class Validationintervention extends CI_Controller {
 					'allow_self_signed' => true
 				)
 			);
+			$mail->addAttachment(dirname(__FILE__) . "/../../../../" .$repertoire. $nomfichier);
 			$mail->setFrom($sender);
-			$mail->addAddress($to);
+			$mail->addAddress($adresse_mail);
 			$mail->isHTML(true);
 			$mail->Subject = $sujet;
 			$mail->Body = $corps;
@@ -564,7 +594,8 @@ class Validationintervention extends CI_Controller {
 				$data = 0;
 			} else {
 				$data = 1;
-			}	*/		
+			}		
+			// FIN ENVOI MAIL SIGNALANT LES ERREURS
 		} else {
 			// DEUXIEME VERIFICATION : vérification doublon			
 			$nombre_erreur=0; // compter le nombre d'erreur afin de pouvoir renvoyer le fichier à l'envoyeur
@@ -646,12 +677,12 @@ class Validationintervention extends CI_Controller {
 						if($menage_ou_individu=="individu") {
 							// Individu tout court
 							$parametre_table="individu";
-						} else if(strtolower($chef_menage) =="o") {
+						} else if($menage_ou_individu=="menage") {
 							// Si chef ménage
 							$parametre_table="menage";
 						} else {
 							// Individu apprtenant à un ménage
-							$parametre_table="individu_menage";
+							$parametre_table="menage";
 						}
 						$retour=$this->ValidationinterventionManager->RechercheParNomPrenomCIN_Fokontany_Acteur($parametre_table,$identifiant_appariement,$id_acteur,$nom,$prenom,$cin,$id_fokontany);
 						$nombre=0;
@@ -691,13 +722,65 @@ class Validationintervention extends CI_Controller {
 			if($nombre_erreur > 0) {
 				// Signaler les erreurs par mail
 				$val_ret["reponse"] = "ERREUR";
+				$val_ret["region"] = $nom_region_original;
+				$val_ret["district"] = $nom_district_original;
+				$val_ret["commune"] = $nom_commune_original;
+				$val_ret["fokontany"] = $nom_fokontany_original;
+				$val_ret["intervention"] = $intitule_intervention;
+				$val_ret["date_inscription"] = $date_inscription;
 				$val_ret["nombre_erreur"] = $nombre_erreur;
 				$objWriter = PHPExcel_IOFactory::createWriter($excel, 'Excel2007');
 				$objWriter->save(dirname(__FILE__) . "/../../../../" .$repertoire. $nomfichier);
 				// Fermer fichier Excel
 				unset($objWriter);
+				// DEBUT ENVOI MAIL SIGNALANT LES ERREURS
+				$data["type_fichier"] = " bénéficiaire ";
+				$data["region"] = $nom_region_original;
+				$data["district"] = $nom_district_original;
+				$data["commune"] = $nom_commune_original;
+				$data["fokontany"] = $nom_fokontany_original;
+				$data["intervention"] = $intitule_intervention;
+				$val_ret["date_inscription"] = $date_inscription;
+				$sujet = 'Erreur lors de la validation de la liste des interventions';
+				$corps = $this->load->view('mail/signaler_erreur_import.php', $data, true);
+				$mail = new PHPMailer;
+				$mail->isSMTP();
+				$mail->Host = 'smtp.gmail.com';
+				$mail->SMTPAuth = true;
+				$mail->Username = $sender;
+				$mail->Password = $mdpsender;
+				$mail->From = "ndrianaina.aime.bruno@gmail.com"; // adresse mail de l’expéditeur
+				$mail->FromName = "Ministère de la population Malagasy"; // nom de l’expéditeur	
+				$mail->addReplyTo('ndrianaina.aime.bruno@gmail.com', 'Ministère de la population');
+				$mail->SMTPSecure = 'tls';
+				$mail->Port = 587;
+				$mail->SMTPOptions = array(
+					'ssl' => array(
+						'verify_peer' => false,
+						'verify_peer_name' => false,
+						'allow_self_signed' => true
+					)
+				);
+				$mail->addAttachment(dirname(__FILE__) . "/../../../../" .$repertoire. $nomfichier);
+				$mail->setFrom($sender);
+				$mail->addAddress($adresse_mail);
+				$mail->isHTML(true);
+				$mail->Subject = $sujet;
+				$mail->Body = $corps;
+				if (!$mail->send()) {
+					$data = 0;
+				} else {
+					$data = 1;
+				}		
+				// FIN ENVOI MAIL SIGNALANT LES ERREURS				
 			} else {
 				$val_ret["reponse"] = "OK";			
+				$val_ret["region"] = $nom_region_original;
+				$val_ret["district"] = $nom_district_original;
+				$val_ret["commune"] = $nom_commune_original;
+				$val_ret["fokontany"] = $nom_fokontany_original;
+				$val_ret["intervention"] = $intitule_intervention;
+				$val_ret["date_inscription"] = $date_inscription;
 				$val_ret["nombre_erreur"] = 0;				
 				$objWriter = PHPExcel_IOFactory::createWriter($excel, 'Excel2007');
 				$objWriter->save(dirname(__FILE__) . "/../../../../" .$repertoire. $nomfichier);
@@ -705,4 +788,63 @@ class Validationintervention extends CI_Controller {
 		}	
 		return ($val_ret);
 	}	
+	// Envoi email vers acteur pour signaler qu'aucune erreur a été détéctée
+	public function envoyer_mail_validation_donnees() {
+		$id_utilisateur=$_POST['id_utilisateur'];
+		$adresse_mail=$_POST['adresse_mail'];
+		$region=$_POST['region'];
+		$district=$_POST['district'];
+		$commune=$_POST['commune'];
+		$fokontany=$_POST['fokontany'];
+		$intervention=$_POST['intervention'];
+		$date_inscription=$_POST['date_inscription'];
+		$retour=$this->ListevalidationinterventionManager->findByMaxDateReceptionAndUtilisateur($id_utilisateur);
+		$date_reception="";
+		if($retour) {
+			foreach($retour as $k=>$v) {
+				$date_reception=$v->date_reception;
+			}
+		}
+		// DEBUT ENVOI MAIL SIGNALANT QUE TOUT EST OK
+		$data["type_fichier"] = " d'intervention ".($retour !="" ? "(envoyé le ".$date_reception.")" : "");
+		$data["region"] = $region;
+		$data["district"] = $district;
+		$data["commune"] = $commune;
+		$data["fokontany"] = $fokontany;
+		$data["intervention"] = $intervention;
+		$sender = "ndrianaina.aime.bruno@gmail.com";
+		$mdpsender = "finaritra";
+		$sujet = "Accusé de reception : fichier excel intervention";
+		$corps = $this->load->view('mail/signaler_import_valide.php', $data, true);
+		$mail = new PHPMailer;
+		$mail->isSMTP();
+		$mail->Host = 'smtp.gmail.com';
+		$mail->SMTPAuth = true;
+		$mail->Username = $sender;
+		$mail->Password = $mdpsender;
+		$mail->From = "ndrianaina.aime.bruno@gmail.com"; // adresse mail de l’expéditeur
+		$mail->FromName = "Ministère de la population Malagasy"; // nom de l’expéditeur	
+		$mail->addReplyTo('ndrianaina.aime.bruno@gmail.com', 'Ministère de la population');
+		$mail->SMTPSecure = 'tls';
+		$mail->Port = 587;
+		$mail->SMTPOptions = array(
+			'ssl' => array(
+				'verify_peer' => false,
+				'verify_peer_name' => false,
+				'allow_self_signed' => true
+			)
+		);
+		$mail->setFrom($sender);
+		$mail->addAddress($adresse_mail);
+		$mail->isHTML(true);
+		$mail->Subject = $sujet;
+		$mail->Body = $corps;
+		if (!$mail->send()) {
+			$data = 0;
+		} else {
+			$data = 1;
+		}		
+		echo ($data);
+		// FIN ENVOI MAIL SIGNALANT QUE TOUT EST OK
+	}
 } ?>	

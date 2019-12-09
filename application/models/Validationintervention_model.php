@@ -5,7 +5,7 @@ class Validationintervention_model extends CI_Model
     protected $table = 'region';
 	// Selection région par nom
 	public function selectionregion($nom) {
-		$requete="select id,nom,code from region where lower(nom)='".$nom."' limit 1";
+		$requete="select id,nom,code from region where lower(nom) like '%".$nom."%' limit 1";
 		$query = $this->db->query($requete);
         return $query->result();				
 	}
@@ -17,11 +17,7 @@ class Validationintervention_model extends CI_Model
 	}
 	// Selection district par nom et id_region
 	public function selectiondistrict($nom,$id_region) {
-		if(intval($id_region)==5) {
-			$requete="select id,nom,code from district where region_id ='".$id_region."' limit 1";
-		} else {
-			$requete="select id,nom,code from district where lower(nom)='".$nom."' and region_id ='".$id_region."' limit 1";
-		}	
+		$requete="select id,nom,code from district where lower(nom) like '%".$nom."%' and region_id ='".$id_region."' limit 1";
 		$query = $this->db->query($requete);
         return $query->result();				
 	}

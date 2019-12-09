@@ -300,7 +300,7 @@
                 <table cellspacing="0" cellpadding="0" width="100%" bgcolor="#ffffff" background="http://s3.amazonaws.com/swu-filepicker/4E687TRe69Ld95IDWyEg_bg_top_02.jpg" style="background-color:transparent">
                     <tr>
                         <td width="100%" height="80" valign="top" style="text-align: center; vertical-align:middle;">
-                            <h1>Bianco</h1>
+                            <h1>Minist&eacute;re de la Population</h1>
                         </td>
                     </tr>
                 </table>
@@ -313,12 +313,16 @@
                 <table cellspacing="0" cellpadding="0" width="600" class="w320">
                     <tr>
                         <td class="header-lg">
-                            Bonjour à vous,
+                            Bonjour &agrave; vous,
                         </td>
                     </tr>
                     <tr>
                         <td class="free-text">
-                            Bienvenue dans l'application de Bianco, pour réinitialiser votre mot de passe veuillez cliquer sur le bouton Réinitialiser,
+                            Bienvenue dans l'application de WEB du minist&eacute;re de la Population, pour r&eacute;initialiser votre mot de passe, veuillez cliquer sur le bouton R&eacute;initialiser,
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="free-text">
                             Merci
                         </td>
                     </tr>
@@ -333,7 +337,7 @@
                                                     <div><a class="button-mobile"
                                                             href="<?php echo $confirmer; ?>"
                                                             style="background-color:#4a89dc;border-radius:5px;color:#ffffff;display:inline-block;font-family:'Cabin', Helvetica, Arial, sans-serif;font-size:14px;font-weight:regular;line-height:45px;text-align:center;text-decoration:none;width:155px;-webkit-text-size-adjust:none;mso-hide:all;">
-                                                            Réinitialiser</a>
+                                                            R&eacute;initialiser</a>
                                                     </div>
                                                 </td>
                                             </tr>

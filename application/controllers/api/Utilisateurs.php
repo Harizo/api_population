@@ -2,7 +2,6 @@
 
 defined('BASEPATH') OR exit('No direct script access allowed');
 
-// afaka fafana refa ts ilaina
 require APPPATH . '/libraries/REST_Controller.php';
 
 class Utilisateurs extends REST_Controller {
@@ -24,7 +23,6 @@ class Utilisateurs extends REST_Controller {
                 $data['nom'] = $user->nom;
                 $data['prenom'] = $user->prenom;
                 $data['raison_sociale'] = $user->raison_sociale;
-               // $data['sigle'] = $user->sigle;
                 $data['token'] = $user->token;
                 $data['email'] = $user->email;
                 $data['enabled'] = $user->enabled;      
@@ -34,6 +32,7 @@ class Utilisateurs extends REST_Controller {
             }                               
         } else {
             if ($enabled == 1) {
+				// Récupération par actif ou inactif
                 $nbr = 0 ;
                 $user = $this->UserManager->findAllByEnabled(0);
                 if ($user) {
@@ -44,6 +43,7 @@ class Utilisateurs extends REST_Controller {
                 }               
                 $data = $nbr;
             } else {
+				// Récupération de tous les enregistrements de la table utlisateur
                 $usr = $this->UserManager->findAll();
                 if ($usr) {
                     foreach ($usr as $key => $value)  {
@@ -89,11 +89,35 @@ class Utilisateurs extends REST_Controller {
                 $data['id'] = $value[0]->id;
                 $data['nom'] = $value[0]->nom;
                 $data['prenom'] = $value[0]->prenom;
-           //     $data['sigle'] = $value[0]->sigle;
                 $data['token'] = $value[0]->token;
                 $data['email'] = $value[0]->email;
                 $data['enabled'] = $value[0]->enabled;         
+                $data['default_password'] = $value[0]->default_password;         
                 $data['roles'] = unserialize($value[0]->roles);
+            }else{
+                $data = array();
+            }
+        }
+        //first login : modification mot de passe par défaut
+		// Methode get et à la fois post
+        $id_utilisateur = $this->get('id_utilisateur');
+        $confirm_pwd = $this->get('conf_pwd');
+        if ($confirm_pwd && $id_utilisateur) {
+			$data = array(
+				'password' => sha1($confirm_pwd),
+				'default_password' => 0,
+			);
+            $value = $this->UserManager->first_login($data,$id_utilisateur);
+            if ($value) {
+                $data = array();
+                $data['id'] = $value->id;
+                $data['nom'] = $value->nom;
+                $data['prenom'] = $value->prenom;
+                $data['token'] = $value->token;
+                $data['email'] = $value->email;
+                $data['enabled'] = $value->enabled;         
+                $data['default_password'] = $value->default_password;         
+                $data['roles'] = unserialize($value->roles);
             }else{
                 $data = array();
             }
@@ -136,11 +160,14 @@ class Utilisateurs extends REST_Controller {
             ], REST_Controller::HTTP_OK);
         }
     }
+	// Sauvegarde des dnnées dans la table utilisateur
     public function index_post() {           
         $id = $this->post('id') ;
         $gestion_utilisateur = intval($this->post('gestion_utilisateur')) ;
         $supprimer = $this->post('supprimer') ;
+		// Menu gestion utlisateur : ajout utlisateur ou mise à jour utlisateur
         if ($gestion_utilisateur == 1) {
+			// $supprimer =0 : veut dire ajout ou mise à jour
             if ($supprimer == 0) {
 				$id_region=null;
 				$tmp = $this->post('id_region');
@@ -169,6 +196,7 @@ class Utilisateurs extends REST_Controller {
 				}
                 $getrole = $this->post('roles');
 				if(intval($this->post('default_password'))==0) {
+					// Mot de passe par défaut : création d'un utlisateur
 					$data = array(
 						'nom' => $this->post('nom'),
 						'prenom' => $this->post('prenom'),         
@@ -193,6 +221,7 @@ class Utilisateurs extends REST_Controller {
 						'description_hote' => $this->post('description_hote'),
 					);
 				} else {
+					// Mise à jour d'un utlisateur
 					$data = array(
 						'nom' => $this->post('nom'),
 						'prenom' => $this->post('prenom'),         
@@ -238,7 +267,7 @@ class Utilisateurs extends REST_Controller {
                             ], REST_Controller::HTTP_OK);
                 }
             } else {
-				//si suppression
+			// suppression d'un utlisateur
 				$dataId = $this->UserManager->delete($id); 
                 if(!is_null($dataId))  {
                     $this->response([
@@ -258,7 +287,6 @@ class Utilisateurs extends REST_Controller {
                 $data = array(
                     'nom' => $this->post('nom'),
                     'prenom' => $this->post('prenom'),
-                    // 'sigle' => $this->post('sigle'),
                     'email' => $this->post('email'),
                     'password' => sha1($this->post('password')),
                     'enabled' => 0,
@@ -287,65 +315,8 @@ class Utilisateurs extends REST_Controller {
                 }           
         }       
     }
-    public function index_put($id) {
-        $data = array(
-            'nom' => $this->put('nom'),
-            'prenom' => $this->put('prenom'),
-            'telephone' => $this->put('telephone'),
-            'email' => $this->put('email'),
-            'username' => $this->put('username'),
-            'password' => $this->put('password'),
-            'fonction' => $this->put('fonction'),
-            'cin' => $this->put('cin'),
-            'enabled' => $this->put('enabled'),
-            'token' => bin2hex(openssl_random_pseudo_bytes(32))
-        );
-        if (!$data || !$id) {
-            $this->response([
-                'status' => FALSE,
-                'response' => 0,
-                'message' => 'No request found'
-                    ], REST_Controller::HTTP_BAD_REQUEST);
-        }
-        $update = $this->UserManager->update($id, $data);       
-        if(!is_null($update)) {
-            $this->response([
-                'status' => TRUE,
-                'response' => 1,
-                'message' => 'Update data success'
-                    ], REST_Controller::HTTP_OK);
-        }  else {
-            $this->response([
-                'status' => FALSE,
-                'message' => 'No request found'
-                    ], REST_Controller::HTTP_BAD_REQUEST);
-        }
-    }
-    public function index_delete($id) {       
-        if (!$id) {
-            $this->response([
-                'status' => FALSE,
-                'response' => 0,
-                'message' => 'No request found'
-                    ], REST_Controller::HTTP_BAD_REQUEST);
-        }
-        $delete = $this->UserManager->delete($id);       
-        if (!is_null($delete)) {
-            $this->response([
-                'status' => TRUE,
-                'response' => 1,
-                'message' => "Delete data success"
-                    ], REST_Controller::HTTP_OK);
-        } else {
-            $this->response([
-                'status' => FALSE,
-                'response' => 0,
-                'message' => 'No request found'
-                    ], REST_Controller::HTTP_BAD_REQUEST);
-        }
-    }
-
-}
+} 
 
 /* End of file controllername.php */
 /* Location: ./application/controllers/controllername.php */
+?>

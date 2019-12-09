@@ -318,69 +318,48 @@
                     </tr>
                     <tr>
                         <td class="free-text">
-                            Bienvenue dans l'application WEB du Ministère de la Population.
+							Après v&eacute;rification des donn&eacute;es<?php echo $type_fichier?> : 
                         </td>
                     </tr>
                     <tr>
                         <td class="free-text">
-                            Voici les informations necessaires pour la connexion à l'application :
+                            Région : <?php echo $region?>
                         </td>
                     </tr>
                     <tr>
                         <td class="free-text">
-                            Login :
-                        </td>
-                        <td class="free-text">
-                            <?php echo $login;?>
+                            District : <?php echo $district;?>
                         </td>
                     </tr>
                     <tr>
                         <td class="free-text">
-                            Mot de passe :
-                        </td>
-                        <td class="free-text">
-                            <?php echo $motdepasse;?>
+                            Commune : <?php echo $commune;?>
                         </td>
                     </tr>
                     <tr>
                         <td class="free-text">
-                            Lors de votre première connexion, l'application vous redirigéra vers la modification du mot de passe par défaut que nous venons d'envoyer.
+                            Fokontany : <?php echo $fokontany;?>
                         </td>
                     </tr>
                     <tr>
                         <td class="free-text">
-                            Et après changement du mot de passe, l'administrateur de l'application n'est plus en mesure de savoir votre mot de passe personnel.
+                            Intervention : <?php echo $intervention;?>
                         </td>
                     </tr>
                     <tr>
                         <td class="free-text">
-							Veuillez le conserver quelque part afin d'éviter un oubli.
+                            Date inscription : <?php echo $date_inscription;?>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="free-text">
+                            , aucune erreur a &eacute;t&eacute; d&eacute;t&eacute;ct&eacute. 
+							 Nous vous signalerons lorsque les donn&eacute;es sont int&eacute;gr&eacute;es dans la Base de donn&eacute;es.
                         </td>
                     </tr>
                     <tr>
                         <td class="free-text">
                             Merci de votre collaboration
-                        </td>
-                    </tr>
-                    <tr>
-                        <td class="mini-block-container">
-                            <table cellspacing="0" cellpadding="0" width="100%"  style="border-collapse:separate !important;">
-                                <tr>
-                                    <td>
-                                        <table cellpadding="0" cellspacing="0" width="100%">
-                                            <tr>
-                                                <td class="button">
-                                                    <div><a class="button-mobile"
-                                                            href="<?php echo $connexion; ?>"
-                                                            style="background-color:#4a89dc;border-radius:5px;color:#ffffff;display:inline-block;font-family:'Cabin', Helvetica, Arial, sans-serif;font-size:14px;font-weight:regular;line-height:45px;text-align:center;text-decoration:none;width:155px;-webkit-text-size-adjust:none;mso-hide:all;">
-                                                            Connexion à l'application</a>
-                                                    </div>
-                                                </td>
-                                            </tr>
-                                        </table>
-                                    </td>
-                                </tr>
-                            </table>
                         </td>
                     </tr>
                 </table>
