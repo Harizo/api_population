@@ -17,15 +17,18 @@ class Biens_eqipements extends REST_Controller {
         $cle_etrangere = $this->get('cle_etrangere');
 		$data=array();
         if ($cle_etrangere) {
-            $res = $this->BienseqipementsManager->findAllByMenage($cle_etrangere);
-			if($res) {
-				foreach ($res as $key => $value) {
+			// Récupération par ménage
+            $retour = $this->BienseqipementsManager->findAllByMenage($cle_etrangere);
+			if($retour) {
+				foreach ($retour as $key => $value) {
+					// Détail description d'un ménage
 					$menage = array();
 					$biens_equipements = array();
 					$men = $this->MenageManager->findById($value->id_menage);                   
 					if(count($men) >0) {
 						$menage =$men;
 					}
+					// Détail description type de bien et équipement
 					$eq = $this->EnquetemenageManager->findById($value->id_biens_equipements,"type_bien_equipement");                   
 					if(count($eq) >0) {
 						$biens_equipements =$eq;
@@ -40,23 +43,28 @@ class Biens_eqipements extends REST_Controller {
 			}
 		} else {	
 			if ($id) {
+				// Récupération par id (id=clé primaire)
 				$data = $this->BienseqipementsManager->findById($id);
 				if (!$data)
 					$data = array();
 			} else {
+				// Récupération de tous les enregistrements
 				$menu = $this->BienseqipementsManager->findAll();	
 				if ($menu) {
 					foreach ($menu as $key => $value) {
+						// Détail description d'un ménage
 						$menage = array();
 						$biens_equipements = array();
 						$men = $this->MenageManager->findById($value->id_menage);                   
 						if(count($men) >0) {
 							$menage =$men;
 						}
-						$eq = $this->EnquetemenageManager->findById($value->id_biens_equipements,"type_bien_equipement");                   
-						if(count($eq) >0) {
-							$biens_equipements =$eq;
+						// Détail description type bien et équipement
+						$equipet = $this->EnquetemenageManager->findById($value->id_biens_equipements,"type_bien_equipement");                   
+						if(count($equipet) >0) {
+							$biens_equipements =$equipet;
 						}
+						// Affectation des valeurs dans un tableau
 						$typeregularisation = array();
 						$data[$key]['id'] = $value->id;
 						$data[$key]['id_menage'] = $value->id_menage;
@@ -101,7 +109,9 @@ class Biens_eqipements extends REST_Controller {
 			'id_biens_equipements' => $this->post('id_biens_equipements'),
 		);
         if ($existe == 1) {
+			// Suppresion détail type bien et équipement avant insertion de nouveau
 			$del = $this->BienseqipementsManager->deleteByMenage($id_menage,"biens_equipements");
+			// Ajout d'un enregistrement de type bien et equipement
 			$dataId = $this->BienseqipementsManager->add($data,"biens_equipements");
 			if (!is_null($dataId)) {
 			$this->response([
@@ -117,6 +127,7 @@ class Biens_eqipements extends REST_Controller {
 					], REST_Controller::HTTP_BAD_REQUEST);
 			}			
         } else  {
+			// Ajout d'un enregistrement de type bien et equipement
 			$dataId = $this->BienseqipementsManager->add($data,"biens_equipements");
 			if (!is_null($dataId)) {
 			$this->response([

@@ -529,7 +529,7 @@ class Validationbeneficiaire extends CI_Controller {
 						$nombre_erreur = $nombre_erreur + 1;						 
 					}
 				}		
-				if($ligne ==4) {
+			/*	if($ligne ==4) {
 					// Contrôle catégorie d'age, sexe, vulnérabilité, pauvreté, type ménage, avec enfant
 					 $cellIterator = $row->getCellIterator();
 					 $cellIterator->setIterateOnlyExistingCells(false);
@@ -669,8 +669,8 @@ class Validationbeneficiaire extends CI_Controller {
 								 )
 						 );													
 					}
-				}	
-				if($ligne >=7) {
+				}*/
+				if($ligne >=5) {
 					// Contrôle de toutes les cellules à partir de la ligne 5
 					// Contrôle partenaire / intitulé intervention / Date 
 					 $cellIterator = $row->getCellIterator();
@@ -1078,6 +1078,7 @@ class Validationbeneficiaire extends CI_Controller {
 			$remplacer=array('&eacute;','e','e','a','o','c','_');
 			$trouver= array('é','è','ê','à','ö','ç',' ');
 			$nombre_erreur=0; // compter le nombre d'erreur afin de pouvoir renvoyer le fichier à l'envoyeur
+			$id_menage=null;
 			foreach($rowIterator as $row) {
 				// Contrôle détail s'il y a des doublons
 				// Le controle se fait en 2 étapes
@@ -1184,9 +1185,7 @@ class Validationbeneficiaire extends CI_Controller {
 						$parametre_table="individu";
 						$table ="individu";
 						$table_controle ="menage_beneficiaire"; // Pour controler si un ménage est déjà bénéficiaire de l'intervention
-					}
-					
-					///////////////////ETO
+					}					
 					if($menage_ou_individu=="menage" || $menage_ou_individu=="groupe") {
 						if(strtolower($chef_menage) =="o") {
 							// 1- Recherche par identifiant_appariement = $identifiant_appariement et $id_acteur stocké auparavant CHEF MENAGE
@@ -1440,7 +1439,6 @@ class Validationbeneficiaire extends CI_Controller {
 							}	 
 						}							
 					} 					
-					////////////////// HATRETO
 					if(null==$date_naissance) {
 						// Calcul date_naissance par défaut
 						$date_actuelle  = new DateTime();
@@ -1536,8 +1534,8 @@ class Validationbeneficiaire extends CI_Controller {
 		$fokontany=$_POST['fokontany'];
 		$intervention=$_POST['intervention'];
 		$date_inscription=$_POST['date_inscription'];
-		$date_inscription = new DateTime($date_inscription); 
-		$date_inscription =$date_inscription->format('d/m/Y');			
+		// $date_inscription = new DateTime($date_inscription); 
+		// $date_inscription =$date_inscription->format('d/m/Y');			
 		$retour=$this->ListevalidationbeneficiaireManager->findByMaxDateReceptionAndUtilisateur($id_utilisateur);
 		$date_reception="";
 		if($retour) {

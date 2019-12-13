@@ -1,32 +1,34 @@
 <?php
 
 defined('BASEPATH') OR exit('No direct script access allowed');
-
 require APPPATH . '/libraries/REST_Controller.php';
 
-class Questionnaire_menage extends REST_Controller {
+class Secteur_programme_projet extends REST_Controller {
 
     public function __construct() {
         parent::__construct();
-        $this->load->model('questionnaire_menage_model', 'QuestionnairemenageManager');
+		$this->load->model('secteur_programme_projet_model', 'SecteurprogrammeManager');
     }
-
     public function index_get() {
         $id = $this->get('id');
-		$data = array();
-		if ($id) {
-			// Récupération par id (id=clé primaire)
-			$temporaire = $this->QuestionnairemenageManager->findById($id);
-			if($temporaire) {
-				$data=$temporaire;
-			}
-		} else {
-			// Récupération de tous les enregistrements	
-			$temporaire = $this->QuestionnairemenageManager->findAll();
-			if ($temporaire) {
-				$data=$temporaire;
-			}
-		}
+        if ($id) {
+			// RÃ©cupÃ©ration par id (id= clÃ© primaire)
+            $data = $this->SecteurprogrammeManager->findById($id);
+            if (!$data)
+                $data = array();
+        } else {
+			$data=array();
+			// RÃ©cupÃ©ration de tous les enregistrements
+			$menu = $this->SecteurprogrammeManager->findAll();	
+            if ($menu) {
+                foreach ($menu as $key => $value) {
+                    $data[$key]['id'] = $value->id;
+                    $data[$key]['id_programme'] = $value->id_programme;
+                    $data[$key]['id_financement_programme'] = $value->id_financement_programme;
+                    $data[$key]['id_type_secteur'] = $value->id_type_secteur;
+                }
+            }
+        }
         if (count($data)>0) {
             $this->response([
                 'status' => TRUE,
@@ -35,37 +37,37 @@ class Questionnaire_menage extends REST_Controller {
             ], REST_Controller::HTTP_OK);
         } else {
             $this->response([
-                'status' => TRUE,
+                'status' => FALSE,
                 'response' => array(),
                 'message' => 'No data were found'
             ], REST_Controller::HTTP_OK);
         }
     }
     public function index_post() {
+		// RÃ©cupÃ©ration des donnÃ©es
         $id = $this->post('id') ;
         $supprimer = $this->post('supprimer') ;
-		// Affectation des valeurs de chaque colonne de la table
+		$id_programme=null;
+		$temporaire=$this->post('id_programme');
+		if(isset($temporaire) && $temporaire !="" && intval($temporaire) >0) {
+			$id_programme=$temporaire;
+		}
+		$id_financement_programme=null;
+		$temporaire=$this->post('id_financement_programme');
+		if(isset($temporaire) && $temporaire !="" && intval($temporaire) >0) {
+			$id_financement_programme=$temporaire;
+		}
+		$id_type_secteur=null;
+		$temporaire=$this->post('id_type_secteur');
+		if(isset($temporaire) && $temporaire !="" && intval($temporaire) >0) {
+			$id_type_secteur=$temporaire;
+		}
+		// Affectation de valeur de la colonne de la table
 		$data = array(
-			'id_menage'                    => $this->post('id_menage'),
-			'type_logement'                => $this->post('type_logement'),
-			'occupation_logement'          => $this->post('occupation_logement'),
-			'revetement_toit'              => $this->post('revetement_toit'),
-			'revetement_sol'               => $this->post('revetement_sol'),
-			'revetement_mur'               => $this->post('revetement_mur'),
-			'eclairage'                    => $this->post('eclairage'),
-			'combustible'                  => $this->post('combustible'),
-			'toilette'                     => $this->post('toilette'),
-			'source_eau'                   => $this->post('source_eau'),
-			'type_bien_equipement'         => $this->post('type_bien_equipement'),
-			'moyen_production'             => $this->post('moyen_production'),
-			'source_revenu'                => $this->post('source_revenu'),
-			'type_elevage'                 => $this->post('type_elevage'),
-			'type_culture'                 => $this->post('type_culture'),
-			'type_aliment'                 => $this->post('type_aliment'),
-			'type_difficulte_alimentaire'  => $this->post('type_difficulte_alimentaire'),
-			'type_strategie_face_probleme' => $this->post('type_strategie_face_probleme'),
-			'type_engagement_activite'     => $this->post('type_engagement_activite'),
-		);               
+			'id_programme'           => $this->post('id_programme'),
+			'id_financement_programme' => $this->post('id_financement_programme'),
+			'id_type_secteur'         => $this->post('id_type_secteur'),
+		);
         if ($supprimer == 0) {
             if ($id == 0) {
                 if (!$data) {
@@ -75,8 +77,8 @@ class Questionnaire_menage extends REST_Controller {
                         'message' => 'No request found'
                             ], REST_Controller::HTTP_BAD_REQUEST);
                 }
-				// Ajout d'un enregistrement
-                $dataId = $this->QuestionnairemenageManager->add($data);              
+				// Ajour d'un enregistrement
+                $dataId = $this->SecteurprogrammeManager->add($data);
                 if (!is_null($dataId)) {
                     $this->response([
                         'status' => TRUE,
@@ -98,31 +100,31 @@ class Questionnaire_menage extends REST_Controller {
                         'message' => 'No request found'
                             ], REST_Controller::HTTP_BAD_REQUEST);
                 }
-				// Mise à jour d'un enregistrement
-                $update = $this->QuestionnairemenageManager->update($id, $data);              
-                if(!is_null($update)){
+				// Mise Ã  jour d'un enregistrement
+                $update = $this->SecteurprogrammeManager->update($id, $data);
+                if(!is_null($update)) {
                     $this->response([
-                        'status' => TRUE, 
+                        'status' => TRUE,
                         'response' => 1,
                         'message' => 'Update data success'
                             ], REST_Controller::HTTP_OK);
-                } else {
+                } else  {
                     $this->response([
                         'status' => FALSE,
                         'message' => 'No request found'
                             ], REST_Controller::HTTP_OK);
                 }
             }
-        } else {
+        } else  {
             if (!$id) {
             $this->response([
-            'status' => FALSE,
-            'response' => 0,
-            'message' => 'No request found'
-                ], REST_Controller::HTTP_BAD_REQUEST);
+                'status' => FALSE,
+                'response' => 0,
+                'message' => 'No request found'
+                    ], REST_Controller::HTTP_BAD_REQUEST);
             }
 			// Suppression d'un enregistrement
-            $delete = $this->QuestionnairemenageManager->delete($id);          
+            $delete = $this->SecteurprogrammeManager->delete($id);
             if (!is_null($delete)) {
                 $this->response([
                     'status' => TRUE,
@@ -134,9 +136,11 @@ class Questionnaire_menage extends REST_Controller {
                     'status' => FALSE,
                     'response' => 0,
                     'message' => 'No request found'
-                        ], REST_Controller::HTTP_OK);
+                        ], REST_Controller::HTTP_BAD_REQUEST);
             }
-        }   
+        }
     }
 }
+/* End of file controllername.php */
+/* Location: ./application/controllers/controllername.php */
 ?>

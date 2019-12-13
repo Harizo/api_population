@@ -15,15 +15,10 @@ class Devise extends REST_Controller {
         $id = $this->get('id');
 		$data = array();
 		if ($id) {
-			$tmp = $this->DeviseManager->findById($id);
-			if($tmp) {
-				$data=$tmp;
-			}
+			// Récupération par id (id=clé primaire)
+			$data = $this->DeviseManager->findById($id);
 		} else {			
-			$tmp = $this->DeviseManager->findAll();
-			if ($tmp) {
-				$data=$tmp;
-			}
+			$data = $this->DeviseManager->findAll();
 		}
         if (count($data)>0) {
             $this->response([
@@ -42,6 +37,7 @@ class Devise extends REST_Controller {
     public function index_post() {
         $id = $this->post('id') ;
         $supprimer = $this->post('supprimer') ;
+		// Affectation description devise
 		$data = array(
 			'description' => $this->post('description'),
 		);               
@@ -54,6 +50,7 @@ class Devise extends REST_Controller {
                         'message' => 'No request found'
                             ], REST_Controller::HTTP_BAD_REQUEST);
                 }
+				// Ajout d'un enregistrement
                 $dataId = $this->DeviseManager->add($data);              
                 if (!is_null($dataId)) {
                     $this->response([
@@ -76,6 +73,7 @@ class Devise extends REST_Controller {
                         'message' => 'No request found'
                             ], REST_Controller::HTTP_BAD_REQUEST);
                 }
+				// Mise à jour d'un enregistrement
                 $update = $this->DeviseManager->update($id, $data);              
                 if(!is_null($update)){
                     $this->response([
@@ -98,6 +96,7 @@ class Devise extends REST_Controller {
             'message' => 'No request found'
                 ], REST_Controller::HTTP_BAD_REQUEST);
             }
+			// Suppression d'un enregistrement
             $delete = $this->DeviseManager->delete($id);          
             if (!is_null($delete)) {
                 $this->response([

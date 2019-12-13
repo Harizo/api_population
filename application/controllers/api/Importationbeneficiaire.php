@@ -327,7 +327,7 @@ class Importationbeneficiaire extends CI_Controller {
 						$code_region="????";
 					}
 				}		
-				if($ligne ==4) {
+			/*	if($ligne ==4) {
 					// Contrôle catégorie d'age, sexe, vulnérabilité, pauvreté, type ménage, avec enfant
 					 $cellIterator = $row->getCellIterator();
 					 $cellIterator->setIterateOnlyExistingCells(false);
@@ -588,8 +588,8 @@ class Importationbeneficiaire extends CI_Controller {
 							$id_variable_ciblage_autres_methode=$v->id_variable;
 						}						
 					}
-				}	
-				if($ligne >=7) {
+				} */	
+				if($ligne >=5) {
 					// Contrôle de toutes les cellules à partir de la ligne 5
 					// Contrôle partenaire / intitulé intervention / Date 
 					 $cellIterator = $row->getCellIterator();
@@ -679,16 +679,20 @@ class Importationbeneficiaire extends CI_Controller {
 					// Sinon DEUX insertion : dans la table (menage_beneficiaire ou individu_beneficiaire avec id_intervention )
 					// ET dans la table (menage ou individu) selon le cas du fichier envoyé : menage ou individu (voir ci-bas)
 					$beneficiaire_existant=false;
+					$menage_ou_individu = strtolower($menage_ou_individu);
+					if($menage_ou_individu=="ménage") {
+						$menage_ou_individu=="menage";
+					}
 					if($menage_ou_individu=="individu") {
 						// Individu tout court
 						$parametre_table="individu";
 						$table ="individu";
-					} else if(strtolower($chef_menage) =="o" && $menage_ou_individu=="menage") {
+					} else if(strtolower($chef_menage) =="o" && ($menage_ou_individu=="menage" || $menage_ou_individu=="groupe" )) {
 						// Si chef ménage
 						$parametre_table="menage";
 						$table ="menage";
 					} else {
-						// Individu appartenant à un ménage
+						// Individu appartenant à un ménage ou un groupe
 						$parametre_table="individu";
 						$table ="individu";
 					}
@@ -1119,9 +1123,7 @@ class Importationbeneficiaire extends CI_Controller {
 		$date_validation->add(new DateInterval('PT1H'));
 		$date_validation =$date_validation->format('Y-m-d H:i:s');		
 		$retour = $this->ImportationbeneficiaireManager->MiseAJourListeValidationBeneficiaire($id_liste_validation_beneficiaire,$date_validation,$id_utilisateur,$id_fokontany,$id_intervention);
-		// Insertion table variable_intervention
-		
-
+	/*	// Insertion table variable_intervention		
 		if($id_variable_cible!=null && $id_liste_variable_cible!=null) {
 			$data= array(
 				'id_variable'                      => $id_variable_cible,
@@ -1241,7 +1243,7 @@ class Importationbeneficiaire extends CI_Controller {
 			// 12 Insertion dans la table variable_intervention
 			$id_variable_intervention = $this->VariableinterventionManager->add($data);
 			
-		}		
+		}	*/	
 		$date_inscription = new DateTime($date_inscription); 
 		$date_inscription =$date_inscription->format('d/m/Y');				
 		if($nombre_erreur > 0) {

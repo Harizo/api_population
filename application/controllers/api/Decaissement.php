@@ -18,31 +18,37 @@ class Decaissement extends REST_Controller {
         $cle_etrangere = $this->get('cle_etrangere');
 		$data = array();
 		if ($id) {
-			$tmp = $this->DecaissementManager->findById($id);
-			if($tmp) {
-				$data=$tmp;
+			// Récupération par id (id=clé primaire)
+			$temporaire = $this->DecaissementManager->findById($id);
+			if($temporaire) {
+				$data=$temporaire;
 			}
-			$ou=1;
+			$choix=1;
 		} else if($cle_etrangere) {
+			// Récupération par financement intervention
 			$menu = $this->DecaissementManager->findAllByFinancementintervention($cle_etrangere);
-			$ou=2;
-		} else {		
+			$choix=2;
+		} else {
+			// Récupération de tous les enregistrements	
 			$menu = $this->DecaissementManager->findAll();
-			$ou=2;
+			$choix=2;
 		}
-		if($ou==2) {
+		if($choix==2) {
 			if ($menu) {
                 foreach ($menu as $key => $value) {
+					// Détail description financement intervention
                     $financementintervention = array();
                     $type_fin = $this->FinancementinterventionManager->findById($value->id_financement_intervention);
 					if(count($type_fin) >0) {
 						$financementintervention=$type_fin;
-					}	
+					}
+					// Détail description acteur	
                     $acteur = array();
                     $ag = $this->ActeurManager->findById($value->id_acteur);
 					if(count($ag) >0) {
 						$acteur=$ag;
 					}	
+					// Détail enregistrement affecté dans un tableau
                     $data[$key]['id'] = $value->id;
                     $data[$key]['id_financement_intervention'] = $value->id_financement_intervention;
                     $data[$key]['financementintervention'] = $financementintervention;
@@ -92,15 +98,16 @@ class Decaissement extends REST_Controller {
     public function index_post() {
         $id = $this->post('id') ;
         $supprimer = $this->post('supprimer') ;
+		// Initialisation de valeur de colonne pour éviter le ZERO par défaut au lieu de null dans la BDD
 		$id_financement_intervention=null;
-		$tmp=$this->post('id_financement_intervention');
-		if(isset($tmp) && $tmp !="" && intval($tmp) >0) {
-			$id_financement_intervention=$tmp;
+		$temporaire=$this->post('id_financement_intervention');
+		if(isset($temporaire) && $temporaire !="" && intval($temporaire) >0) {
+			$id_financement_intervention=$temporaire;
 		}
 		$id_acteur=null;
-		$tmp=$this->post('id_acteur');
-		if(isset($tmp) && $tmp !="" && intval($tmp) >0) {
-			$id_acteur=$tmp;
+		$temporaire=$this->post('id_acteur');
+		if(isset($temporaire) && $temporaire !="" && intval($temporaire) >0) {
+			$id_acteur=$temporaire;
 		}
 		$date_revision=null;
 		$date_debut_periode=null;
@@ -170,6 +177,7 @@ class Decaissement extends REST_Controller {
 		if($this->post('transfert_direct_beneficiaire')) {
 			$transfert_direct_beneficiaire=$this->post('transfert_direct_beneficiaire');
 		}
+		// Affectation de valeur de chaque colonne de la table
  		$data = array(
 			'id_financement_intervention'               => $this->post('id_financement_intervention'),
 			'nom_informateur'                           => $this->post('nom_informateur'),
@@ -207,6 +215,7 @@ class Decaissement extends REST_Controller {
                         'message' => 'No request found'
                             ], REST_Controller::HTTP_BAD_REQUEST);
                 }
+				// Ajout d'un enregistrement
                 $dataId = $this->DecaissementManager->add($data);              
                 if (!is_null($dataId)) {
                     $this->response([
@@ -229,6 +238,7 @@ class Decaissement extends REST_Controller {
                         'message' => 'No request found'
                             ], REST_Controller::HTTP_BAD_REQUEST);
                 }
+				// Mise à jour d'un enregistrement
                 $update = $this->DecaissementManager->update($id, $data);              
                 if(!is_null($update)){
                     $this->response([
@@ -251,6 +261,7 @@ class Decaissement extends REST_Controller {
             'message' => 'No request found'
                 ], REST_Controller::HTTP_BAD_REQUEST);
             }
+			// Suppression d'un enregistrement
             $delete = $this->DecaissementManager->delete($id);          
             if (!is_null($delete)) {
                 $this->response([

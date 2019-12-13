@@ -15,11 +15,13 @@ class Frequence_transfert extends REST_Controller {
         $id = $this->get('id');
 		$data = array();
 		if ($id) {
-			$tmp = $this->Frequencetransfert->findById($id);
-			if($tmp) {
-				$data=$tmp;
+			// Récupération par id (id=clé primaire)
+			$temporaire = $this->Frequencetransfert->findById($id);
+			if($temporaire) {
+				$data=$temporaire;
 			}
-		} else {			
+		} else {
+			// Récupération de tous les enregistrements	
 			$menu = $this->Frequencetransfert->findAll();
 			if($menu) {
                 foreach ($menu as $key => $value) {
@@ -46,6 +48,7 @@ class Frequence_transfert extends REST_Controller {
     public function index_post() {
         $id = $this->post('id') ;
         $supprimer = $this->post('supprimer') ;
+		// Affectation de valeur de la colonne de la table
 		$data = array(
 			'code' => $this->post('code'),
 			'description' => $this->post('description'),
@@ -59,6 +62,7 @@ class Frequence_transfert extends REST_Controller {
                         'message' => 'No request found'
                             ], REST_Controller::HTTP_BAD_REQUEST);
                 }
+				// Ajout d'un enregistrement
                 $dataId = $this->Frequencetransfert->add($data);              
                 if (!is_null($dataId)) {
                     $this->response([
@@ -81,6 +85,7 @@ class Frequence_transfert extends REST_Controller {
                         'message' => 'No request found'
                             ], REST_Controller::HTTP_BAD_REQUEST);
                 }
+				// Mise à jour d'un enregistrement
                 $update = $this->Frequencetransfert->update($id, $data);              
                 if(!is_null($update)){
                     $this->response([
@@ -103,6 +108,7 @@ class Frequence_transfert extends REST_Controller {
             'message' => 'No request found'
                 ], REST_Controller::HTTP_BAD_REQUEST);
             }
+			// Suppression d'un enregistrement
             $delete = $this->Frequencetransfert->delete($id);          
             if (!is_null($delete)) {
                 $this->response([

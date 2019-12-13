@@ -19,40 +19,47 @@ class Zone_intervention_programme extends REST_Controller {
         $cle_etrangere = $this->get('cle_etrangere');
 		$data = array();
 		if ($id) {
-			$tmp = $this->ZoneinterventionprogrammeManager->findById($id);
-			if($tmp) {
-				$data=$tmp;
+			// Récupération par id (id=cle primaire)
+			$temporaire = $this->ZoneinterventionprogrammeManager->findById($id);
+			if($temporaire) {
+				$data=$temporaire;
 			}
 			$ou=1;
 		} else if($cle_etrangere) {	
+			// Récupération par programme
 			$menu=$this->ZoneinterventionprogrammeManager->findByIdProgramme($cle_etrangere);
 			$ou=2;
-		} else {			
+		} else {	
+			// Récupération de tous les enregistrements
 			$menu = $this->ZoneinterventionprogrammeManager->findAll();
 			$ou=2;
 		}
 		if($ou==2) {
 			if ($menu) {
                 foreach ($menu as $key => $value) {
+					// Détail description programme
                     $programme = array();
                     $prg = $this->ProgrammeManager->findById($value->id_programme);
 					if(count($prg) >0) {
 						$programme=$prg;
 					}
+					// Détail description district
 					$district =array();
 					if($value->id_district) {
 						$dist = $this->DistrictManager->findById($value->id_district);
 						if(count($dist) >0) {
 							$district=$dist;
 						}						
-					}					
+					}
+					// Détail description région	
 					$region =array();
 					if($value->id_region) {
 						$reg = $this->RegionManager->findByIdArray($value->id_region);
 						if(count($reg) >0) {
 							$region=$reg;
 						}						
-					}					
+					}	
+					// Affectation des valeurs dans un tableau	
                     $data[$key]['id'] = $value->id;
                     $data[$key]['id_programme'] = $value->id_programme;
                     $data[$key]['programme'] = $programme;
@@ -82,16 +89,18 @@ class Zone_intervention_programme extends REST_Controller {
     public function index_post() {
         $id = $this->post('id') ;
         $supprimer = $this->post('supprimer') ;
+		// Initialisation des valeurs à null pour éviter le ZERO par défaut inséré dans la BDD
 		$id_district=null;
-		$tmp=$this->post('id_district');
-		if(isset($tmp) && $tmp !="" && intval($tmp) >0) {
-			$id_district=$tmp;
+		$temporaire=$this->post('id_district');
+		if(isset($temporaire) && $temporaire !="" && intval($temporaire) >0) {
+			$id_district=$temporaire;
 		}
 		$id_region=null;
-		$tmp=$this->post('id_region');
-		if(isset($tmp) && $tmp !="" && intval($tmp) >0) {
-			$id_region=$tmp;
+		$temporaire=$this->post('id_region');
+		if(isset($temporaire) && $temporaire !="" && intval($temporaire) >0) {
+			$id_region=$temporaire;
 		}
+		// Affectation des valeurs de chaque colonne
  		$data = array(
 			'id_programme' => $this->post('id_programme'),
 			'id_district' => $id_district,
@@ -108,6 +117,7 @@ class Zone_intervention_programme extends REST_Controller {
                         'message' => 'No request found'
                             ], REST_Controller::HTTP_BAD_REQUEST);
                 }
+				// Ajout d'un enregistrement
                 $dataId = $this->ZoneinterventionprogrammeManager->add($data);              
                 if (!is_null($dataId)) {
                     $this->response([
@@ -130,6 +140,7 @@ class Zone_intervention_programme extends REST_Controller {
                         'message' => 'No request found'
                             ], REST_Controller::HTTP_BAD_REQUEST);
                 }
+				// Mise à jour d'un enregistrement
                 $update = $this->ZoneinterventionprogrammeManager->update($id, $data);              
                 if(!is_null($update)){
                     $this->response([
@@ -152,6 +163,7 @@ class Zone_intervention_programme extends REST_Controller {
             'message' => 'No request found'
                 ], REST_Controller::HTTP_BAD_REQUEST);
             }
+			// Suppression d'un enregistrement
             $delete = $this->ZoneinterventionprogrammeManager->delete($id);          
             if (!is_null($delete)) {
                 $this->response([

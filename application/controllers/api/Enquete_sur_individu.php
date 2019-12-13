@@ -16,12 +16,12 @@ class Enquete_sur_individu extends REST_Controller {
         $cle_etrangere = $this->get('cle_etrangere');
         $data = array() ;
         if ($cle_etrangere) {
+			// Récupération par individu
             $menu = $this->EnqueteindividuManager->findAllByindividu($cle_etrangere);
             if ($menu) {
                 $data['id'] = ($menu->id);
                 $data['id_individu'] = $menu->id_individu;
                 $data['id_lien_de_parente'] = $menu->id_lien_de_parente;
-                // $data['situation_matrimoniale'] = $menu->situation_matrimoniale;
                 $data['id_handicap_visuel'] = $menu->id_handicap_visuel;
                 $data['id_handicap_parole'] = $menu->id_handicap_parole;
                 $data['id_handicap_auditif'] = $menu->id_handicap_auditif;
@@ -33,9 +33,11 @@ class Enquete_sur_individu extends REST_Controller {
                 $data['id_groupe_appartenance'] = $menu->id_groupe_appartenance;
             }
         }  else {
-            if ($id) {              
+            if ($id) {    
+				// Récupération par id (id=clé primaire)
                 $data = $this->EnqueteindividuManager->findById($id);
             } else {
+				// Récupération de tous les enregistrments
                 $data = $this->EnqueteindividuManager->findAll();
             }
         }
@@ -56,6 +58,7 @@ class Enquete_sur_individu extends REST_Controller {
     public function index_post() {
         $id = $this->post('id') ;
         $supprimer = $this->post('supprimer') ;
+		// Initialisations de valeurs des colonnes de latable pour éviter le ZERO par défaut dans la BDD : ATTENTION
 		$id_lien_de_parente=null;
 		$id_handicap_visuel=null;
 		$id_handicap_parole=null;
@@ -100,10 +103,10 @@ class Enquete_sur_individu extends REST_Controller {
 		if(isset($tmp) && $tmp !="" && intval($tmp) >0) {
 			$id_groupe_appartenance=$tmp;
 		}
+		// Affectation des valeurs des colonnes
 		$data = array(
 			'id_individu' 			 => $this->post('id_individu'),
 			'id_lien_de_parente'     => $id_lien_de_parente,
-			// 'situation_matrimoniale' => $this->post('situation_matrimoniale'),
 			'id_handicap_visuel' 	 => $id_handicap_visuel,
 			'id_handicap_parole'     => $id_handicap_parole,
 			'id_handicap_auditif' 	 => $id_handicap_auditif,
@@ -123,6 +126,7 @@ class Enquete_sur_individu extends REST_Controller {
                         'message' => 'Data 0'
                             ], REST_Controller::HTTP_BAD_REQUEST);
                 }
+				// Ajout d'un enregistrement
                 $dataId = $this->EnqueteindividuManager->add($data);
                 if (!is_null($dataId)) {
                     $this->response([
@@ -145,6 +149,7 @@ class Enquete_sur_individu extends REST_Controller {
                         'message' => 'No request found'
                             ], REST_Controller::HTTP_BAD_REQUEST);
                 }
+				// Mise à jour d'un enregistrement
                 $update = $this->EnqueteindividuManager->update($id, $data);              
                 if(!is_null($update)){
                     $this->response([
@@ -167,6 +172,7 @@ class Enquete_sur_individu extends REST_Controller {
             'message' => 'No request found'
                 ], REST_Controller::HTTP_BAD_REQUEST);
             }
+			// Suppression d'un enregistrement
             $delete = $this->EnqueteindividuManager->delete($id);          
             if (!is_null($delete)) {
                 $this->response([

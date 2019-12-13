@@ -115,7 +115,7 @@ class Validationbeneficiaire_model extends CI_Model
 			." left outer join region as r on r.id=d.region_id"
 			." where i.identifiant_appariement='".$identifiant_appariement."' and i.id_acteur=".$id_acteur	
 			." and i.nom='".$nom."' and i.prenom='".$prenom."' and i.cin='".$cin."' and i.id_fokontany=".$id_fokontany
-			." and i.id_menage=".$id_menage;
+			.(intval($id_menage) > 0 ? " and i.id_menage=".$id_menage : "");
 			$query = $this->db->query($requete);
 			return $query->result();				
 	}
@@ -144,7 +144,7 @@ class Validationbeneficiaire_model extends CI_Model
 			." left outer join region as r on r.id=d.region_id"
 			." where i.identifiant_appariement='".$identifiant_appariement."' and i.id_acteur=".$id_acteur
 			." and i.nom='".$nom."' and i.prenom='".$prenom."' and i.cin='".$cin."' and i.id_fokontany=".$id_fokontany
-			." and i.id_menage=".$id_menage;
+			.(intval($id_menage) > 0 ? " and i.id_menage=".$id_menage : "");
 			$query = $this->db->query($requete);
 			return $query->result();				
 		} else if($parametre_table=="menage") {

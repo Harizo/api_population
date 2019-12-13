@@ -8,9 +8,9 @@ class Programme extends REST_Controller {
 
     public function __construct() {
         parent::__construct();
+		// Modèles utilisées
         $this->load->model('programme_model', 'ProgrammeManager');
         $this->load->model('type_action_model', 'TypeactionManager');
-        $this->load->model('type_financement_model', 'TypefinancementManager');
         $this->load->model('tutelle_model', 'TutelleManager');
     }
 
@@ -18,19 +18,16 @@ class Programme extends REST_Controller {
         $id = $this->get('id');
 		$data = array();
 		if ($id) {
-			$tmp = $this->ProgrammeManager->findById($id);
-			if($tmp) {
-				$data=$tmp;
+			// Récupération par id (clé primaire)
+			$temporaire = $this->ProgrammeManager->findById($id);
+			if($temporaire) {
+				$data=$temporaire;
 			}
-		} else {			
+		} else {
+			// Récupération de tous les enregistrements	
 			$menu = $this->ProgrammeManager->findAll();
 			if ($menu) {
                 foreach ($menu as $key => $value) {
-                    $typefinacement = array();
-                    $type_fin = $this->TypefinancementManager->findById($value->id_type_financement);
-					if(count($type_fin) >0) {
-						$typefinacement=$type_fin;
-					}	
                     $typeaction = array();
                     $type_ac = $this->TypeactionManager->findById($value->id_type_action);
 					if(count($type_ac) >0) {
@@ -52,8 +49,6 @@ class Programme extends REST_Controller {
                     $data[$key]['typeaction'] = $typeaction;
                     $data[$key]['intitule'] = $value->intitule;
                     $data[$key]['situation_intervention'] = $value->situation_intervention;
-                    $data[$key]['id_type_financement'] = $value->id_type_financement;
-                    $data[$key]['typefinacement'] = $typefinacement;
                     $data[$key]['date_debut'] = $value->date_debut;
                     $data[$key]['date_fin'] = $value->date_fin;
                     $data[$key]['description'] = $value->description;
@@ -86,21 +81,17 @@ class Programme extends REST_Controller {
     public function index_post() {
         $id = $this->post('id') ;
         $supprimer = $this->post('supprimer') ;
-		$id_type_financement=null;
-		$tmp=$this->post('id_type_financement');
-		if(isset($tmp) && $tmp !="" && intval($tmp) >0) {
-			$id_type_financement=$tmp;
-		}
 		$id_type_action=null;
-		$tmp=$this->post('id_type_action');
-		if(isset($tmp) && $tmp !="" && intval($tmp) >0) {
-			$id_type_action=$tmp;
+		$temporaire=$this->post('id_type_action');
+		if(isset($temporaire) && $temporaire !="" && intval($temporaire) >0) {
+			$id_type_action=$temporaire;
 		}
 		$id_tutelle=null;
-		$tmp=$this->post('id_tutelle');
-		if(isset($tmp) && $tmp !="" && intval($tmp) >0) {
-			$id_tutelle=$tmp;
+		$temporaire=$this->post('id_tutelle');
+		if(isset($temporaire) && $temporaire !="" && intval($temporaire) >0) {
+			$id_tutelle=$temporaire;
 		}
+		// Affectation des colonnes de la table	
  		$data = array(
 			'nom' => $this->post('nom'),
 			'prenom'                   => $this->post('prenom'),
@@ -110,7 +101,6 @@ class Programme extends REST_Controller {
 			'id_type_action'           => $id_type_action,
 			'intitule'                 => $this->post('intitule'),
 			'situation_intervention'   => $this->post('situation_intervention'),
-			'id_type_financement'      => $id_type_financement,
 			'date_debut'               => $this->post('date_debut'),
 			'date_fin'                 => $this->post('date_fin'),
 			'description'              => $this->post('description'),
@@ -129,6 +119,7 @@ class Programme extends REST_Controller {
                         'message' => 'No request found'
                             ], REST_Controller::HTTP_BAD_REQUEST);
                 }
+				// Ajout d'un enregistrement
                 $dataId = $this->ProgrammeManager->add($data);              
                 if (!is_null($dataId)) {
                     $this->response([
@@ -151,6 +142,7 @@ class Programme extends REST_Controller {
                         'message' => 'No request found'
                             ], REST_Controller::HTTP_BAD_REQUEST);
                 }
+				// Mise à jour d'un enregistrement
                 $update = $this->ProgrammeManager->update($id, $data);              
                 if(!is_null($update)){
                     $this->response([
@@ -173,6 +165,7 @@ class Programme extends REST_Controller {
             'message' => 'No request found'
                 ], REST_Controller::HTTP_BAD_REQUEST);
             }
+			// Suppression d'un enregistrement
             $delete = $this->ProgrammeManager->delete($id);          
             if (!is_null($delete)) {
                 $this->response([

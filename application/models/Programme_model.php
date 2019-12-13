@@ -32,7 +32,6 @@ class Programme_model extends CI_Model {
             'id_type_action'           => $programme['id_type_action'],
             'intitule'                 => $programme['intitule'],
             'situation_intervention'   => $programme['situation_intervention'],
-            'id_type_financement'      => $programme['id_type_financement'],
             'date_debut'               => $programme['date_debut'],
             'date_fin'                 => $programme['date_fin'],
             'description'              => $programme['description'],

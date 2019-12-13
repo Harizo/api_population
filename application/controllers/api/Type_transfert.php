@@ -15,11 +15,13 @@ class Type_transfert extends REST_Controller {
         $id = $this->get('id');
 		$data = array();
 		if ($id) {
+			// Récupération par id (id=clé primaire)
 			$tmp = $this->TypetransfertManager->findById($id);
 			if($tmp) {
 				$data=$tmp;
 			}
-		} else {			
+		} else {	
+			// Récupération de tous les enregistrements
 			$menu = $this->TypetransfertManager->findAll();
 			if($menu) {
                 foreach ($menu as $key => $value) {
@@ -48,6 +50,7 @@ class Type_transfert extends REST_Controller {
     public function index_post() {
         $id = $this->post('id') ;
         $supprimer = $this->post('supprimer') ;
+		// Affectation des valeurs de la colonne de la table
 		$data = array(
 			'code' => $this->post('code'),
 			'description' => $this->post('description'),
@@ -61,6 +64,7 @@ class Type_transfert extends REST_Controller {
                         'message' => 'No request found'
                             ], REST_Controller::HTTP_BAD_REQUEST);
                 }
+				// Ajout d'un enregistrement
                 $dataId = $this->TypetransfertManager->add($data);              
                 if (!is_null($dataId)) {
                     $this->response([
@@ -83,6 +87,7 @@ class Type_transfert extends REST_Controller {
                         'message' => 'No request found'
                             ], REST_Controller::HTTP_BAD_REQUEST);
                 }
+				// Mise à jour d'un enregistrement
                 $update = $this->TypetransfertManager->update($id, $data);              
                 if(!is_null($update)){
                     $this->response([
@@ -105,6 +110,7 @@ class Type_transfert extends REST_Controller {
             'message' => 'No request found'
                 ], REST_Controller::HTTP_BAD_REQUEST);
             }
+			// Suppression d'un enregistrement
             $delete = $this->TypetransfertManager->delete($id);          
             if (!is_null($delete)) {
                 $this->response([

@@ -20,32 +20,37 @@ class Detail_type_transfert extends REST_Controller {
         $id_intervetion = $this->get('id_intervetion');
 		$data = array();
 		if ($id) {
+			// Récupération par id (id=clé primaire)
 			$tmp = $this->DetailtypetransfertManager->findById($id);
 			if($tmp) {
 				$data=$tmp;
 			}
-			$ou=1;
+			$choix=1;
 		} else if ($cle_etrangere){
+			// Récupération par type de transfert
 			$menu = $this->DetailtypetransfertManager->findByTypetransfert($cle_etrangere);
-			// $menu = $this->DetailtypetransfertManager->findAll();
-			$ou=2;
-		} else {	
+			$choix=2;
+		} else {
+			// Récupération de tous les enregistrements	
 			$menu = $this->DetailtypetransfertManager->findAll();
-			$ou=2;
+			$choix=2;
 		}
-		if($ou==2) {
+		if($choix==2) {
 			if($menu) {
                 foreach ($menu as $key => $value) {
+					// Détail description unité de mesure
                     $unitedemesure = array();
                     $type_fin = $this->UnitemesureManager->findById($value->id_unite_mesure);
 					if(count($type_fin) >0) {
 						$unitedemesure=$type_fin;
 					}	
+					// Détail description type de transfert
                     $typedetransfert = array();
                     $ag = $this->TypetransfertManager->findById($value->id_type_transfert);
 					if(count($ag) >0) {
 						$typedetransfert=$ag;
-					}	
+					}
+					// Affectation dans un tableau pour affichage	
                     $data[$key]['id'] = $value->id;
                     $data[$key]['code'] = $value->code;
                     $data[$key]['description'] = $value->description;
@@ -55,6 +60,7 @@ class Detail_type_transfert extends REST_Controller {
                     $data[$key]['typedetransfert'] = $typedetransfert;
                     $data[$key]['id_detail_type_transfert'] = 0;
 					if($id_intervetion) {
+						// Récupération détail type transfert par intervention
 						$val_qte= $this->DetailtypetransfertinterventionManager->findByInterventionIdtypetransfert($id_intervetion,$value->id);
 						if($val_qte) { 
 							foreach ($val_qte as $k => $v) {	
@@ -89,6 +95,7 @@ class Detail_type_transfert extends REST_Controller {
     public function index_post() {
         $id = $this->post('id') ;
         $supprimer = $this->post('supprimer') ;
+		// Affectation de valeur colonne de la table
 		$data = array(
 			'code' => $this->post('code'),
 			'description' => $this->post('description'),
@@ -104,6 +111,7 @@ class Detail_type_transfert extends REST_Controller {
                         'message' => 'No request found'
                             ], REST_Controller::HTTP_BAD_REQUEST);
                 }
+				// Ajout d'un enregistrement
                 $dataId = $this->DetailtypetransfertManager->add($data);              
                 if (!is_null($dataId)) {
                     $this->response([
@@ -126,6 +134,7 @@ class Detail_type_transfert extends REST_Controller {
                         'message' => 'No request found'
                             ], REST_Controller::HTTP_BAD_REQUEST);
                 }
+				// Mise à jour d'un enregistrement
                 $update = $this->DetailtypetransfertManager->update($id, $data);              
                 if(!is_null($update)){
                     $this->response([
@@ -148,6 +157,7 @@ class Detail_type_transfert extends REST_Controller {
             'message' => 'No request found'
                 ], REST_Controller::HTTP_BAD_REQUEST);
             }
+			// Suppression d'un enregistrement
             $delete = $this->DetailtypetransfertManager->delete($id);          
             if (!is_null($delete)) {
                 $this->response([

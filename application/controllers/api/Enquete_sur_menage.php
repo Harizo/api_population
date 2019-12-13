@@ -13,19 +13,23 @@ class Enquete_sur_menage extends REST_Controller {
         $cle_etrangere = $this->get('cle_etrangere');
         $data = array() ;
 		if($id) {
+			// Récupération par id (id=cle primaire)
 			$data = $this->EnquetesurmenageManager->findById($id);
             if (!$data)
                 $data = array();
-			$ou=1;
+			$choix=1;
 		} else if ($cle_etrangere)  {
+			// Récupération par ménage
             $menu = $this->EnquetesurmenageManager->findAllByMenage($cle_etrangere);
-			$ou=2;
+			$choix=2;
         } else  {
+			// Récupération de tous les enregistrements
 			$menu = $this->EnquetesurmenageManager->findAll();
-			$ou=2;
+			$choix=2;
         }
-		if($ou==2) {
+		if($choix==2) {
             if ($menu)  {
+				// Affectation des valeurs dans un tableau
                 $data['id'] = ($menu->id);
                 $data['id_menage'] = $menu->id_menage;
                 $data['id_type_logement'] = $menu->id_type_logement;
@@ -69,6 +73,7 @@ class Enquete_sur_menage extends REST_Controller {
     public function index_post() {
         $id = $this->post('id') ;
         $supprimer = $this->post('supprimer') ;
+		// Affectation des valeurs des colonnes de la table
 		$data = array(
 			'id_menage' => $this->post('id_menage'),
 			'id_type_logement'         => $this->post('id_type_logement'),
@@ -103,6 +108,7 @@ class Enquete_sur_menage extends REST_Controller {
                         'message' => 'No request found'
                             ], REST_Controller::HTTP_BAD_REQUEST);
                 }
+				// Ajout d'un enregistrement
                 $dataId = $this->EnquetesurmenageManager->add($data);
                 if (!is_null($dataId)) {
                     $this->response([
@@ -125,6 +131,7 @@ class Enquete_sur_menage extends REST_Controller {
                         'message' => 'No request found'
                             ], REST_Controller::HTTP_BAD_REQUEST);
                 }
+				// Mise à jour d'un enregistrement
                 $update = $this->EnquetesurmenageManager->update($id, $data);              
                 if(!is_null($update)){
                     $this->response([
@@ -147,6 +154,7 @@ class Enquete_sur_menage extends REST_Controller {
             'message' => 'No request found'
                 ], REST_Controller::HTTP_BAD_REQUEST);
             }
+			// Suppression d'un enregistrement
             $delete = $this->EnquetesurmenageManager->delete($id);          
             if (!is_null($delete)) {
                 $this->response([

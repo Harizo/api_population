@@ -11,8 +11,8 @@ class Listerecommandation extends REST_Controller {
         parent::__construct();
         $this->load->model('listerecommandation_model', 'listerecommandationManager');
     }
-
 public function convertDateAngular($daty){
+	// Conversion date angular en format Y-m-d
         if(isset($daty) && $daty != ""){
             if(strlen($daty) >33) {
                 $daty=substr($daty,0,33);
@@ -32,8 +32,10 @@ public function convertDateAngular($daty){
         $data = array();
 		$fait = $this->get('fait');
         if ($fait) {
+			// Récupération des recommandations non fait
             $data = $this->listerecommandationManager->getlesnonfait();
 		} else {
+			// Récupération de tous les recommandations
             $data = $this->listerecommandationManager->getlesrecommandations();
 		}	
 		if(!$data)
@@ -66,7 +68,8 @@ public function convertDateAngular($daty){
 		$site_id=null;
 		if(isset($tmp) && $tmp !="" && intval($tmp) >0) {
 			$site_id=$tmp;
-		}		
+		}	
+		// Affectation des valeurs
 		$data = array(
 			'resume' => $this->post('resume'),
 			'url' => $this->post('url'),
@@ -87,6 +90,7 @@ public function convertDateAngular($daty){
                         'message' => 'No request found'
                             ], REST_Controller::HTTP_BAD_REQUEST);
                 }
+				// Ajout d'un enregistrement
                 $dataId = $this->listerecommandationManager->add($data);
                 
                 if (!is_null($dataId)) {
@@ -110,6 +114,7 @@ public function convertDateAngular($daty){
                         'message' => 'No request found'
                             ], REST_Controller::HTTP_BAD_REQUEST);
                 }
+				// Mise à jour d'un enregistrement
                 $update = $this->listerecommandationManager->update($id, $data);
                 if(!is_null($update)) {
                     $this->response([
@@ -132,6 +137,7 @@ public function convertDateAngular($daty){
                     'message' => 'No request found'
                         ], REST_Controller::HTTP_BAD_REQUEST);
             }
+			// Suppression d'un enregistrement
             $delete = $this->listerecommandationManager->delete($id);     
 		/*	// suppression fichier correspondant
 			// $dossier_traite = "images/jpeg";

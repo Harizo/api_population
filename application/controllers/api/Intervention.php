@@ -21,23 +21,23 @@ class Intervention extends REST_Controller {
         $cle_etrangere = $this->get('cle_etrangere');
 		$data = array();
 		if ($id) {
+			// Récupération par id 
 			$temporaire = $this->InterventionManager->findById($id);
 			if($temporaire) {
-				// $data=$temporaire;
 				$menu=$temporaire;
 			} else {
 				$menu=array();
 			}
-			$ou=1;
 		} else if($cle_etrangere) {
+			// Récupération par id_programme
 			$menu = $this->InterventionManager->findByProgramme($cle_etrangere);
-			$ou=2;	
-		} else {			
+		} else {
+			// Récupération de tous les enregistrements	
 			$menu = $this->InterventionManager->findAll();
-			$ou=2;
 		}
-		// if($ou==2) {
 			if ($menu) {
+				// Affectation des valeurs dans un tableau et récupération des détails d'information 
+				// pour les colonnes clés étargères
                 foreach ($menu as $key => $value) {
                     $typetransfert = array();
                     $type_fin = $this->TypetrasfertManager->findById($value->id_type_transfert);
@@ -104,7 +104,6 @@ class Intervention extends REST_Controller {
                     $data[$key]['detail_charge'] = 0;
 				}
 			}			
-		// }
         if (count($data)>0) {
             $this->response([
                 'status' => TRUE,
@@ -122,6 +121,7 @@ class Intervention extends REST_Controller {
     public function index_post() {
         $id = $this->post('id') ;
         $supprimer = $this->post('supprimer') ;
+		// Initialisation null des colonnes clés étrangères : pour éviter le ZERO par défaut lors de l'insertion / ATTENTION
 		$id_type_transfert=null;
 		$temporaire=$this->post('id_type_transfert');
 		if(isset($temporaire) && $temporaire !="" && intval($temporaire) >0) {
@@ -142,6 +142,7 @@ class Intervention extends REST_Controller {
 		if(isset($temporaire) && $temporaire !="" && intval($temporaire) >0) {
 			$id_frequence_transfert=$temporaire;
 		}
+		// Affectation des valeurs
  		$data = array(
 			'id_programme' => $this->post('id_programme'),
 			'identifiant' => $this->post('identifiant'),
@@ -165,7 +166,7 @@ class Intervention extends REST_Controller {
 			'commentaire' => $this->post('commentaire'),
 		); 
 		$detail_type_transfert=array();
-		$nombre = intval($this->post('nombre_detail_type_transfert'));
+		$nombre_detail_type_transfert = intval($this->post('nombre_detail_type_transfert'));
         if ($supprimer == 0) {
             if ($id == 0) {
                 if (!$data) {
@@ -175,9 +176,11 @@ class Intervention extends REST_Controller {
                         'message' => 'No request found'
                             ], REST_Controller::HTTP_BAD_REQUEST);
                 }
+				// Ajout d'un enregistrement 
                 $dataId = $this->InterventionManager->add($data);      
-				if($nombre >0) {
-					for($i=0;$i<$nombre;$i++) {
+				if($nombre_detail_type_transfert >0) {
+					// Ajout détail type transfert
+					for($i=0;$i<$nombre_detail_type_transfert;$i++) {
 						$type_trf=array(
 							'id_intervention' => $dataId,
 							'id_detail_type_transfert' => $this->post('id_detail_type_transfert_'.$i),
@@ -207,10 +210,13 @@ class Intervention extends REST_Controller {
                         'message' => 'No request found'
                             ], REST_Controller::HTTP_BAD_REQUEST);
                 }
-                $update = $this->InterventionManager->update($id, $data);              
+				// Mise à jour d'un enregistrement 
+                $update = $this->InterventionManager->update($id, $data);  
+				// Suppresion de tous les détails type transfert avant insertion de nouveau
 				$del = $this->DetailtypetransfertinterventionManager->deleteByIntervention($id);  
-				if($nombre >0) {
-					for($i=0;$i<$nombre;$i++) {
+				if($nombre_detail_type_transfert >0) {
+					// Ajout détail type transfert
+					for($i=0;$i<$nombre_detail_type_transfert;$i++) {
 						$type_trf=array(
 							'id_intervention' => $this->post('id_intervention_'.$i),
 							'id_detail_type_transfert' => $this->post('id_detail_type_transfert_'.$i),
@@ -242,7 +248,9 @@ class Intervention extends REST_Controller {
             'message' => 'No request found'
                 ], REST_Controller::HTTP_BAD_REQUEST);
             }
+			// Suppression des fils type_transfert_intervention 
 			$del = $this->DetailtypetransfertinterventionManager->deleteByIntervention($id);  
+			// Suppresion d'un enregistrement d'intervention
             $delete = $this->InterventionManager->delete($id);          
             if (!is_null($delete)) {
                 $this->response([

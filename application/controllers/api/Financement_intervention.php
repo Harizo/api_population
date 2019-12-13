@@ -21,54 +21,63 @@ class Financement_intervention extends REST_Controller {
         $cle_etrangere = $this->get('cle_etrangere');
 		$data = array();
 		if ($id) {
-			$tmp = $this->FinancementinterventionManager->findById($id);
-			if($tmp) {
-				$data=$tmp;
+			// Récupération par id (id=clé primaire)
+			$temporaire = $this->FinancementinterventionManager->findById($id);
+			if($temporaire) {
+				$data=$temporaire;
 			}
-			$ou=1;
-		} else if($cle_etrangere) {			
+			$choix=1;
+		} else if($cle_etrangere) {	
+			// Récupération par intervention
 			$menu = $this->FinancementinterventionManager->findByIdIntervention($cle_etrangere);
-			$ou=2;
+			$choix=2;
 		} else {
+			// Récupération de tous les enregistrements
 			$menu = $this->FinancementinterventionManager->findAll();
-			$ou=2;			
+			$choix=2;			
 		}
-		if($ou==2) {
+		if($choix==2) {
 			if ($menu) {
                 foreach ($menu as $key => $value) {
+					// Détail description intervention
 					$intervention =array();
 					if($value->id_intervention) {
 						$prg = $this->InterventionManager->findById($value->id_intervention);
 						if(count($prg) >0) {
 							$intervention=$prg;
 						}						
-					}					
+					}	
+					// Détail description source de financement
                     $sourcefinancement = array();
                     $tpf = $this->SourcefinancementManager->findById($value->id_source_financement);
 					if(count($tpf) >0) {
 						$sourcefinancement=$tpf;
 					}
+					// Détail description action stratégique
 					$actionstrategique =array();
 					if($value->id_action_strategique) {
 						$reg = $this->ActionstrategiqueManager->findById($value->id_action_strategique);
 						if(count($reg) >0) {
 							$actionstrategique=$reg;
 						}						
-					}					
+					}	
+					// Détail description devise	
 					$devise =array();
 					if($value->id_devise) {
 						$devi = $this->DeviseManager->findById($value->id_devise);
 						if(count($devi) >0) {
 							$devise=$devi;
 						}						
-					}					
+					}
+					// Détail description type secteur
 					$typesecteur =array();
 					if($value->id_type_secteur) {
 						$ts = $this->TypesecteurManager->findById($value->id_type_secteur);
 						if(count($ts) >0) {
 							$typesecteur=$ts;
 						}						
-					}					
+					}
+					// Affectation de valeur dans un tableau	
                     $data[$key]['id'] = $value->id;
                     $data[$key]['id_intervention'] = $value->id_intervention;
                     $data[$key]['intervention'] = $intervention;
@@ -104,26 +113,28 @@ class Financement_intervention extends REST_Controller {
     public function index_post() {
         $id = $this->post('id') ;
         $supprimer = $this->post('supprimer') ;
+		// Initialisation des valeurs à null pour éviter le ZERO par défaut inséré dans la BDD
 		$id_source_financement=null;
-		$tmp=$this->post('id_source_financement');
-		if(isset($tmp) && $tmp !="" && intval($tmp) >0) {
-			$id_source_financement=$tmp;
+		$temporaire=$this->post('id_source_financement');
+		if(isset($temporaire) && $temporaire !="" && intval($temporaire) >0) {
+			$id_source_financement=$temporaire;
 		}
 		$id_action_strategique=null;
-		$tmp=$this->post('id_action_strategique');
-		if(isset($tmp) && $tmp !="" && intval($tmp) >0) {
-			$id_action_strategique=$tmp;
+		$temporaire=$this->post('id_action_strategique');
+		if(isset($temporaire) && $temporaire !="" && intval($temporaire) >0) {
+			$id_action_strategique=$temporaire;
 		}
 		$id_devise=null;
-		$tmp=$this->post('id_devise');
-		if(isset($tmp) && $tmp !="" && intval($tmp) >0) {
-			$id_devise=$tmp;
+		$temporaire=$this->post('id_devise');
+		if(isset($temporaire) && $temporaire !="" && intval($temporaire) >0) {
+			$id_devise=$temporaire;
 		}
 		$id_type_secteur=null;
-		$tmp=$this->post('id_type_secteur');
-		if(isset($tmp) && $tmp !="" && intval($tmp) >0) {
-			$id_type_secteur=$tmp;
+		$temporaire=$this->post('id_type_secteur');
+		if(isset($temporaire) && $temporaire !="" && intval($temporaire) >0) {
+			$id_type_secteur=$temporaire;
 		}
+		// Affecation de valeur de chaque colonne de la table
  		$data = array(
 			'id_intervention' => $this->post('id_intervention'),
 			'id_source_financement' => $id_source_financement,
@@ -142,6 +153,7 @@ class Financement_intervention extends REST_Controller {
                         'message' => 'No request found'
                             ], REST_Controller::HTTP_BAD_REQUEST);
                 }
+				// Ajout d'un enregistrement
                 $dataId = $this->FinancementinterventionManager->add($data);              
                 if (!is_null($dataId)) {
                     $this->response([
@@ -164,6 +176,7 @@ class Financement_intervention extends REST_Controller {
                         'message' => 'No request found'
                             ], REST_Controller::HTTP_BAD_REQUEST);
                 }
+				// Mise à jour d'un enregistrement
                 $update = $this->FinancementinterventionManager->update($id, $data);              
                 if(!is_null($update)){
                     $this->response([
@@ -186,6 +199,7 @@ class Financement_intervention extends REST_Controller {
             'message' => 'No request found'
                 ], REST_Controller::HTTP_BAD_REQUEST);
             }
+			// Suppression d'un enregistrement
             $delete = $this->FinancementinterventionManager->delete($id);          
             if (!is_null($delete)) {
                 $this->response([

@@ -15,15 +15,11 @@ class Type_secteur extends REST_Controller {
         $id = $this->get('id');
 		$data = array();
 		if ($id) {
-			$tmp = $this->TypesecteurManager->findById($id);
-			if($tmp) {
-				$data=$tmp;
-			}
-		} else {			
-			$tmp = $this->TypesecteurManager->findAll();
-			if ($tmp) {
-				$data=$tmp;
-			}
+			// Récupération par id (id=clé primaire)
+			$data = $this->TypesecteurManager->findById($id);
+		} else {
+			// Récupération de tous les enregistrements	
+			$data = $this->TypesecteurManager->findAll();
 		}
         if (count($data)>0) {
             $this->response([
@@ -42,6 +38,7 @@ class Type_secteur extends REST_Controller {
     public function index_post() {
         $id = $this->post('id') ;
         $supprimer = $this->post('supprimer') ;
+		// Affectation de valeur de la colonne nom
 		$data = array(
 			'nom' => $this->post('nom'),
 		);               
@@ -54,6 +51,7 @@ class Type_secteur extends REST_Controller {
                         'message' => 'No request found'
                             ], REST_Controller::HTTP_BAD_REQUEST);
                 }
+				// Ajout d'un enregistrement
                 $dataId = $this->TypesecteurManager->add($data);              
                 if (!is_null($dataId)) {
                     $this->response([
@@ -76,6 +74,7 @@ class Type_secteur extends REST_Controller {
                         'message' => 'No request found'
                             ], REST_Controller::HTTP_BAD_REQUEST);
                 }
+				// Mise à jour d'un enregistrement
                 $update = $this->TypesecteurManager->update($id, $data);              
                 if(!is_null($update)){
                     $this->response([
@@ -98,6 +97,7 @@ class Type_secteur extends REST_Controller {
             'message' => 'No request found'
                 ], REST_Controller::HTTP_BAD_REQUEST);
             }
+			// Suppression d'un enregistrement
             $delete = $this->TypesecteurManager->delete($id);          
             if (!is_null($delete)) {
                 $this->response([

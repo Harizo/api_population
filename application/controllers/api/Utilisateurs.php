@@ -195,8 +195,9 @@ class Utilisateurs extends REST_Controller {
 					$id_intervention=$tmp;
 				}
                 $getrole = $this->post('roles');
-				if(intval($this->post('default_password'))==0) {
-					// Mot de passe par défaut : création d'un utlisateur
+				if(intval($this->post('default_password'))==0) {  
+					// C'est-à-dire mot de passe par défaut déjà modifié
+					// Mise à jour d'un utlisateur
 					$data = array(
 						'nom' => $this->post('nom'),
 						'prenom' => $this->post('prenom'),         
@@ -221,7 +222,7 @@ class Utilisateurs extends REST_Controller {
 						'description_hote' => $this->post('description_hote'),
 					);
 				} else {
-					// Mise à jour d'un utlisateur
+					// Mot de passe par défaut : création d'un utlisateur
 					$data = array(
 						'nom' => $this->post('nom'),
 						'prenom' => $this->post('prenom'),         
@@ -293,7 +294,6 @@ class Utilisateurs extends REST_Controller {
                     'token' => bin2hex(openssl_random_pseudo_bytes(32)),
                     'roles' => serialize($getrole)
                 );
-
                 if (!$data) {
                     $this->response([
                         'status' => FALSE,

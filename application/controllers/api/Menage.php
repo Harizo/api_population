@@ -14,6 +14,7 @@ class Menage extends REST_Controller {
         $this->load->model('acteur_model', 'ActeurManager');
         $this->load->model('type_beneficiaire_model', 'TypebeneficiaireManager');
     }
+	// Conversion date angular date longue en  format y-m-d
 	public function convertDateAngular($daty){
 		if(isset($daty) && $daty != ""){
 			if(strlen($daty) >33) {
@@ -35,35 +36,42 @@ class Menage extends REST_Controller {
         $cle_etrangere = $this->get('cle_etrangere');
 		$data=array();
         if ($id) {
+			// Récupération par id (clé primaire)
             $data = $this->MenageManager->findById($id);
             if (!$data)
                 $data = array();
-			$ou=1;
+			$choix=1;
         } else if($cle_etrangere) {
-			$ou=2;
+			// Récupération par id_fokontany
+			$choix=2;
 			$menu = $this->MenageManager->findByIdFokontany($cle_etrangere);	
 		} else {
-			$ou=2;			
+			// Récupération de tous les enregistrements
+			$choix=2;			
 			$menu = $this->MenageManager->findAll();	
         }
-		if($ou==2) {
+		if($choix==2) {
             if ($menu) {
                 foreach ($menu as $key => $value) {
+					// Description fokontany
                     $fokontany = array();
                     $type_emp = $this->FokontanyManager->findById($value->id_fokontany);
 					if(count($type_emp) >0) {
 						$fokontany=$type_emp;
-					}	
+					}
+					// Description type bénéficiaire
                     $type_beneficiaire = array();
                     $type_emp = $this->TypebeneficiaireManager->findById($value->id_type_beneficiaire);
 					if(count($type_emp) >0) {
 						$type_beneficiaire=$type_emp;
 					}	
+					// Description acteur
                     $acteur = array();
                     $acteur_temp = $this->ActeurManager->findById($value->id_type_beneficiaire);
 					if(count($acteur_temp) >0) {
 						$acteur=$acteur_temp;
-					}	
+					}
+					// Valeur retourné en tableau	
                     $data[$key]['id'] = $value->id;
                     $data[$key]['identifiant_unique'] = $value->identifiant_unique;
                     $data[$key]['identifiant_appariement'] = $value->identifiant_appariement;
@@ -139,6 +147,7 @@ class Menage extends REST_Controller {
 		if(isset($temporaire) && $temporaire !="" && intval($temporaire) >0) {
 			$id_acteur=$temporaire;
 		}
+		// Affectation valeur colonne
 		$data = array(
 			'identifiant_unique'     => $this->post('identifiant_unique'),
 			'identifiant_appariement'=> $this->post('identifiant_appariement'),
@@ -173,6 +182,7 @@ class Menage extends REST_Controller {
 			'id_acteur'              => $id_acteur,
 			'id_type_beneficiaire'   => $id_type_beneficiaire
 		);
+		// Supprimer =0 veut dire : soit un ajout ou mise a jour sinon suppression d'un enregistrement
         if ($supprimer == 0) {
             if ($id == 0) {
                 if (!$data) {
@@ -182,6 +192,7 @@ class Menage extends REST_Controller {
                         'message' => 'No request found'
                             ], REST_Controller::HTTP_BAD_REQUEST);
                 }
+				// Ajout d'un enregistrement
                 $dataId = $this->MenageManager->add($data);
                 if (!is_null($dataId)) {
                     $this->response([
@@ -204,6 +215,7 @@ class Menage extends REST_Controller {
                         'message' => 'No request found'
                             ], REST_Controller::HTTP_BAD_REQUEST);
                 }
+				// Mise à jour d'un enregistrement
                 $update = $this->MenageManager->update($id, $data);
                 if(!is_null($update)) {
                     $this->response([
@@ -226,6 +238,7 @@ class Menage extends REST_Controller {
                 'message' => 'No request found'
                     ], REST_Controller::HTTP_BAD_REQUEST);
             }
+			// Suppression d'un enregistrement
             $delete = $this->MenageManager->delete($id);
             if (!is_null($delete)) {
                 $this->response([

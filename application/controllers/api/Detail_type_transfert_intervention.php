@@ -18,19 +18,22 @@ class Detail_type_transfert_intervention extends REST_Controller {
         $cle_etrangere = $this->get('cle_etrangere');
 		$data = array();
 		if ($id) {
+			// Récupération par id (id=clé primaire)
 			$tmp = $this->DetailtypetransfertinterventionManager->findById($id);
 			if($tmp) {
 				$data=$tmp;
 			}
-			$ou=1;
+			$choix=1;
 		} else if ($cle_etrangere){
+			// Récupération par intervention
 			$menu = $this->DetailtypetransfertinterventionManager->findByIntervention($cle_etrangere);
-			$ou=2;
-		} else {	
+			$choix=2;
+		} else {
+			// Récupération de tous les enregistrements	
 			$menu = $this->DetailtypetransfertinterventionManager->findAll();
-			$ou=2;
+			$choix=2;
 		}
-		if($ou==2) {
+		if($choix==2) {
 			if($menu) {
                 foreach ($menu as $key => $value) {
                     $data[$key]['id'] = $value->id;
@@ -57,6 +60,7 @@ class Detail_type_transfert_intervention extends REST_Controller {
     public function index_post() {
         $id = $this->post('id') ;
         $supprimer = $this->post('supprimer') ;
+		// Affectation de valeur des colonnes de la table
 		$data = array(
 			'id_intervention' => $this->post('id_intervention'),
 			'id_detail_type_transfert' => $this->post('id_detail_type_transfert'),
@@ -71,6 +75,7 @@ class Detail_type_transfert_intervention extends REST_Controller {
                         'message' => 'No request found'
                             ], REST_Controller::HTTP_BAD_REQUEST);
                 }
+				// Ajout d'un enregistrement
                 $dataId = $this->DetailtypetransfertinterventionManager->add($data);              
                 if (!is_null($dataId)) {
                     $this->response([
@@ -93,6 +98,7 @@ class Detail_type_transfert_intervention extends REST_Controller {
                         'message' => 'No request found'
                             ], REST_Controller::HTTP_BAD_REQUEST);
                 }
+				// Mise à jour d'un enregistrement
                 $update = $this->DetailtypetransfertinterventionManager->update($id, $data);              
                 if(!is_null($update)){
                     $this->response([
@@ -115,6 +121,7 @@ class Detail_type_transfert_intervention extends REST_Controller {
             'message' => 'No request found'
                 ], REST_Controller::HTTP_BAD_REQUEST);
             }
+			// Suppression d'un enregistrement
             $delete = $this->DetailtypetransfertinterventionManager->delete($id);          
             if (!is_null($delete)) {
                 $this->response([
