@@ -128,6 +128,6 @@ class Importationbeneficiaire_model extends CI_Model
         }else{
             return null;
         }                 
-    }		
-	
+    }			
 }
+?>

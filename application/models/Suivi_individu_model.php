@@ -18,7 +18,6 @@ class Suivi_individu_model extends CI_Model
             return null;
         }                    
     }
-
 	// Cette fonction met à jour un enregistrement dans la table
     public function update($id, $suivi_individu)
     {
@@ -133,5 +132,5 @@ class Suivi_individu_model extends CI_Model
             return null;
         }                  
     }
-
 }
+?>

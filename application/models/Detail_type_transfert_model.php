@@ -4,6 +4,7 @@ class Detail_type_transfert_model extends CI_Model {
     protected $table = 'detail_type_transfert';
 
     public function add($detailtypetransfert)  {
+		// Ajout d'un enregitrement
         $this->db->set($this->_set($detailtypetransfert))
                             ->insert($this->table);
         if($this->db->affected_rows() === 1)  {
@@ -13,6 +14,7 @@ class Detail_type_transfert_model extends CI_Model {
         }                    
     }
     public function update($id, $detailtypetransfert)  {
+		// Mise à jour d'un enregitrement
         $this->db->set($this->_set($detailtypetransfert))
                             ->where('id', (int) $id)
                             ->update($this->table);
@@ -23,6 +25,7 @@ class Detail_type_transfert_model extends CI_Model {
         }                      
     }
     public function _set($detailtypetransfert) {
+		// Affectation des valeurs
         return array(
             'code'              => $detailtypetransfert['code'],
             'description'       => $detailtypetransfert['description'],
@@ -31,6 +34,7 @@ class Detail_type_transfert_model extends CI_Model {
         );
     }
     public function delete($id) {
+		// Suppression d'un enregitrement
         $this->db->where('id', (int) $id)->delete($this->table);
         if($this->db->affected_rows() === 1)  {
             return true;
@@ -39,6 +43,7 @@ class Detail_type_transfert_model extends CI_Model {
         }  
     }
     public function findAll() {
+		// Selection de tous les enregitrements
         $result =  $this->db->select('*')
                         ->from($this->table)
                         ->order_by('description')
@@ -51,6 +56,7 @@ class Detail_type_transfert_model extends CI_Model {
         }                 
     }
     public function findById($id) {
+		// Selection par id
         $result =  $this->db->select('*')
                         ->from($this->table)
                         ->where("id", $id)
@@ -64,6 +70,7 @@ class Detail_type_transfert_model extends CI_Model {
         }                 
     }
     public function findByTypetransfert($id_type_transfert) {
+		// Selection par id_type_transfert
         $result =  $this->db->select('*')
                         ->from($this->table)
                         ->where("id_type_transfert", $id_type_transfert)
@@ -77,6 +84,7 @@ class Detail_type_transfert_model extends CI_Model {
         }                 
     }
     public function findByIntervention($id_intervention) {
+		// Selection par id_intervention
 		$query = "select dtti.id_detail_type_transfert as id,dtt.description,dtt.id_unite_mesure,dtt.id_type_transfert,dtt.code,dtti.valeur_quantite"
 				." from detail_type_transfert_intervention as dtti"
 				." left outer join detail_type_transfert as dtt on dtt.id=dtti.id_detail_type_transfert" 

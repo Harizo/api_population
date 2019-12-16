@@ -65,7 +65,7 @@ class Variable_intervention_model extends CI_Model {
             return $result;
         }else{
             return null;
-        }                 
+        }
     }
 	// Récupération par id (clé primaire)
     public function findById($id) {

@@ -4,6 +4,7 @@ class Projet_model extends CI_Model {
     protected $table = 'projet';
 
     public function add($projet)  {
+		// Ajout d'un enregitrement
         $this->db->set($this->_set($projet))
                             ->insert($this->table);
         if($this->db->affected_rows() === 1)  {
@@ -13,6 +14,7 @@ class Projet_model extends CI_Model {
         }                    
     }
     public function update($id, $projet)  {
+		// Mise à jour d'un enregitrement
         $this->db->set($this->_set($projet))
                             ->where('id', (int) $id)
                             ->update($this->table);
@@ -23,17 +25,18 @@ class Projet_model extends CI_Model {
         }                      
     }
     public function _set($projet) {
+		// Affectation des valeurs
         return array(
             'intitule'         => $projet['intitule'],
             'objectif_general' => $projet['objectif_general'],
             'observation'      => $projet['observation'],
             'type_intervention' => $projet['type_intervention'],
-            // 'id_programme'     => $projet['id_programme'],
             'date_debut'       => $projet['date_debut'],
             'date_fin'         => $projet['date_fin']
         );
     }
     public function delete($id) {
+		// Suppression d'un enregitrement
         $this->db->where('id', (int) $id)->delete($this->table);
         if($this->db->affected_rows() === 1)  {
             return true;
@@ -42,6 +45,7 @@ class Projet_model extends CI_Model {
         }  
     }
     public function findAll() {
+		// Selection de tous les enregitrements
         $result =  $this->db->select('*')
                         ->from($this->table)
                         ->order_by('intitule')
@@ -54,6 +58,7 @@ class Projet_model extends CI_Model {
         }                 
     }
     public function findById($id)  {
+		// Selection par id
         $result =  $this->db->select('*')
                         ->from($this->table)
                         ->where("id", $id)

@@ -4,6 +4,7 @@ class Decaissement_model extends CI_Model {
     protected $table = 'decaissement';
 
     public function add($decaissement)  {
+		// Ajout d'un enregitrement
         $this->db->set($this->_set($decaissement))
                             ->insert($this->table);
         if($this->db->affected_rows() === 1)  {
@@ -13,6 +14,7 @@ class Decaissement_model extends CI_Model {
         }                    
     }
     public function update($id, $decaissement)  {
+		// Mise à jour d'un enregitrement
         $this->db->set($this->_set($decaissement))
                             ->where('id', (int) $id)
                             ->update($this->table);
@@ -23,6 +25,7 @@ class Decaissement_model extends CI_Model {
         }                      
     }
     public function _set($decaissement) {
+		// Affectation des valeurs
         return array(
             'id_financement_intervention'               => $decaissement['id_financement_intervention'],
             'nom_informateur'                           => $decaissement['nom_informateur'],
@@ -53,6 +56,7 @@ class Decaissement_model extends CI_Model {
         );
     }
     public function delete($id) {
+		// Suppression d'un enregitrement
         $this->db->where('id', (int) $id)->delete($this->table);
         if($this->db->affected_rows() === 1)  {
             return true;
@@ -61,6 +65,7 @@ class Decaissement_model extends CI_Model {
         }  
     }
     public function findAll() {
+		// Selection de tous les enregitrements
         $result =  $this->db->select('*')
                         ->from($this->table)
                         ->order_by('id')
@@ -73,6 +78,7 @@ class Decaissement_model extends CI_Model {
         }                 
     }
     public function findById($id) {
+		// Selection par id
         $result =  $this->db->select('*')
                         ->from($this->table)
                         ->where("id", $id)
@@ -86,6 +92,7 @@ class Decaissement_model extends CI_Model {
         }                 
     }
     public function findAllByFinancementintervention($id_financement_intervention)  {
+		// Selection par id_financement_intervention
         $result =  $this->db->select('*')
                         ->from($this->table)
                         ->order_by('id')

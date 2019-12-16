@@ -26,7 +26,7 @@ class Suivi_menage_entete extends REST_Controller {
         $id_menage = $this->get('id_menage');
         $data = array() ;
         if ($cle_etrangere) 
-        {
+        {	// Selection par ménage
             $suivi_menage = $this->SuivimenageenteteManager->findAllByMenage($cle_etrangere);
 
             
@@ -47,6 +47,7 @@ class Suivi_menage_entete extends REST_Controller {
 			{ 
 				$id_i=$id_intervention;
                 $id_prog = '"%'.$id_intervention.'%"' ;
+				// Selection par programme et par ménage
                 $list_suivi_menage = $this->SuivimenageenteteManager->findAllByProgrammeAndMenage($id_intervention,$id_menage);
                 if ($list_suivi_menage) 
                 {
@@ -93,6 +94,7 @@ class Suivi_menage_entete extends REST_Controller {
             if ($id_intervention) 
             {
                 $id_prog = '"'.$id_intervention.'"' ;
+				// Selection par programme
                 $list_suivi_menage = $this->SuivimenageenteteManager->findAllByProgramme($id_prog);
                 if ($list_suivi_menage) 
                 {
@@ -105,23 +107,20 @@ class Suivi_menage_entete extends REST_Controller {
                         $data[$key]['Addresse'] = ($value->Addresse);
                         $data[$key]['NumeroEnregistrement'] = ($value->NumeroEnregistrement);
                         $data[$key]['id_liste_validation_intervention'] = ($value->id_liste_validation_intervention);
-                       // $data['id_menage'] = ($suivi_menage->id_menage);
                         $data[$key]['id_intervention'] = ($id_intervention);
                         $data[$key]['id_fokontany'] = ($value->id_fokontany);
                         $data[$key]['date_suivi'] = ($date_suivi);
-                        //$data[$key]['menage'] = $this->menageManager->findById($value->id_menage);
-                       
                     }
                 }
             }
             else
             {
                 if ($id) 
-                {
+                {	// Selection par id
                     $data = $this->SuivimenageenteteManager->findById($id);
                 } 
                 else 
-                {
+                {	// Selection de tous les enregistrements
                     $data = $this->SuivimenageenteteManager->findAll();                   
                 }
             }
@@ -150,6 +149,7 @@ class Suivi_menage_entete extends REST_Controller {
         $id = $this->post('id') ;
         $supprimer = $this->post('supprimer') ;
         if ($supprimer == 0) {
+			// Affectation des valeurs
 			$data = array(
 				'id_intervention' => $this->post('id_intervention'),
 				'date_suivi' => $this->post('date_suivi'),
@@ -166,7 +166,7 @@ class Suivi_menage_entete extends REST_Controller {
                         'message' => 'No request found'
                             ], REST_Controller::HTTP_BAD_REQUEST);
                 }
-
+				// Ajout d'un enregistrement
                 $dataId = $this->SuivimenageenteteManager->add($data);
 
                 if (!is_null($dataId)) 
@@ -191,6 +191,7 @@ class Suivi_menage_entete extends REST_Controller {
                         'message' => 'No request found'
                             ], REST_Controller::HTTP_BAD_REQUEST);
                 }
+				// Mise à jour d'un enregistrement
                 $update = $this->SuivimenageenteteManager->update($id, $data);              
                 if(!is_null($update)){
                     $this->response([
@@ -213,6 +214,7 @@ class Suivi_menage_entete extends REST_Controller {
             'message' => 'No request found'
                 ], REST_Controller::HTTP_BAD_REQUEST);
             }
+			// Suppression d'un enregistrement
             $delete = $this->SuivimenageenteteManager->delete($id);          
             if (!is_null($delete)) {
                 $this->response([

@@ -26,7 +26,7 @@ class Suivi_menage_detail_transfert extends REST_Controller {
         $id_menage = $this->get('id_menage');
         $data = array() ;
         if ($cle_etrangere) 
-        {
+        {	// Selection par individu
             $suivi_menage_detail_transfert = $this->SuivimenageenteteManager->findAllByIndividu($cle_etrangere);
 
             
@@ -47,6 +47,7 @@ class Suivi_menage_detail_transfert extends REST_Controller {
 				$data=array();
  				$id_i=$id_intervention;
                $id_prog = '"%'.$id_intervention.'%"' ;
+			   // Selection par programme et par ménage
                 $list_suivi_menage = $this->SuivimenageenteteManager->findAllByProgrammeAndIndividu($id_intervention,$id_menage);
                 if ($list_suivi_menage) 
                 {
@@ -80,6 +81,7 @@ class Suivi_menage_detail_transfert extends REST_Controller {
             if ($id_intervention) 
             {
                 $id_prog = '"'.$id_intervention.'"' ;
+				// Selection par programme
                 $list_suivi_menage = $this->SuivimenageenteteManager->findAllByProgramme($id_prog);
                 if ($list_suivi_menage) 
                 {
@@ -91,21 +93,18 @@ class Suivi_menage_detail_transfert extends REST_Controller {
                         $data[$key]['AgeInscrire'] = ($value->AgeInscrire);
                         $data[$key]['Addresse'] = ($value->Addresse);
                         $data[$key]['NumeroEnregistrement'] = ($value->NumeroEnregistrement);
-                       // $data['id_menage'] = ($suivi_menage_detail_transfert->id_menage);
                         $data[$key]['id_intervention'] = ($id_intervention);
-                        //$data[$key]['menage'] = $this->menageManager->findById($value->id_menage);
-                       
                     }
                 }
             }
             else
             {
                 if ($id) 
-                {
+                {	// Selection par id
                     $data = $this->SuivimenageenteteManager->findById($id);
                 } 
                 else 
-                {
+                {	// Selection de tous les enregistrements
                     $data = $this->SuivimenageenteteManager->findAll();                   
                 }
             }
@@ -148,7 +147,7 @@ class Suivi_menage_detail_transfert extends REST_Controller {
                         'message' => 'No request found'
                             ], REST_Controller::HTTP_BAD_REQUEST);
                 }
-
+				// Ajout d'un enregistrement
                 $dataId = $this->SuivimenageenteteManager->add($data);
 
                 if (!is_null($dataId)) 
@@ -173,6 +172,7 @@ class Suivi_menage_detail_transfert extends REST_Controller {
                         'message' => 'No request found'
                             ], REST_Controller::HTTP_BAD_REQUEST);
                 }
+				// Mise à jour d'un enregistrement
                 $update = $this->SuivimenageenteteManager->update($id, $data);              
                 if(!is_null($update)){
                     $this->response([
@@ -195,6 +195,7 @@ class Suivi_menage_detail_transfert extends REST_Controller {
             'message' => 'No request found'
                 ], REST_Controller::HTTP_BAD_REQUEST);
             }
+			// Suppression d'un enregistrement
             $delete = $this->SuivimenageenteteManager->delete($id);          
             if (!is_null($delete)) {
                 $this->response([

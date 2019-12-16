@@ -134,5 +134,5 @@ class Suivi_individu_detail_transfert_model extends CI_Model
             return null;
         }                  
     }
-
 }
+?>

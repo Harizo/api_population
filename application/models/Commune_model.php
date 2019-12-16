@@ -4,6 +4,7 @@ class Commune_model extends CI_Model {
     protected $table = 'commune';
 
     public function add($commune) {
+		// Ajout d'un enregitrement
         $this->db->set($this->_set($commune))
                             ->insert($this->table);
         if($this->db->affected_rows() === 1)
@@ -14,6 +15,7 @@ class Commune_model extends CI_Model {
         }                    
     }
     public function update($id, $commune) {
+		// Mise à jour d'un enregitrement
         $this->db->set($this->_set($commune))
                             ->where('id', (int) $id)
                             ->update($this->table);
@@ -24,6 +26,7 @@ class Commune_model extends CI_Model {
         }                      
     }
     public function _set($commune) {
+		// Affectation des valeurs
         return array(
             'code'           =>      $commune['code'],
             'nom'            =>      $commune['nom'],
@@ -31,6 +34,7 @@ class Commune_model extends CI_Model {
         );
     }
     public function delete($id) {
+		// Suppression d'un enregitrement
         $this->db->where('id', (int) $id)->delete($this->table);
         if($this->db->affected_rows() === 1) {
             return true;
@@ -39,6 +43,7 @@ class Commune_model extends CI_Model {
         }  
     }
     public function findAll() {
+		// Selection de tous les enregitrements
         $result =  $this->db->select('*')
                         ->from($this->table)
                         ->order_by('nom')
@@ -52,6 +57,7 @@ class Commune_model extends CI_Model {
         }                 
     }
 	public function find_Commune_avec_District_et_Region($id_district) {
+		// Selection commune avec description district et région correspondant
 		$requete='select c.id,c.nom,c.code,c.district_id,d.nom as nomdistrict,d.region_id,r.nom as region'
 				.' from commune as c'
 				.' left outer join district as d on d.id=c.district_id'
@@ -66,6 +72,7 @@ class Commune_model extends CI_Model {
         }  
 	}
 	public function find_Fokontany_avec_District_et_Region($id_commune) {
+		// Selection fokontany avec description commune,district et région correspondant
 		$requete='select f.id,f.nom,f.code,f.id_commune,c.nom as commune,d.nom as nomdistrict,d.region_id,r.nom as region'
 				.' from fokontany as f'
 				.' left outer join commune as c on c.id=f.id_commune'
@@ -81,6 +88,7 @@ class Commune_model extends CI_Model {
         }  
 	}
     public function findAllByDistrict($district_id) {
+		// Selection commune par district
         $result =  $this->db->select('*')
                         ->from($this->table)
                         ->order_by('nom')
@@ -94,6 +102,7 @@ class Commune_model extends CI_Model {
         }                 
     }
     public function findById($id) {
+		// Selection par id
         $result =  $this->db->select('*')
                         ->from($this->table)
                         ->where("id", $id)
@@ -107,40 +116,15 @@ class Commune_model extends CI_Model {
         }                 
     }
     public function findByIdOLD($id) 
-    {
+    {	// Selection par id
         $this->db->where("id", $id);
         $q = $this->db->get($this->table);
         if ($q->num_rows() > 0) {
             return $q->row();
         }
     }	
-    /*public function findById($id)  {
-        $this->db->where("id", $id);
-        $q = $this->db->get($this->table);
-        if ($q->num_rows() > 0) {
-            return $q->row();
-        }
-        return null;
-		if(isset($id)) {
-			$requete='select c.id,c.nom,c.code,c.district_id,d.nom as nomdistrict,r.nom as region,r.site_id,s.nom as nom_site
-			from commune as c
-			left outer join district as d on d.id=c.district_id
-			left outer join region as r on r.id=d.region_id
-			left outer join site as s on s.id=r.site_id where c.id='.$id
-			.' order by r.site_id,c.nom,d.nom	';				
-			$query= $this->db->query($requete);
-			if($query->result())
-			{
-				return $query->row();
-				// return $result;
-			}else{
-				return null;
-			}   
-		} else {
-			return null;
-		}	
-    }*/
     public function findAllByDistrictObjet($district_id) {
+		// Selection commune par district
         $this->db->where("district_id", $district_id);
         $q = $this->db->get($this->table);
         if ($q->num_rows() > 0) {

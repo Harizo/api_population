@@ -4,6 +4,7 @@ class Acteur_regional_model extends CI_Model {
     protected $table = 'acteur_regional';
 
     public function add($acteur_regional)  {
+		// Ajout d'un enregitrement
         $this->db->set($this->_set($acteur_regional))
                             ->insert($this->table);
         if($this->db->affected_rows() === 1)  {
@@ -13,6 +14,7 @@ class Acteur_regional_model extends CI_Model {
         }                    
     }
     public function update($id, $acteur_regional)  {
+		// Mise à jour d'un enregitrement
         $this->db->set($this->_set($acteur_regional))
                             ->where('id', (int) $id)
                             ->update($this->table);
@@ -23,6 +25,7 @@ class Acteur_regional_model extends CI_Model {
         }                      
     }
     public function _set($acteur_regional) {
+		// Affectation des valeurs
         return array(
             'nom'            => $acteur_regional['nom'],
             'representant'   => $acteur_regional['representant'],
@@ -33,6 +36,7 @@ class Acteur_regional_model extends CI_Model {
        );
     }
     public function delete($id) {
+		// Suppression d'un enregitrement
         $this->db->where('id', (int) $id)->delete($this->table);
         if($this->db->affected_rows() === 1)  {
             return true;
@@ -41,6 +45,7 @@ class Acteur_regional_model extends CI_Model {
         }  
     }
     public function findAll() {
+		// Selection de tous les enregitrements
         $result =  $this->db->select('*')
                         ->from($this->table)
                         ->order_by('nom')
@@ -53,6 +58,7 @@ class Acteur_regional_model extends CI_Model {
         }                 
     }
     public function findById($id) {
+		// Selection par id
         $result =  $this->db->select('*')
                         ->from($this->table)
                         ->where("id", $id)

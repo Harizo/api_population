@@ -4,6 +4,7 @@ class Individu_model extends CI_Model {
     protected $table = 'individu';
 
     public function add($individu) {
+		// Ajout d'un enregitrement
         $this->db->set($this->_set($individu))
                             ->insert($this->table);
         if($this->db->affected_rows() === 1)
@@ -14,6 +15,7 @@ class Individu_model extends CI_Model {
         }                    
     }
     public function update($id, $individu) {
+		// Mise à jour d'un enregitrement
         $this->db->set($this->_set($individu))
                             ->where('id', (int) $id)
                             ->update($this->table);
@@ -24,6 +26,7 @@ class Individu_model extends CI_Model {
         }                      
     }
     public function _set($individu) {
+		// Affectation des valeurs
         return array(
 			'id_menage'                => $individu['id_menage'],
 			'identifiant_unique'       => $individu['identifiant_unique'],
@@ -58,13 +61,13 @@ class Individu_model extends CI_Model {
 			'id_handicap_moteur'       => $individu['id_handicap_moteur'],
 			'id_type_ecole'            => $individu['id_type_ecole'],
 			'id_niveau_de_classe'      => $individu['id_niveau_de_classe'],
-		//	'langue'                   => $individu['langue'],
 			'id_situation_matrimoniale' => $individu['id_situation_matrimoniale'],
 			'id_fokontany'              => $individu['id_fokontany'],
 			'id_acteur'                 => $individu['id_acteur'],
         );
     }
     public function delete($id) {
+		// Suppression d'un enregitrement
         $this->db->where('id', (int) $id)->delete($this->table);
         if($this->db->affected_rows() === 1) {
             return true;
@@ -73,6 +76,7 @@ class Individu_model extends CI_Model {
         }  
     }
     public function findAll() {
+		// Selection de tous les enregitrements
         $result =  $this->db->select('*')
                         ->from($this->table)
                         ->order_by('id')
@@ -86,6 +90,7 @@ class Individu_model extends CI_Model {
         }                 
     }
     public function findByIdFokontany($id_fokontany) {
+		// Selection individu par id_fokontany
         $result =  $this->db->select('*')
                         ->from($this->table)
 						->where("id_fokontany", $id_fokontany)
@@ -100,6 +105,7 @@ class Individu_model extends CI_Model {
         }                 
     }
     public function findById($id)  {
+		// Selection par id
         $this->db->where("id", $id);
         $q = $this->db->get($this->table);
         if ($q->num_rows() > 0) {
@@ -108,6 +114,7 @@ class Individu_model extends CI_Model {
         return null;
     }
     public function findAllByMenage($menage_id)
+		// Selection individu par ménage 
     {
         $result =  $this->db->select('*')
                         ->from($this->table)

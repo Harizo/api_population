@@ -58,6 +58,7 @@ class Validationbeneficiaire_model extends CI_Model
 		$query = $this->db->query($requete);
         return $query->result();				
     }
+	// Recherche menage par id_appariement et par acteur
     public function RechercheFokontanyMenageParIdentifiantActeur($identifiant_appariement,$id_acteur) {
 		$requete= "select m.id as id_menage,m.id_fokontany,f.code as code_fokontany,c.code as code_commune,d.code as code_district,r.code as code_region,m.identifiant_unique"
 		." from menage as m "
@@ -69,6 +70,7 @@ class Validationbeneficiaire_model extends CI_Model
 		$query = $this->db->query($requete);
         return $query->result();				
     }
+	// Recherche individu par id_appariement et par acteur
     public function RechercheFokontanyIndividuParIdentifiantActeur($identifiant_appariement,$id_acteur) {
 		$requete= "select i.id as id_individu,i.id_fokontany,f.code as code_fokontany,c.code as code_commune,d.code as code_district,r.code as code_region,i.identifiant_unique"
 		." from individu as i "

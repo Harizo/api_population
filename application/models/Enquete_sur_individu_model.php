@@ -3,6 +3,7 @@
 class Enquete_sur_individu_model extends CI_Model {
     protected $table = 'enquete_individu';
     public function add($enquete_sur_individu)  {
+		// Ajout d'un enregitrement
         $this->db->set($this->_set($enquete_sur_individu))
                             ->insert($this->table);
         if($this->db->affected_rows() === 1)
@@ -13,6 +14,7 @@ class Enquete_sur_individu_model extends CI_Model {
         }                    
     }
     public function update($id, $enquete_sur_individu)   {
+		// Mise à jour d'un enregitrement
         $this->db->set($this->_set($enquete_sur_individu))
                             ->where('id', (int) $id)
                             ->update($this->table);
@@ -23,10 +25,10 @@ class Enquete_sur_individu_model extends CI_Model {
         }                      
     }
     public function _set($enquete_sur_individu) {
+		// Affectation des valeurs
         return array(
             'id_individu'             => $enquete_sur_individu['id_individu'],
             'id_lien_de_parente'      => $enquete_sur_individu['id_lien_de_parente'],                       
-            // 'situation_matrimoniale'  => $enquete_sur_individu['situation_matrimoniale'],                       
             'id_handicap_visuel'      => $enquete_sur_individu['id_handicap_visuel'],                       
             'id_handicap_parole'      => $enquete_sur_individu['id_handicap_parole'],                       
             'id_handicap_auditif'     => $enquete_sur_individu['id_handicap_auditif'],                       
@@ -39,6 +41,7 @@ class Enquete_sur_individu_model extends CI_Model {
         );
     }
     public function delete($id) {
+		// Suppression d'un enregitrement
         $this->db->where('id', (int) $id)->delete($this->table);
         if($this->db->affected_rows() === 1)  {
             return true;
@@ -47,6 +50,7 @@ class Enquete_sur_individu_model extends CI_Model {
         }  
     }
     public function findAll() {
+		// Selection de tous les enregitrements
         $result =  $this->db->select('*')
                         ->from($this->table)
                         ->order_by('id')
@@ -58,7 +62,8 @@ class Enquete_sur_individu_model extends CI_Model {
             return null;
         }                 
     }
-    public function findAllByindividu($id_individu) {      
+    public function findAllByindividu($id_individu) {  
+		// Selection par individu
         $this->db->where("id_individu", $id_individu);
         $q = $this->db->get($this->table);
         if ($q->num_rows() > 0) {
@@ -67,6 +72,7 @@ class Enquete_sur_individu_model extends CI_Model {
         return null;  
     }
     public function findById($id) {
+		// Selection par id
         $this->db->where("id", $id);
         $q = $this->db->get($this->table);
         if ($q->num_rows() > 0) {

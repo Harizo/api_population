@@ -18,9 +18,11 @@ class Variable_intervention extends REST_Controller {
         $cle_etrangere = $this->get('cle_etrangere');
         if ($cle_etrangere){
             $data = array();
+			// Selection liste variable
             $temporaire = $this->VariableManager->findAllByIdlistevariable($cle_etrangere);
             if ($temporaire) {
                 foreach ($temporaire as $key => $value) {
+					// Affectation des valeurs dans un tableau
                     $listevariable = array();
                     $listevariable = $this->ListevariableManager->findById($value->id_liste_variable);
                     $data[$key]['id'] = $value->id;
@@ -32,11 +34,14 @@ class Variable_intervention extends REST_Controller {
         } else {
             if ($id) {
                 $data = array();
+				// Selection par id
                 $data = $this->VariableManager->findById($id);
             } else {
+				// Selection de tous les enregistrements
                 $menu = $this->VariableManager->findAll();
                 if ($menu) {
                     foreach ($menu as $key => $value) {
+						// Affectation des valeurs dans un tableau
                         $listevariable = array();
                         $listevariable = $this->ListevariableManager->findById($value->id_liste_variable);
                         $data[$key]['id'] = $value->id;
@@ -82,6 +87,7 @@ class Variable_intervention extends REST_Controller {
                         'message' => 'No request found'
                             ], REST_Controller::HTTP_BAD_REQUEST);
                 }
+				// Ajout d'un enregistrement
                 $dataId = $this->VariableManager->add($data);
                 if (!is_null($dataId)) {
                     $this->response([

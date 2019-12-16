@@ -15,14 +15,16 @@ class Tutelle extends REST_Controller {
         $id = $this->get('id');
 		$data = array();
 		if ($id) {
-			$tmp = $this->TutelleManager->findById($id);
-			if($tmp) {
-				$data=$tmp;
+			// Selection par id
+			$temporaire = $this->TutelleManager->findById($id);
+			if($temporaire) {
+				$data=$temporaire;
 			}
-		} else {			
-			$tmp = $this->TutelleManager->findAll();
-			if ($tmp) {
-				$data=$tmp;
+		} else {
+			// Selection de tous les enregistrements	
+			$temporaire = $this->TutelleManager->findAll();
+			if ($temporaire) {
+				$data=$temporaire;
 			}
 		}
         if (count($data)>0) {
@@ -54,6 +56,7 @@ class Tutelle extends REST_Controller {
                         'message' => 'No request found'
                             ], REST_Controller::HTTP_BAD_REQUEST);
                 }
+				// Ajout d'un enregitrement
                 $dataId = $this->TutelleManager->add($data);              
                 if (!is_null($dataId)) {
                     $this->response([
@@ -76,6 +79,7 @@ class Tutelle extends REST_Controller {
                         'message' => 'No request found'
                             ], REST_Controller::HTTP_BAD_REQUEST);
                 }
+				// Mise à jour d'un enregistrement
                 $update = $this->TutelleManager->update($id, $data);              
                 if(!is_null($update)){
                     $this->response([
@@ -98,6 +102,7 @@ class Tutelle extends REST_Controller {
             'message' => 'No request found'
                 ], REST_Controller::HTTP_BAD_REQUEST);
             }
+			// Suppression d'un enregitrement
             $delete = $this->TutelleManager->delete($id);          
             if (!is_null($delete)) {
                 $this->response([

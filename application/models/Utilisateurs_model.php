@@ -172,6 +172,7 @@ class Utilisateurs_model extends CI_Model
         }                  
     }
     public function findAllByEnabled($enabled)  {
+		// Selection par enabled
         $result = $this->db->select('*')
                         ->from($this->table)
                         ->where("enabled", $enabled)
@@ -185,6 +186,7 @@ class Utilisateurs_model extends CI_Model
         }                  
     }
     public function findById($id) {
+		// Selection par id
         $this->db->where("id", $id);
         $q = $this->db->get($this->table);
         if ($q->num_rows() > 0) {
@@ -193,6 +195,7 @@ class Utilisateurs_model extends CI_Model
         return null;
     }   
 	public function findByIdtab($id) {
+		// Selection par id : résultat dans un tableau
         $result =  $this->db->select('*')
                         ->from($this->table)
                         ->where("id", $id)
@@ -206,6 +209,7 @@ class Utilisateurs_model extends CI_Model
         }                 
     }
     public function findByMail($mail) {
+		// Selection par mail
         $this->db->where("email", $mail);
         $q = $this->db->get($this->table);
         if ($q->num_rows() > 0) {
@@ -214,6 +218,7 @@ class Utilisateurs_model extends CI_Model
         return null;
     }
     public function findByPassword($mdp) {
+		// Selection par mot de passe
         $this->db->where("password", sha1($mdp));
         $q = $this->db->get($this->table);
         if ($q->num_rows() > 0) {
@@ -222,6 +227,7 @@ class Utilisateurs_model extends CI_Model
         return null;
     }
     public function sign_in($email, $pwd)   {
+		// Selection par mail et password
         $result = $this->db->select('*')
                         ->from($this->table)
                         ->where("email", $email)
@@ -236,12 +242,14 @@ class Utilisateurs_model extends CI_Model
         }                  
     }
     public function _set_first_login($utilisateurs)  {
+		// Affectation des valeurs lors de la première connexion
         return array(
             'password'         => $utilisateurs['password'],
             'default_password' => $utilisateurs['default_password'],
         );
     }
     public function first_login($data, $id_utilisateur)  {
+		// Selection par id_utilisateur
         $this->db->set($this->_set_first_login($data))
                  ->where('id', (int) $id_utilisateur)
                  ->update($this->table);
@@ -252,6 +260,7 @@ class Utilisateurs_model extends CI_Model
         }                      
     }
     public function _set_default_password($id_utilisateur,$password)  {
+		// Affectation mot de passe par défaut
         return array(
             'id_utilisateur' => $id_utilisateur,
             'password'       => $password,

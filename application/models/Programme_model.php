@@ -4,6 +4,7 @@ class Programme_model extends CI_Model {
     protected $table = 'programme';
 
     public function add($programme)  {
+		// Ajout d'un enregitrement
         $this->db->set($this->_set($programme))
                             ->insert($this->table);
         if($this->db->affected_rows() === 1)  {
@@ -13,6 +14,7 @@ class Programme_model extends CI_Model {
         }                    
     }
     public function update($id, $programme)  {
+		// Mise à jour d'un enregitrement
         $this->db->set($this->_set($programme))
                             ->where('id', (int) $id)
                             ->update($this->table);
@@ -23,6 +25,7 @@ class Programme_model extends CI_Model {
         }                      
     }
     public function _set($programme) {
+		// Affectation des valeurs
         return array(
             'nom'                      => $programme['nom'],
             'prenom'                   => $programme['prenom'],
@@ -43,6 +46,7 @@ class Programme_model extends CI_Model {
         );
     }
     public function delete($id) {
+		// Suppression d'un enregitrement
         $this->db->where('id', (int) $id)->delete($this->table);
         if($this->db->affected_rows() === 1)  {
             return true;
@@ -51,6 +55,7 @@ class Programme_model extends CI_Model {
         }  
     }
     public function findAll() {
+		// Selection de tous les enregitrements
         $result =  $this->db->select('*')
                         ->from($this->table)
                         ->order_by('intitule')
@@ -63,6 +68,7 @@ class Programme_model extends CI_Model {
         }                 
     }
     public function findById($id) {
+		// Selection par id
         $result =  $this->db->select('*')
                         ->from($this->table)
                         ->where("id", $id)

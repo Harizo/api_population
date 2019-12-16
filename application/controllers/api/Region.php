@@ -15,14 +15,9 @@ class Region extends REST_Controller {
     //recuperation region
     public function index_get() {
         $id = $this->get('id');
-        $cle_etrangere = $this->get('cle_etrangere');
-
-        if ($cle_etrangere) {
-            $data = $this->RegionManager->findAllBySite($cle_etrangere);
-            
-        } else {
             if ($id) {
                 $data = array();
+				// Selection par id
                 $region = $this->RegionManager->findById($id);
                 $data['id'] = $region->id;
                 $data['code'] = $region->code;
@@ -30,6 +25,7 @@ class Region extends REST_Controller {
                 $data['chef_lieu'] = $region->chef_lieu;
                 
             } else {
+				// Selection de tous les enregistrements
                 $region = $this->RegionManager->findAll();
                 if ($region) {
                     foreach ($region as $key => $value) {
@@ -43,7 +39,6 @@ class Region extends REST_Controller {
                 } else
                     $data = array();
             }
-        }
         if (count($data)>0) {
             $this->response([
                 'status' => TRUE,
@@ -76,6 +71,7 @@ class Region extends REST_Controller {
                         'message' => 'No request found'
                             ], REST_Controller::HTTP_BAD_REQUEST);
                 }
+				// Ajout d'un enregistrement
                 $dataId = $this->RegionManager->add($data);              
                 if (!is_null($dataId)) {
                     $this->response([
@@ -102,6 +98,7 @@ class Region extends REST_Controller {
                         'message' => 'No request found'
                             ], REST_Controller::HTTP_BAD_REQUEST);
                 }
+				// Mise à jour d'un enregistrement
                 $update = $this->RegionManager->update($id, $data);              
                 if(!is_null($update)){
                     $this->response([
@@ -124,6 +121,7 @@ class Region extends REST_Controller {
             'message' => 'No request found'
                 ], REST_Controller::HTTP_BAD_REQUEST);
             }
+			// Suppression d'un enregistrement
             $delete = $this->RegionManager->delete($id);          
             if (!is_null($delete)) {
                 $this->response([

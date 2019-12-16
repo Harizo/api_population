@@ -8,6 +8,7 @@ class Zone_intervention extends REST_Controller {
 
     public function __construct() { 
         parent::__construct();
+		// Ouverture des modèles utilisées
         $this->load->model('zone_intervention_model', 'ZoneinterventionManager');
         $this->load->model('intervention_model', 'InterventionManager');
         $this->load->model('fokontany_model', 'FokontanyManager');
@@ -21,48 +22,57 @@ class Zone_intervention extends REST_Controller {
         $cle_etrangere = $this->get('cle_etrangere');
 		$data = array();
 		if ($id) {
+			// Selection par id
 			$temporaire = $this->ZoneinterventionManager->findById($id);
 			if($temporaire) {
 				$data=$temporaire;
 			}
-			$ou=1;
-		} else if($cle_etrangere){			
+			$choix=1;
+		} else if($cle_etrangere){	
+			// Selection par intervention
 			$menu = $this->ZoneinterventionManager->findByIdIntervention($cle_etrangere);
-			$ou=2;
+			$choix=2;
 		} else {			
 			$menu = $this->ZoneinterventionManager->findAll();
-			$ou=2;
+			$choix=2;
 		}
-		if($ou==2) {			
+		if($choix==2) {			
 			if ($menu) {
                 foreach ($menu as $key => $value) {
+					// Affectation des valeurs dans un tableau
 					$intervention =array();
 					if($value->id_intervention) {
+						// Selection description intervention
 						$prg = $this->InterventionManager->findById($value->id_intervention);
 						if(count($prg) >0) {
 							$intervention=$prg;
 						}						
 					}					
                     $fokontany = array();
+					// Selection description fokontany
                     $tpf = $this->FokontanyManager->findById($value->id_fokontany);
 					if(count($tpf) >0) {
 						$fokontany=$tpf;
 					}
                     $commune = array();
+					// Selection description commune
                     $co = $this->CommuneManager->findById($fokontany[0]->id_commune);
 					if(count($co) >0) {
 						$commune=$co;
 					}
                     $district = array();
+					// Selection description district
                     $dis = $this->DistrictManager->findById($commune[0]->district_id);
 					if(count($dis) >0) {
 						$district=$dis;
 					}
                     $region = array();
+					// Selection description région
                     $dis = $this->RegionManager->findByIdArray($district[0]->region_id);
 					if(count($dis) >0) {
 						$region=$dis;
 					}
+					// Affectation des valeurs dans un tableau
                     $data[$key]['id'] = $value->id;
                     $data[$key]['id_intervention'] = $value->id_intervention;
                     $data[$key]['intervention'] = $intervention;
@@ -111,6 +121,7 @@ class Zone_intervention extends REST_Controller {
 		if(isset($temporaire) && $temporaire !="" && intval($temporaire) >0) {
 			$individu_beneficiaire_prevu=$temporaire;
 		}
+		// Affectation des valeurs
  		$data = array(
 			'id_intervention'             => $this->post('id_intervention'),
 			'id_fokontany'                => $id_fokontany,
@@ -126,6 +137,7 @@ class Zone_intervention extends REST_Controller {
                         'message' => 'No request found'
                             ], REST_Controller::HTTP_BAD_REQUEST);
                 }
+				// Ajout d'un enregistrement
                 $dataId = $this->ZoneinterventionManager->add($data);              
                 if (!is_null($dataId)) {
                     $this->response([
@@ -148,6 +160,7 @@ class Zone_intervention extends REST_Controller {
                         'message' => 'No request found'
                             ], REST_Controller::HTTP_BAD_REQUEST);
                 }
+				// Mise à jour d'un enregistrement
                 $update = $this->ZoneinterventionManager->update($id, $data);              
                 if(!is_null($update)){
                     $this->response([
@@ -170,6 +183,7 @@ class Zone_intervention extends REST_Controller {
             'message' => 'No request found'
                 ], REST_Controller::HTTP_BAD_REQUEST);
             }
+			// Suppression d'un enregistrement
             $delete = $this->ZoneinterventionManager->delete($id);          
             if (!is_null($delete)) {
                 $this->response([

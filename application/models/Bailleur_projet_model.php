@@ -4,6 +4,7 @@ class Bailleur_projet_model extends CI_Model {
     protected $table = 'bailleur_projet';
 
     public function add($bailleur_projet) {
+		// Ajout d'un enregitrement
         $this->db->set($this->_set($bailleur_projet))
                             ->insert($this->table);
         if($this->db->affected_rows() === 1)
@@ -14,6 +15,7 @@ class Bailleur_projet_model extends CI_Model {
         }                    
     }
     public function update($id, $bailleur_projet) {
+		// Mise à jour d'un enregitrement
         $this->db->set($this->_set($bailleur_projet))
                             ->where('id', (int) $id)
                             ->update($this->table);
@@ -24,6 +26,7 @@ class Bailleur_projet_model extends CI_Model {
         }                      
     }
     public function _set($bailleur_projet) {
+		// Affectation des valeurs
         return array(
             'id_projet'           => $bailleur_projet['id_projet'],
             'id_bailleur'         => $bailleur_projet['id_bailleur'],
@@ -34,6 +37,7 @@ class Bailleur_projet_model extends CI_Model {
         );
     }
     public function delete($id) {
+		// Suppression d'un enregitrement
         $this->db->where('id', (int) $id)->delete($this->table);
         if($this->db->affected_rows() === 1) {
             return true;
@@ -42,6 +46,7 @@ class Bailleur_projet_model extends CI_Model {
         }  
     }
     public function deleteByParentId($id) {
+		// Suppression par id projet
         $this->db->where('id_projet', (int) $id)->delete($this->table);
         if($this->db->affected_rows() >= 1) {
             return true;
@@ -50,6 +55,7 @@ class Bailleur_projet_model extends CI_Model {
         }  
     }
     public function findAll() {
+		// Selection de tous les enregitrements
         $result =  $this->db->select('*')
                         ->from($this->table)
                         ->order_by('id')
@@ -62,6 +68,7 @@ class Bailleur_projet_model extends CI_Model {
             return null;
         }                 
     }
+	// Selection par id_projet
     public function findByIdParent($id_projet) {
         $result =  $this->db->select('*')
                         ->from($this->table)
@@ -77,6 +84,7 @@ class Bailleur_projet_model extends CI_Model {
         }                 
     }
     public function findById($id) {
+		// Selection par id
         $result =  $this->db->select('*')
                         ->from($this->table)
                         ->where("id", $id)
@@ -89,12 +97,5 @@ class Bailleur_projet_model extends CI_Model {
             return null;
         }                 
     }	
-    /*public function findById($id)  {
-        $this->db->where("id", $id);
-        $q = $this->db->get($this->table);
-        if ($q->num_rows() > 0) {
-            return $q->row();
-        }
-        return null;
-    } */
 }
+?>

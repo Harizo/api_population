@@ -18,10 +18,12 @@ class Variable extends REST_Controller {
         $cle_etrangere = $this->get('cle_etrangere');
         if ($cle_etrangere){
             $data = array();
+			// Selection liste variable
             $temporaire = $this->VariableManager->findAllByIdlistevariable($cle_etrangere);
             if ($temporaire) {
                 foreach ($temporaire as $key => $value) {
                     $listevariable = array();
+					// Selection détail liste variable
                     $listevariable = $this->ListevariableManager->findById($value->id_liste_variable);
                     $data[$key]['id'] = $value->id;
                     $data[$key]['code'] = $value->code;
@@ -31,9 +33,11 @@ class Variable extends REST_Controller {
             }           
         } else {
             if ($id) {
+				// Selection par id
                 $data = array();
                 $data = $this->VariableManager->findById($id);
             } else {
+				// Selection de tous les enregistrements
                 $menu = $this->VariableManager->findAll();
                 if ($menu) {
                     foreach ($menu as $key => $value) {

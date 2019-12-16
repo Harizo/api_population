@@ -3,6 +3,7 @@
 class Individu_beneficiaire_model extends CI_Model {
     protected $table = 'individu_beneficiaire';
     public function add($individu_beneficiaire)    {
+		// Ajout d'un enregitrement
         $this->db->set($this->_set($individu_beneficiaire))
                             ->insert($this->table);
         if($this->db->affected_rows() === 1)  {
@@ -12,6 +13,7 @@ class Individu_beneficiaire_model extends CI_Model {
         }                    
     }
     public function update($id, $individu_beneficiaire)  {
+		// Mise à jour d'un enregitrement
         $this->db->set($this->_set($individu_beneficiaire))
                             ->where('id', (int) $id)
                             ->update($this->table);
@@ -22,6 +24,7 @@ class Individu_beneficiaire_model extends CI_Model {
         }                      
     }
     public function _set($individu_beneficiaire)  {
+		// Affectation des valeurs
         return array(
             'id_individu'   =>  $individu_beneficiaire['id_individu'],
             'id_intervention'  =>  $individu_beneficiaire['id_intervention'],                      
@@ -29,6 +32,7 @@ class Individu_beneficiaire_model extends CI_Model {
         );
     }
     public function delete($id)  {
+		// Suppression d'un enregitrement
         $this->db->where('id', (int) $id)->delete($this->table);
         if($this->db->affected_rows() === 1)
         {
@@ -38,6 +42,7 @@ class Individu_beneficiaire_model extends CI_Model {
         }  
     }
     public function findAll()  {
+		// Selection de tous les enregitrements
         $result =  $this->db->select('*')
                         ->from($this->table)
                         ->order_by('id')
@@ -50,6 +55,7 @@ class Individu_beneficiaire_model extends CI_Model {
         }                 
     }
     public function findAllByProgramme($id_interventions)  {
+		// Selection par iintervention
         $result =  $this->db->select('individu.id as id_individu,
                                         individu_beneficiaire.id as id,
                                         individu.Nom as Nom,
@@ -70,7 +76,7 @@ class Individu_beneficiaire_model extends CI_Model {
         }                  
     }
     public function findAllByindividu($id_individu)   {
-        
+        // Selection par id_individu
         $this->db->where("id_individu", $id_individu);
         $q = $this->db->get($this->table);
         if ($q->num_rows() > 0) {
@@ -79,6 +85,7 @@ class Individu_beneficiaire_model extends CI_Model {
         return null;  
     }
     public function findById($id)    {
+		// Selection par id
         $this->db->where("id", $id);
         $q = $this->db->get($this->table);
         if ($q->num_rows() > 0) {
@@ -86,14 +93,15 @@ class Individu_beneficiaire_model extends CI_Model {
         }
         return null;
     }
-    public function findAllByProgrammeAndVillage($id_interventions,$id_village)    {
+    public function findAllByProgrammeAndVillage($id_interventions,$id_fokontany)    {
+		// Selection individu bénéficiaire par intervention et par 
 		$requete="select mp.id,mp.id_individu,i.nom,i.prenom,i.date_naissance,i.id_menage,m.adresse"
 				." from individu_beneficiaire as mp"
 				." left outer join individu as i on i.id=mp.id_individu"
 				." left outer join menage as m on m.id=i.id_menage"
 				." left outer join fokontany as v on v.id=m.id_fokontany"
                 ." where mp.id_intervention like ".$id_interventions
-				." and v.id=".$id_village;	
+				." and v.id=".$id_fokontany;	
 				$result = $this->db->query($requete)->result();
         if($result)  {
             return $result;

@@ -140,7 +140,5 @@ class Secteur_programme_projet extends REST_Controller {
             }
         }
     }
-}
-/* End of file controllername.php */
-/* Location: ./application/controllers/controllername.php */
+} 
 ?>
