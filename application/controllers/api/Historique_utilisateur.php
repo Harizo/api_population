@@ -73,9 +73,6 @@ class Historique_utilisateur extends REST_Controller {
             } else
                 $data = array();
         }
-        
-        
-
         if (count($data)>0)
         {
             $this->response([
@@ -115,7 +112,7 @@ class Historique_utilisateur extends REST_Controller {
                 'message' => 'No request found'
                     ], REST_Controller::HTTP_BAD_REQUEST);
         }
-
+		// Ajout d'un enregistrement
         $dataId = $this->HistoriqueutilisateurManager->add($data);
 
         if (!is_null($dataId))

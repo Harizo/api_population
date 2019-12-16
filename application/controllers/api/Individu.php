@@ -1,20 +1,20 @@
 <?php
 
 defined('BASEPATH') OR exit('No direct script access allowed');
-//harizo
-// afaka fafana refa ts ilaina
 require APPPATH . '/libraries/REST_Controller.php';
 
 class Individu extends REST_Controller {
 
     public function __construct() {
         parent::__construct();
+		// Ouverture des modèles utilisées
         $this->load->model('individu_model', 'IndividuManager');
         $this->load->model('fokontany_model', 'FokontanyManager');
         $this->load->model('acteur_model', 'ActeurManager');
         $this->load->model('type_beneficiaire_model', 'TypebeneficiaireManager');
         $this->load->model('enquete_menage_model', 'EnquetemenageManager');
     }
+	// Conversion d'un date angular (date longue) au forlat Y-m-d
 	public function convertDateAngular($daty){
 		if(isset($daty) && $daty != ""){
 			if(strlen($daty) >33) {
@@ -36,29 +36,30 @@ class Individu extends REST_Controller {
         $id = $this->get('id');
         $cle_etrangere = $this->get('cle_etrangere');
         if ($id) {
+			// Selection individu par id
             $data = $this->IndividuManager->findById($id);
             if (!$data)
                 $data = array();
-			$ou=1;
+			$choix=1;
         } 
         else if($cle_etrangere) 
         {
+			// Selection individu par ménage
 			$menu = $this->IndividuManager->findAllByMenage($cle_etrangere);
-			$ou=2;
+			$choix=2;
 		} else {	
-			$ou=2;
+			$choix=2;
+			// Selection de tous les individus
 			$menu = $this->IndividuManager->findAll();	
         }
-		if($ou==2) {
+		if($choix==2) {
             if ($menu) {
                 foreach ($menu as $key => $value) {
+					// Selection groupe appartenance
 					$ga = $this->EnquetemenageManager->findById($value->id_groupe_appartenance,"groupe_appartenance");
                     $acteur = array();
-                    /*$acteur_temp = $this->ActeurManager->findById($value->id_type_beneficiaire);
-					if(count($acteur_temp) >0) {
-						$acteur=$acteur_temp;
-					}	*/
                     $fokontany = array();
+					// Selection description fokontany
                     $type_emp = $this->FokontanyManager->findById($value->id_fokontany);
 					if(count($type_emp) >0) {
 						$fokontany=$type_emp;
@@ -90,7 +91,8 @@ class Individu extends REST_Controller {
                     $data[$key]['cin'] = $value->cin;
                     $data[$key]['date_naissance'] = $value->date_naissance;
                     $data[$key]['sexe'] = $value->sexe;
-					$lip = $this->EnquetemenageManager->findById($value->id_liendeparente,"liendeparente");
+					// Selection description : lien de parenté,les différents type d'handicaps,type école,niveau de classe et situation matrimoniale
+					$lien = $this->EnquetemenageManager->findById($value->id_liendeparente,"liendeparente");
 					$hv = $this->EnquetemenageManager->findById($value->id_handicap_visuel,"handicap_visuel");
 					$hp = $this->EnquetemenageManager->findById($value->id_handicap_parole,"handicap_parole");
 					$ha = $this->EnquetemenageManager->findById($value->id_handicap_auditif,"handicap_auditif");
@@ -99,7 +101,7 @@ class Individu extends REST_Controller {
 					$te = $this->EnquetemenageManager->findById($value->id_type_ecole,"type_ecole");
 					$nclass = $this->EnquetemenageManager->findById($value->id_niveau_de_classe,"niveau_de_classe");
 					$situationmatrimoniale = $this->EnquetemenageManager->findById($value->id_situation_matrimoniale,"situation_matrimoniale");
-                    $data[$key]['liendeparente'] = $lip;
+                    $data[$key]['liendeparente'] = $lien;
                     $data[$key]['id_liendeparente'] = $value->id_liendeparente;
                     $data[$key]['handicap_visuel'] = $hv;
                     $data[$key]['id_handicap_visuel'] = $value->id_handicap_visuel;
@@ -143,10 +145,11 @@ class Individu extends REST_Controller {
         $id = $this->post('id') ;
         $supprimer = $this->post('supprimer') ;
 		$date_naissance = $this->convertDateAngular($this->post('date_naissance'));
+		// Initialisation null et affectation des valeurs : pour éviter le ZERO par défaut au lieu de null
 		$id_liendeparente=null;
-		$lip = $this->post('id_liendeparente') ;
-		if(isset($lip) && $lip !="" && intval($lip) >0) {
-			$id_liendeparente=$lip;
+		$lien = $this->post('id_liendeparente') ;
+		if(isset($lien) && $lien !="" && intval($lien) >0) {
+			$id_liendeparente=$lien;
 		}
 		$id_handicap_visuel=null;
 		$hv = $this->post('id_handicap_visuel') ;
@@ -198,6 +201,7 @@ class Individu extends REST_Controller {
 		if(isset($temporaire) && $temporaire !="" && intval($temporaire) >0) {
 			$id_fokontany=$temporaire;
 		}
+		// Affectation des valeurs de chaque colonne de la table
 		$data = array(
 			'id_menage'                => $this->post('id_menage'),
 			'identifiant_unique'       => $this->post('identifiant_unique'),
@@ -246,6 +250,7 @@ class Individu extends REST_Controller {
                         'message' => 'No request found'
                             ], REST_Controller::HTTP_BAD_REQUEST);
                 }
+				// Ajout d'un enregistrement
                 $dataId = $this->IndividuManager->add($data);
                 if (!is_null($dataId)) {
                     $this->response([
@@ -268,6 +273,7 @@ class Individu extends REST_Controller {
                         'message' => 'No request found'
                             ], REST_Controller::HTTP_BAD_REQUEST);
                 }
+				// Mise à jour d'un enregistrement
                 $update = $this->IndividuManager->update($id, $data);
                 if(!is_null($update)) {
                     $this->response([
@@ -290,6 +296,7 @@ class Individu extends REST_Controller {
                 'message' => 'No request found'
                     ], REST_Controller::HTTP_BAD_REQUEST);
             }
+			// Suppresion d'un enregistrement
             $delete = $this->IndividuManager->delete($id);
             if (!is_null($delete)) {
                 $this->response([

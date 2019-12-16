@@ -14,11 +14,13 @@ class Objectif_specifique extends REST_Controller {
     public function index_get() {
         $id = $this->get('id');
         if ($id) {
+			// Selection d'un enregitrement par id
             $data = $this->ObjectifspecifiqueManager->findById($id);
             if (!$data)
                 $data = array();
         } else {
 			$data=array();
+			// Selection des tous les enregitrements
 			$menu = $this->ObjectifspecifiqueManager->findAll();	
             if ($menu) {
                 foreach ($menu as $key => $value) {
@@ -58,6 +60,7 @@ class Objectif_specifique extends REST_Controller {
                         'message' => 'No request found'
                             ], REST_Controller::HTTP_BAD_REQUEST);
                 }
+				// Ajout d'un enregistrement
                 $dataId = $this->ObjectifspecifiqueManager->add($data);
                 if (!is_null($dataId)) {
                     $this->response([
@@ -80,6 +83,7 @@ class Objectif_specifique extends REST_Controller {
                         'message' => 'No request found'
                             ], REST_Controller::HTTP_BAD_REQUEST);
                 }
+				// Mise à jour d'un enregistrement
                 $update = $this->ObjectifspecifiqueManager->update($id, $data);
                 if(!is_null($update)) {
                     $this->response([
@@ -102,6 +106,7 @@ class Objectif_specifique extends REST_Controller {
                 'message' => 'No request found'
                     ], REST_Controller::HTTP_BAD_REQUEST);
             }
+			// Suppression d'un enregistrement
             $delete = $this->ObjectifspecifiqueManager->delete($id);
             if (!is_null($delete)) {
                 $this->response([

@@ -26,6 +26,7 @@ class Mail extends REST_Controller {
         $mdpsender = "finaritra";
 
         if ($actif == 0) {
+			// Envoi mail code de confirmation
             $data['activer'] = base_url() . "/mail?actif=1&courriel=" . $courriel . "&token=" . $token;
             $sujet = 'Code de confirmation';
             $corps = $this->load->view('mail/activation.php', $data, true);
@@ -58,6 +59,7 @@ class Mail extends REST_Controller {
 
         if ($actif == 1) {
             $site = "http://localhost:3000";//$site = substr_replace(base_url(), "", -10);
+			// Mise à jour adresse mail et token
             $val = $this->UserManager->update2($courriel, $token);
             if ($val == 1) {
                 redirect($site . '/auth/login');
@@ -66,6 +68,7 @@ class Mail extends REST_Controller {
             }
         }
         if ($actif == 2) {
+			// Mail de confirmation
             $data['confirmer'] = base_url() . "/mail?actif=3&token=" . $token;
             $sujet = 'Reinitialisation mot de passe';
             $corps = $this->load->view('mail/confirmation.php', $data, true);
@@ -97,6 +100,7 @@ class Mail extends REST_Controller {
         }
 
         if ($actif == 3) {
+			// Rédirection vers réinitialisation mot de pass
             $site = "http://localhost:3000"; //$site = substr_replace(base_url(), "", -10);
             redirect($site . '/auth/reset-password?token=' . $token);
         }
@@ -104,6 +108,7 @@ class Mail extends REST_Controller {
 
         if ($actif == 7) 
         {
+			// envoi mail : INFORMATION SUR LE COMPTE D'UTILISATEUR
             $data['mdp'] = $this->get('teny_miafina');
             $data['email'] = $this->get('email');
             $sujet ="INFORMATION SUR LE COMPTE D'UTILISATEUR";

@@ -118,9 +118,7 @@
             {
     			$id_type_acteur=$tmp;
     		}
-
             //Fin Récupération des données passé en paramètre dans le controlleur angular js
-
      		$data = array(
     			'nom' => $this->post('nom'),
     			'nif' => $this->post('nif'),
@@ -134,8 +132,6 @@
     			'rcs' => $this->post('rcs'),
     			'id_type_acteur' => $id_type_acteur,
     		);      
-
-
             if ($supprimer == 0) //Si c'est pas une suppression de donnée
             {
 
@@ -200,17 +196,14 @@
             } 
             else //Si Suppression de donnée
             {
-                if (!$id) 
-                {
+                if (!$id) {
                     $this->response([
                     'status' => FALSE,
                     'response' => 0,
                     'message' => 'No request found'
                         ], REST_Controller::HTTP_BAD_REQUEST);
                 }
-
                 $delete = $this->ActeurManager->delete($id); //Appel du fonction "delete" du model "Acteur_model.php"
-
                 if (!is_null($delete)) //Si supprimer avec succès
                 {
                     $this->response([
@@ -218,9 +211,7 @@
                         'response' => 1,
                         'message' => "Delete data success"
                             ], REST_Controller::HTTP_OK);
-                } 
-                else 
-                {
+                } else {
                     $this->response([
                         'status' => FALSE,
                         'response' => 0,

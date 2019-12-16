@@ -17,8 +17,7 @@ class Liste_variable extends REST_Controller {
 			$region = $this->ListevariableManager->findById($id);
 			$data['id'] = $region->id;
 			$data['code'] = $region->code;
-			$data['description'] = $region->description;
-			
+			$data['description'] = $region->description;			
 		} else {
 			$region = $this->ListevariableManager->findAll();
 			if ($region) {

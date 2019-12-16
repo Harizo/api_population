@@ -127,9 +127,11 @@ class Importerdecoupageadministratif extends CI_Controller {
 				$id_region=null;
 				$reg=array();
 				if($code_region >'') {
+					// Selection region par code
 					if($amoron_mania==false) {
 						$reg = $this->ImporterdecoupageadministratifManager->selectionregion($code_region);
 					} else {
+						// Selection region par id
 						$reg = $this->ImporterdecoupageadministratifManager->selectionregionparid("ania");
 					}	
 					if(count($reg) >0) {
@@ -145,6 +147,7 @@ class Importerdecoupageadministratif extends CI_Controller {
 							'surface' => null,
 							'chef_lieu' => $chef_lieu,
 						);  
+						// Ajour d'une région
 						$id_region = $this->RegionManager->addImport($data);	
 					}	
 				} 

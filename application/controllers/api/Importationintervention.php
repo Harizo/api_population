@@ -7,6 +7,7 @@ require APPPATH . '/PHPMailer/PHPMailerAutoload.php';
 class Importationintervention extends CI_Controller {
     public function __construct() {
         parent::__construct();
+		// Ouverture des modèles utilisées
         $this->load->model('importationintervention_model', 'ImportationinterventionManager');
         $this->load->model('validationintervention_model', 'ValidationinterventionManager');
         $this->load->model('region_model', 'RegionManager');
@@ -25,6 +26,7 @@ class Importationintervention extends CI_Controller {
         $this->load->model('suivi_individu_detail_transfert_model', 'SuiviIndividuDetailtransfertManager');        
         $this->load->model('detail_type_transfert_intervention_model', 'DetailTypeTransfertInterventionManager');        
     }
+	// Copie fichier excel vers le serveur
 	public function upload_importationdonneesintervention() {	
 		$erreur="aucun";
 		$replace=array('e','e','e','a','o','c','_','_','_');
@@ -72,7 +74,6 @@ class Importationintervention extends CI_Controller {
 			$valeur_retour["reponse"] = "ERREUR";
 			$valeur_retour["nombre_erreur"] = 9999999;
 			echo json_encode($valeur_retour);
-            // echo 'File upload not found';
 		} 
 		echo json_encode($valeur_retour);
 	}  
@@ -216,8 +217,10 @@ class Importationintervention extends CI_Controller {
 					$reg=array();
 					if($nom_region >'') {
 						if($amoron_mania==false) {
+							// Selection region par nom
 							$reg = $this->ImportationinterventionManager->selectionregion($nom_region);
 						} else {
+							// Selection region par id
 							$reg = $this->ImportationinterventionManager->selectionregionparid(5);
 						}	
 						if(count($reg) >0) {
@@ -232,6 +235,7 @@ class Importationintervention extends CI_Controller {
 						if(intval($id_region) >0) {
 							if($nom_district >'') {
 								$region_ok = true;
+								// Selection district par nom et id_region
 								$dis = $this->ImportationinterventionManager->selectiondistrict($nom_district,$id_region);
 								if(count($dis) >0) {
 									foreach($dis as $indice=>$v) {
@@ -245,6 +249,7 @@ class Importationintervention extends CI_Controller {
 								if(intval($id_district) >0) {
 									if($nom_commune >'') {
 										$district_ok = true;
+										// Selection commune par nom et id_district
 										$comm = $this->ImportationinterventionManager->selectioncommune($nom_commune,$id_district);
 										if(count($comm) >0) {
 											foreach($comm as $indice=>$v) {
@@ -499,6 +504,7 @@ class Importationintervention extends CI_Controller {
 			$val_ret["nombre_erreur"] = $nombre_erreur;
 			// Fermer fichier Excel
 		} else {
+			// Tout est ok
 			$val_ret["reponse"] = "OK";
 			$val_ret["region"] = $nom_region_original;
 			$val_ret["district"] = $nom_district_original;

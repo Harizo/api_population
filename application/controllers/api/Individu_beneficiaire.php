@@ -8,7 +8,7 @@ class Individu_beneficiaire extends REST_Controller {
 
     public function __construct() {
         parent::__construct();
-
+		// Ouverture des modèles utilisées
         $this->load->model('individu_beneficiaire_model', 'IndividubeneficiaireManager');
         $this->load->model('individu_model', 'individuManager');
     }
@@ -19,6 +19,7 @@ class Individu_beneficiaire extends REST_Controller {
         $id_fokontany = $this->get('id_fokontany');
         $data = array() ;
         if ($cle_etrangere)  {
+			// Selection d'un individu
             $individu_beneficiaire = $this->IndividubeneficiaireManager->findAllByIndividu($cle_etrangere);
 			$data = array() ;
             if ($individu_beneficiaire) {
@@ -30,6 +31,7 @@ class Individu_beneficiaire extends REST_Controller {
         } else {
             if ($id_intervention && $id_fokontany) 	{ 
                 $id_prog = "'%".'"'.$id_intervention.'"'."%'" ;
+				// Selection des individus par programme et par fokontany
                 $list_individu_programme = $this->IndividubeneficiaireManager->findAllByProgrammeAndVillage($id_prog,$id_fokontany);
                 if ($list_individu_programme) {
                     foreach ($list_individu_programme as $key => $value) {
@@ -48,6 +50,7 @@ class Individu_beneficiaire extends REST_Controller {
                 }				
 			} else	if ($id_intervention) {
                 $id_prog = '"'.$id_intervention.'"' ;
+				// Selection individu par programme
                 $list_individu_programme = $this->IndividubeneficiaireManager->findAllByProgramme($id_prog);
                 if ($list_individu_programme) {
                     foreach ($list_individu_programme as $key => $value) {
@@ -69,8 +72,10 @@ class Individu_beneficiaire extends REST_Controller {
                 }
             }  else  {
                 if ($id) {
+					// Selection d'un individu par id
                     $data = $this->IndividubeneficiaireManager->findById($id);
                 }  else {
+					// Selection de tous les individus
                     $data = $this->IndividubeneficiaireManager->findAll();                   
                 }                
             }
@@ -94,6 +99,7 @@ class Individu_beneficiaire extends REST_Controller {
         $supprimer = $this->post('supprimer') ;
         if ($supprimer == 0)  {
             if ($id == 0) {
+				// Affectation des valeurs de chaque colonne de la table
                 $data = array(
                     'id_individu' => $this->post('id_individu'),
                     'id_intervention' => ($this->post('id_intervention')),
@@ -106,6 +112,7 @@ class Individu_beneficiaire extends REST_Controller {
                         'message' => 'No request found'
                             ], REST_Controller::HTTP_BAD_REQUEST);
                 }
+				// Ajout d'un enregistrement
                 $dataId = $this->IndividubeneficiaireManager->add($data);
                 if (!is_null($dataId)) {
                     $this->response([
@@ -132,6 +139,7 @@ class Individu_beneficiaire extends REST_Controller {
                         'message' => 'No request found'
                             ], REST_Controller::HTTP_BAD_REQUEST);
                 }
+				// Mise à jour d'un enregistrement
 				$update = $this->IndividubeneficiaireManager->update($id, $data);
                 if(!is_null($update)){
                     $this->response([
@@ -155,6 +163,7 @@ class Individu_beneficiaire extends REST_Controller {
             'message' => 'No request found'
                 ], REST_Controller::HTTP_BAD_REQUEST);
             }
+			// Suppression d'un enregistrement
             $delete = $this->IndividubeneficiaireManager->delete($id);          
             if (!is_null($delete)) {
                 $this->response([

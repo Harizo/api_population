@@ -41,7 +41,6 @@ class Enquete_menage extends REST_Controller {
 				$data=$tmp;
 			}
 		}
-
         //Début Etat de sortie
         if (count($data)>0) //S'il y a des données dans la table,retourne le tableau $data
         {

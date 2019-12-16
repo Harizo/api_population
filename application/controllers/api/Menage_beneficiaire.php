@@ -14,6 +14,7 @@ class Menage_beneficiaire extends REST_Controller {
         $id_fokontany = $this->get('id_fokontany');
         $data = array() ;
         if ($cle_etrangere) {
+			// Selection des enregistrements par ménage
             $menage_programme = $this->MenagebeficiaireManager->findAllByMenage($cle_etrangere);          
             if ($menage_programme) {
                 $data['id'] = ($menage_programme->id);
@@ -24,6 +25,7 @@ class Menage_beneficiaire extends REST_Controller {
         } else {
             if ($id_intervention && $id_fokontany) {  
                 $id_prog = "'%".'"'.$id_intervention.'"'."%'" ;
+				// Selection des ménage par programme et par fokontany
                 $list_menage = $this->MenagebeficiaireManager->findAllByProgrammeAndVillage($id_prog,$id_fokontany);
                 if ($list_menage)  {
                     foreach ($list_menage as $key => $value)  {
@@ -43,6 +45,7 @@ class Menage_beneficiaire extends REST_Controller {
                 }				
 			} else	if ($id_intervention) {
                 $id_prog = '"'.$id_intervention.'"' ;
+				// Selection ménage par programme
                 $list_menage_programme = $this->MenagebeficiaireManager->findAllByProgramme($id_prog);
                 if ($list_menage_programme) {
                     foreach ($list_menage_programme as $key => $value) {
@@ -58,8 +61,10 @@ class Menage_beneficiaire extends REST_Controller {
                 }
             } else {
                 if ($id) {
+					// Selection ménage par id (id=clé primaire)
                     $data = $this->MenagebeficiaireManager->findById($id);
                 } else {
+					// Selection de tous les ménages
                     $data = $this->MenagebeficiaireManager->findAll();                   
                 }
             }
@@ -95,6 +100,7 @@ class Menage_beneficiaire extends REST_Controller {
                         'message' => 'No request found'
                             ], REST_Controller::HTTP_BAD_REQUEST);
                 }
+				// Ajout d'un enregistrement
                 $dataId = $this->MenagebeficiaireManager->add($data);
                 if (!is_null($dataId)) {
                     $this->response([
@@ -122,6 +128,7 @@ class Menage_beneficiaire extends REST_Controller {
                         'message' => 'No request found'
                             ], REST_Controller::HTTP_BAD_REQUEST);
                 }
+				// Mise à jour d'un enregistrement
                 $update = $this->MenagebeficiaireManager->update($id, $data);              
                 if(!is_null($update)){
                     $this->response([
@@ -144,6 +151,7 @@ class Menage_beneficiaire extends REST_Controller {
             'message' => 'No request found'
                 ], REST_Controller::HTTP_BAD_REQUEST);
             }
+			// Suppression d'un enregistrement
             $delete = $this->MenagebeficiaireManager->delete($id);          
             if (!is_null($delete)) {
                 $this->response([
