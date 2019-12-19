@@ -148,6 +148,9 @@ class Importationintervention extends CI_Controller {
 						$id_acteur=null;
 					}
 					// récupération id_intervention  dans la BDD
+					$trouve= array("é","è","ê","à","ö","ç","'","ô"," ");
+					$remplace=array("e","e","e","a","o","c","","o","");
+					$intitule_intervention=str_replace($trouve,$remplace,$intitule_intervention);
 					$retour = $this->InterventionManager->findByIntitule($intitule_intervention);
 					if(count($retour) >0) {
 						foreach($retour as $k=>$v) {

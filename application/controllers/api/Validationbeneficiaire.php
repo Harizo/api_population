@@ -238,6 +238,9 @@ class Validationbeneficiaire extends CI_Controller {
 					} else {
 						// Vérifier si intitule_intervention existe dans la BDD
 						$id_intervention = null;  // A utliser ultérieurement pour controle doublon bénéficiaire intervention
+						$trouve= array("é","è","ê","à","ö","ç","'","ô"," ");
+						$remplace=array("e","e","e","a","o","c","","o","");
+						$intitule_intervention=str_replace($trouve,$remplace,$intitule_intervention);
 						$retour = $this->InterventionManager->findByIntitule($intitule_intervention);
 						if(!$retour) {
 							$sheet->getStyle("D2")->getFill()->applyFromArray(

@@ -35,6 +35,7 @@ class Intervention_model extends CI_Model {
             'email_informateur' => $intervention['email_informateur'],
             'ministere_tutelle' => $intervention['ministere_tutelle'],
             'intitule' => $intervention['intitule'],
+            'intitule2' => $intervention['intitule2'],
             'id_acteur' => $intervention['id_acteur'],
             'categorie_intervention' => $intervention['categorie_intervention'],
             'id_type_action' => $intervention['id_type_action'],
@@ -47,6 +48,8 @@ class Intervention_model extends CI_Model {
             'flag_integration_donnees' => $intervention['flag_integration_donnees'],
             'nouvelle_integration' => $intervention['nouvelle_integration'],
             'commentaire' => $intervention['commentaire'],
+            'montant_transfert' => $intervention['montant_transfert'],
+            'id_nomenclature_intervention' => $intervention['id_nomenclature_intervention'],
         );
     }
     public function delete($id) {
@@ -87,9 +90,13 @@ class Intervention_model extends CI_Model {
     }
     public function findByIntitule($intitule) {
 		// Selection par intitule intervention
+		/*$requete = "select * from ".$this->table . " where intitule like '%".$intitule."%'";
+ 		$query = $this->db->query($requete);
+        $result =   $query->result();*/			
+				
         $result =  $this->db->select('*')
                         ->from($this->table)
-                        ->where("intitule", $intitule)
+                        ->where("intitule2", $intitule)
                         ->order_by('intitule', 'asc')
                         ->get()
                         ->result();
