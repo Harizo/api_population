@@ -4,6 +4,7 @@ class Menage_model extends CI_Model {
     protected $table = 'menage';
 
     public function add($menage) {
+		// Ajout d'un enregitrement
         $this->db->set($this->_set($menage))
                             ->insert($this->table);
         if($this->db->affected_rows() === 1)
@@ -14,6 +15,7 @@ class Menage_model extends CI_Model {
         }                    
     }
     public function addchefmenage($menage) {
+		// Ajout che ménage
         $this->db->set($this->_setbeneficiaire_acteur($menage))
                             ->insert($this->table);
         if($this->db->affected_rows() === 1) {
@@ -23,6 +25,7 @@ class Menage_model extends CI_Model {
         }                    
     }
     public function update($id, $menage) {
+		// Mise à jour d'un enregitrement
         $this->db->set($this->_set($menage))
                             ->where('id', (int) $id)
                             ->update($this->table);
@@ -33,6 +36,7 @@ class Menage_model extends CI_Model {
         }                      
     }
     public function _set($menage) {
+		// Affectation des valeurs
         return array(
 			'identifiant_unique'     => $menage['identifiant_unique'],
 			'identifiant_appariement'=> $menage['identifiant_appariement'],
@@ -65,9 +69,11 @@ class Menage_model extends CI_Model {
 			'depense_mensuel'        => $menage['depense_mensuel'],
 			'id_fokontany'           => $menage['id_fokontany'],
 			'id_acteur'              => $menage['id_acteur'],
+			'etat_groupe'              => $menage['etat_groupe'],
         );
     }
     public function _setbeneficiaire_acteur($menage) {
+		// Affectation des valeurs par acteur
         return array(
 			'identifiant_unique'     => $menage['identifiant_unique'],
 			'identifiant_appariement'=> $menage['identifiant_appariement'],
@@ -100,9 +106,11 @@ class Menage_model extends CI_Model {
 			'depense_mensuel'        => $menage['depense_mensuel'],
 			'id_fokontany'           => $menage['id_fokontany'],
 			'id_acteur'              => $menage['id_acteur'],
+			'etat_groupe'              => $menage['etat_groupe'],
         );
     }
     public function delete($id) {
+		// Suppression d'un enregitrement
         $this->db->where('id', (int) $id)->delete($this->table);
         if($this->db->affected_rows() === 1) {
             return true;
@@ -111,6 +119,7 @@ class Menage_model extends CI_Model {
         }  
     }
     public function findAll() {
+		// Selection de tous les enregitrements
         $result =  $this->db->select('*')
                         ->from($this->table)
                         ->order_by('id')
@@ -124,6 +133,7 @@ class Menage_model extends CI_Model {
         }                 
     }
     public function findByIdFokontany($id_fokontany) {
+		// Selection par id_fokontany
         $result =  $this->db->select('*')
                         ->from($this->table)
 						->where("id_fokontany", $id_fokontany)
@@ -138,6 +148,7 @@ class Menage_model extends CI_Model {
         }                 
     }
     public function findById($id)  {
+		// Selection par id
         $this->db->where("id", $id);
         $q = $this->db->get($this->table);
         if ($q->num_rows() > 0) {

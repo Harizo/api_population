@@ -1,54 +1,60 @@
 <?php
-//harizo
 defined('BASEPATH') OR exit('No direct script access allowed');
 
-// afaka fafana refa ts ilaina
 require APPPATH . '/libraries/REST_Controller.php';
 
-class Variable_intervention extends REST_Controller {
+class Nomenclature_intervention4 extends REST_Controller {
 
     public function __construct() {
         parent::__construct();
-        $this->load->model('variable_model', 'VariableManager');
-        $this->load->model('liste_variable_model', 'ListevariableManager');
+        $this->load->model('nomenclature_intervention4_model', 'Nomenclatureintervention4Manager');
+        $this->load->model('nomenclature_intervention3_model', 'Nomenclatureintervention3Manager');
     }
-    //recuperation détail variable intervention
+    //recuperation nomenclature intervention  niveau 2
     public function index_get() {
         $id = $this->get('id');
         $cle_etrangere = $this->get('cle_etrangere');
         if ($cle_etrangere){
             $data = array();
-			// Selection liste variable
-            $temporaire = $this->VariableManager->findAllByIdlistevariable($cle_etrangere);
-            if ($temporaire) {
-                foreach ($temporaire as $key => $value) {
-					// Affectation des valeurs dans un tableau
-                    $listevariable = array();
-                    $listevariable = $this->ListevariableManager->findById($value->id_liste_variable);
+			// Récupération de tous les nomenclature intervention par id_nomenclature3
+            $temporaire = $this->Nomenclatureintervention4Manager->findAllByNomenclature3($cle_etrangere);
+            if ($temporaire) 
+            {
+                foreach ($temporaire as $key => $value) 
+                {
+					// Récupération description nomenclature intervention niveau 1
+                    $nomenclature3 = array();
+                    $nomenclature3 = $this->Nomenclatureintervention3Manager->findById($value->id_nomenclature3);
                     $data[$key]['id'] = $value->id;
-                    $data[$key]['id_variable'] = $value->id_variable;
-                    $data[$key]['id_liste_validation_beneficiaire'] = $value->id_liste_validation_beneficiaire;
-                    $data[$key]['listevariable'] = $listevariable;
+                    $data[$key]['code'] = $value->code;
+                    $data[$key]['description'] = $value->description;
+                    $data[$key]['nomenclature3'] = $nomenclature3;
                 }
-            }           
+            }
+            
         } else {
             if ($id) {
                 $data = array();
-				// Selection par id
-                $data = $this->VariableManager->findById($id);
+				// Récupération par id
+                $data = $this->Nomenclatureintervention4Manager->findById($id);
             } else {
-				// Selection de tous les enregistrements
-                $menu = $this->VariableManager->findAll();
+				// Récupération de tous les nomenclature intervention niveau 4
+                $menu = $this->Nomenclatureintervention4Manager->findAll();
                 if ($menu) {
                     foreach ($menu as $key => $value) {
-						// Affectation des valeurs dans un tableau
-                        $listevariable = array();
-                        $listevariable = $this->ListevariableManager->findById($value->id_liste_variable);
+                        $nomenclature3 = array();
+                        $nomenclature3 = $this->Nomenclatureintervention3Manager->findById($value->id_nomenclature3);
                         $data[$key]['id'] = $value->id;
-                        $data[$key]['id_variable'] = $value->id_variable;
-                        $data[$key]['id_liste_validation_beneficiaire'] = $value->id_liste_validation_beneficiaire;
-                        $data[$key]['id_liste_variable'] = $value->id_liste_variable;
-                        $data[$key]['listevariable'] = $listevariable;
+                        $data[$key]['code'] = $value->code;
+                        $data[$key]['description'] = $value->description;
+                        $data[$key]['code1'] = $value->code1;
+                        $data[$key]['description1'] = $value->description1;
+                        $data[$key]['code2'] = $value->code2;
+                        $data[$key]['description2'] = $value->description2;
+                        $data[$key]['code3'] = $value->code3;
+                        $data[$key]['description3'] = $value->description3;
+                        $data[$key]['id_nomenclature3'] = $value->id_nomenclature3;
+                        $data[$key]['nomenclature3'] = $nomenclature3;
                     }
                 } else
                     $data = array();
@@ -68,17 +74,16 @@ class Variable_intervention extends REST_Controller {
             ], REST_Controller::HTTP_OK);
         }
     }
-    //insertion,modification,suppression détail variable
+    //insertion,modification,suppression nomenclateure niveau 4
     public function index_post() {
         $id = $this->post('id') ;
         $supprimer = $this->post('supprimer') ;
         if ($supprimer == 0) {
             if ($id == 0) {
-				// Nouvel enregistrement
                 $data = array(
-                    'id_variable' => $this->post('id_variable'),
-                    'id_liste_variable' => $this->post('id_liste_variable'),
-                    'id_liste_validation_beneficiaire' => $this->post('id_liste_validation_beneficiaire'),
+                    'code' => $this->post('code'),
+                    'description' => $this->post('description'),
+                    'id_nomenclature3' => $this->post('id_nomenclature3')
                 );
                 if (!$data) {
                     $this->response([
@@ -88,7 +93,7 @@ class Variable_intervention extends REST_Controller {
                             ], REST_Controller::HTTP_BAD_REQUEST);
                 }
 				// Ajout d'un enregistrement
-                $dataId = $this->VariableManager->add($data);
+                $dataId = $this->Nomenclatureintervention4Manager->add($data);
                 if (!is_null($dataId)) {
                     $this->response([
                         'status' => TRUE,
@@ -103,11 +108,10 @@ class Variable_intervention extends REST_Controller {
                             ], REST_Controller::HTTP_BAD_REQUEST);
                 }
             } else {
-				// Mise à jour d'un enregistrement
                 $data = array(
-                    'id_variable' => $this->post('id_variable'),
-                    'id_liste_variable' => $this->post('id_liste_variable'),
-                    'id_liste_validation_beneficiaire' => $this->post('id_liste_validation_beneficiaire'),
+                    'code' => $this->post('code'),
+                    'description' => $this->post('description'),
+                    'id_nomenclature3' => $this->post('id_nomenclature3')
                 );
                 if (!$data || !$id) {
                     $this->response([
@@ -116,7 +120,8 @@ class Variable_intervention extends REST_Controller {
                         'message' => 'No request found'
                     ], REST_Controller::HTTP_BAD_REQUEST);
                 }
-                $update = $this->VariableManager->update($id, $data);
+				// Mise à jour d'un enregistrement
+                $update = $this->Nomenclatureintervention4Manager->update($id, $data);
                 if(!is_null($update)) {
                     $this->response([
                         'status' => TRUE,
@@ -139,7 +144,7 @@ class Variable_intervention extends REST_Controller {
                         ], REST_Controller::HTTP_BAD_REQUEST);
             }
 			// Suppression d'un enregistrement
-            $delete = $this->VariableManager->delete($id);         
+            $delete = $this->Nomenclatureintervention4Manager->delete($id);         
             if (!is_null($delete)) {
                 $this->response([
                     'status' => TRUE,
@@ -156,6 +161,4 @@ class Variable_intervention extends REST_Controller {
         }        
     }
 }
-/* End of file controllername.php */
-/* Location: ./application/controllers/controllername.php */
 ?>

@@ -1,7 +1,6 @@
 <?php
 
 defined('BASEPATH') OR exit('No direct script access allowed');
-// afaka fafana refa ts ilaina
 require APPPATH . '/libraries/REST_Controller.php';
 
 class Fokontany extends REST_Controller {
@@ -10,7 +9,6 @@ class Fokontany extends REST_Controller {
         parent::__construct();
         $this->load->model('fokontany_model', 'FokontanyManager');        
         $this->load->model('commune_model', 'CommuneManager');
-        $this->load->model('site_model', 'SiteManager');
     }
     //recuperation fokontany
     public function index_get() {
@@ -19,14 +17,14 @@ class Fokontany extends REST_Controller {
         $cle_etrangere = $this->get('cle_etrangere');
 
         if ($cle_etrangere) {
-            //$data = $this->FokontanyManager->findAllByCommune($cle_etrangere);
-            // $data = $this->FokontanyManager->find_Liste_Fokontany_avec_Commune_et_District_et_Region($cle_etrangere);
             $data = array();
+			// Récupération des fokontany par commune
             $tmp = $this->FokontanyManager->findAllByCommune($cle_etrangere);
             if ($tmp) 
             {
                 foreach ($tmp as $key => $value) 
                 {
+					// Récupérationdescription commune
                     $commune = array();
                     $commune = $this->CommuneManager->findByIdOLD($value->id_commune);
                     $data[$key]['id'] = $value->id;
@@ -40,6 +38,7 @@ class Fokontany extends REST_Controller {
         } else {
             if ($id) {
                 $data = array();
+				// Récupération par id
                 $fokontany = $this->FokontanyManager->findById($id);
                 $commune = $this->CommmuneManager->findById($fokontany->id_commune);
                 $data['id'] = $fokontany->id;
@@ -50,6 +49,7 @@ class Fokontany extends REST_Controller {
                 $data['commune'] = $commune;
                 
             } else {
+				// Récupération de tous les fokontany
                 $fokontany = $this->FokontanyManager->findAll();
                 if ($fokontany) {
                     foreach ($fokontany as $key => $value) {
@@ -102,6 +102,7 @@ class Fokontany extends REST_Controller {
                         'message' => 'No request found'
                             ], REST_Controller::HTTP_BAD_REQUEST);
                 }
+				// Ajout d'un enregistrement
                 $dataId = $this->FokontanyManager->add($data);              
                 if (!is_null($dataId)) {
                     $this->response([
@@ -124,6 +125,7 @@ class Fokontany extends REST_Controller {
                         'message' => 'No request found'
                             ], REST_Controller::HTTP_BAD_REQUEST);
                 }
+				// Mise à jour d'un enregistrement
                 $update = $this->FokontanyManager->update($id, $data);              
                 if(!is_null($update)){
                     $this->response([
@@ -146,6 +148,7 @@ class Fokontany extends REST_Controller {
             'message' => 'No request found'
                 ], REST_Controller::HTTP_BAD_REQUEST);
             }
+			// Suppression d'un enregistrement
             $delete = $this->FokontanyManager->delete($id);          
             if (!is_null($delete)) {
                 $this->response([

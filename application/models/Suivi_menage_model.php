@@ -18,7 +18,6 @@ class Suivi_menage_model extends CI_Model
             return null;
         }                    
     }
-
 	// Cette fonction met à jour un enregistrement dans la table
     public function update($id, $suivi_menage)
     {
@@ -32,7 +31,6 @@ class Suivi_menage_model extends CI_Model
             return null;
         }                      
     }
-
 	// Cette fonction affecte les données  d'un enregistrement via controleur php avant d'être passée en paramètre
 	// dans la fonction add ou fontion update
     public function _set($suivi_menage)
@@ -42,7 +40,6 @@ class Suivi_menage_model extends CI_Model
             'id_suivi_menage_entete'      => $suivi_menage['id_suivi_menage_entete'],                      
         );
     }
-
 	// Cette fonction permet de supprimer un enregitrement dans la table
     public function delete($id)
     {
@@ -132,5 +129,5 @@ class Suivi_menage_model extends CI_Model
             return null;
         }                  
     }
-
 }
+?>

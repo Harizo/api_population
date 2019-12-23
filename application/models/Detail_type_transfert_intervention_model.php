@@ -4,6 +4,7 @@ class Detail_type_transfert_intervention_model extends CI_Model {
     protected $table = 'detail_type_transfert_intervention';
 
     public function add($detailtypetransfertintervention)  {
+		// Ajout d'un enregitrement
         $this->db->set($this->_set($detailtypetransfertintervention))
                             ->insert($this->table);
         if($this->db->affected_rows() === 1)  {
@@ -13,6 +14,7 @@ class Detail_type_transfert_intervention_model extends CI_Model {
         }                    
     }
     public function update($id, $detailtypetransfertintervention)  {
+		// Mise à jour d'un enregitrement
         $this->db->set($this->_set($detailtypetransfertintervention))
                             ->where('id', (int) $id)
                             ->update($this->table);
@@ -23,6 +25,7 @@ class Detail_type_transfert_intervention_model extends CI_Model {
         }                      
     }
     public function _set($detailtypetransfertintervention) {
+		// Affectation des valeurs
         return array(
             'id_intervention'     => $detailtypetransfertintervention['id_intervention'],
             'id_detail_type_transfert' => $detailtypetransfertintervention['id_detail_type_transfert'],
@@ -30,6 +33,7 @@ class Detail_type_transfert_intervention_model extends CI_Model {
         );
     }
     public function delete($id) {
+		// Suppression d'un enregitrement
         $this->db->where('id', (int) $id)->delete($this->table);
         if($this->db->affected_rows() === 1)  {
             return true;
@@ -38,6 +42,7 @@ class Detail_type_transfert_intervention_model extends CI_Model {
         }  
     }
     public function deleteByIntervention($id_intervention) {
+		// Suppression par id_intervention
         $this->db->where('id_intervention', (int) $id_intervention)->delete($this->table);
         if($this->db->affected_rows() >= 1)  {
             return true;
@@ -46,6 +51,7 @@ class Detail_type_transfert_intervention_model extends CI_Model {
         }  
     }
     public function findAll() {
+		// Selection de tous les enregitrements
         $result =  $this->db->select('*')
                         ->from($this->table)
                         ->order_by('description')
@@ -58,6 +64,7 @@ class Detail_type_transfert_intervention_model extends CI_Model {
         }                 
     }
     public function findById($id) {
+		// Selection par id
         $result =  $this->db->select('*')
                         ->from($this->table)
                         ->where("id", $id)
@@ -71,6 +78,7 @@ class Detail_type_transfert_intervention_model extends CI_Model {
         }                 
     }
     public function findByIntervention($id_intervention) {
+		// Selection par id_intervention
         $result =  $this->db->select('*')
                         ->from($this->table)
                         ->where("id_intervention", $id_intervention)

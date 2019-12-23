@@ -108,6 +108,7 @@ class Menage extends REST_Controller {
                     $data[$key]['acteur'] = $acteur;
                     $data[$key]['id_type_beneficiaire'] = $value->id_type_beneficiaire;
                     $data[$key]['type_beneficiaire'] = $type_beneficiaire;
+                    $data[$key]['etat_groupe'] = $value->etat_groupe;
                 }
             }
             if (!$data)
@@ -181,6 +182,7 @@ class Menage extends REST_Controller {
 			'id_fokontany'           => $id_fokontany,
 			'id_acteur'              => $id_acteur,
 			'id_type_beneficiaire'   => $id_type_beneficiaire
+			'etat_groupe'         => $this->post('etat_groupe'),
 		);
 		// Supprimer =0 veut dire : soit un ajout ou mise a jour sinon suppression d'un enregistrement
         if ($supprimer == 0) {

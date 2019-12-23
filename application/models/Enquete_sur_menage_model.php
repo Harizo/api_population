@@ -4,6 +4,7 @@ class Enquete_sur_menage_model extends CI_Model {
     protected $table = 'enquete_menage';
 
     public function add($enquete_menage)  {
+		// Ajout d'un enregitrement
         $this->db->set($this->_set($enquete_menage))
                             ->insert($this->table);
         if($this->db->affected_rows() === 1) {
@@ -13,6 +14,7 @@ class Enquete_sur_menage_model extends CI_Model {
         }                    
     }
     public function update($id, $enquete_menage)  {
+		// Mise à jour d'un enregitrement
         $this->db->set($this->_set($enquete_menage))
                             ->where('id', (int) $id)
                             ->update($this->table);
@@ -23,6 +25,7 @@ class Enquete_sur_menage_model extends CI_Model {
         }                      
     }
     public function _set($enquete_menage) {
+		// Affectation des valeurs
         return array(
             'id_menage'                =>  $enquete_menage['id_menage'],
             'id_type_logement'         =>  $enquete_menage['id_type_logement'],                       
@@ -50,6 +53,7 @@ class Enquete_sur_menage_model extends CI_Model {
         );
     }
     public function delete($id) {
+		// Suppression d'un enregitrement
         $this->db->where('id', (int) $id)->delete($this->table);
         if($this->db->affected_rows() === 1) {
             return true;
@@ -58,6 +62,7 @@ class Enquete_sur_menage_model extends CI_Model {
         }  
     }
     public function findAll() {
+		// Selection de tous les enregitrements
         $result =  $this->db->select('*')
                         ->from($this->table)
                         ->order_by('id')
@@ -69,7 +74,8 @@ class Enquete_sur_menage_model extends CI_Model {
             return null;
         }                 
     }
-    public function findAllByMenage($id_menage)  {       
+    public function findAllByMenage($id_menage)  {     
+		// Selection par ménage
         $this->db->where("id_menage", $id_menage);
         $q = $this->db->get($this->table);
         if ($q->num_rows() > 0) {
@@ -78,6 +84,7 @@ class Enquete_sur_menage_model extends CI_Model {
         return null;  
     }
     public function findById($id) {
+		// Selection par id
         $this->db->where("id", $id);
         $q = $this->db->get($this->table);
         if ($q->num_rows() > 0) {

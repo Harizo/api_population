@@ -8,6 +8,7 @@ class Uploadfichier extends CI_Controller {
         parent::__construct();
        
     }
+	// Sauvegarde recommandation
 	public function save_recommandation() {	
 		$erreur="aucun";
 		$replace=array('e','e','e','a','o','c','_','_','_');
@@ -41,7 +42,8 @@ class Uploadfichier extends CI_Controller {
             echo 'File upload not found';
 		} 
 		echo json_encode($emplacement);
-	}  
+	}
+	// Prendre un fichier dans le serveur (download)	
 	public function prendre_fichier()  {
 		$filename = $_POST["nom_fichier"]; 
 		$rep = $_POST["repertoire"];

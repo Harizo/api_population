@@ -8,6 +8,7 @@ class Projet extends REST_Controller {
 
     public function __construct() {
         parent::__construct();
+		// Ouverture des modèles utlisées
         $this->load->model('projet_model', 'ProjetManager');
         $this->load->model('programme_model', 'ProgrammeManager');
         $this->load->model('objectif_specifique_model', 'ObjectifspecifiqueManager');
@@ -22,6 +23,7 @@ class Projet extends REST_Controller {
         $this->load->model('acteur_model', 'ActeurManager');
         $this->load->model('acteur_regional_model', 'ActeurregionalManager');
     }
+	// Conversion date longue au format Y-m-d
     public function convertDateAngular($daty){
         if(isset($daty) && $daty != ""){
             if(strlen($daty) >33) {
@@ -43,6 +45,7 @@ class Projet extends REST_Controller {
 		$parent_id = $this->get('parent_id');
 		$data = array();		
 		if ($id) {
+			// Selection par id
 			$tmp = $this->ProjetManager->findById($id);
 			if ($tmp) {
 				$data=$tmp;
@@ -62,7 +65,9 @@ class Projet extends REST_Controller {
 					$ret=array();
 					foreach($bail as $k=>$v) {
 						$tmp=array();
+						// Selection description bailleur
 						$ba= $this->BailleurManager->findById($v->id_bailleur); 
+						// Selection description type de financement
 						$ttrsfr= $this->TypefinancementManager->findById($v->id_type_financement); 
 						$tmp["id"]=$v->id;	
 						$tmp["id_projet"]=$v->id_projet;	
@@ -137,14 +142,7 @@ class Projet extends REST_Controller {
 				$menu = $this->ProjetManager->findAll();
 				if ($menu) {
 					foreach ($menu as $key => $value) {
-					   /*$programme = array();
-						$prg = $this->ProgrammeManager->findById($value->id_programme);
-						if(count($prg) >0) {
-							$programme = $prg;
-						} */
 						$data[$key]['id'] = $value->id;
-						/*$data[$key]['id_programme'] = $value->id_programme;
-						$data[$key]['programme'] = $programme;*/
 						$data[$key]['date_debut'] = $value->date_debut;
 						$data[$key]['date_fin'] = $value->date_fin;
 						$data[$key]['intitule'] = $value->intitule;
@@ -181,17 +179,11 @@ class Projet extends REST_Controller {
         $supprimer = $this->post('supprimer') ;
 		$date_debut = $this->convertDateAngular($this->post('date_debut'));		
 		$date_fin = $this->convertDateAngular($this->post('date_fin'));	
-	/*	$id_programme=null;
-		$tmp1=$this->post('id_programme');
-		if(isset($tmp1) && $tmp1 !="" && intval($tmp1) >0) {
-			$id_programme=$tmp1;
-		} 	*/		
 		$data = array(
 			'intitule'         => $this->post('intitule'),
 			'objectif_general' => $this->post('objectif_general'),
 			'observation'      => $this->post('observation'),
 			'type_intervention' => $this->post('type_intervention'),
-			// 'id_programme'     => $id_programme,
 			'date_debut'       => $date_debut,
 			'date_fin'         => $date_fin,
 		);               
@@ -204,6 +196,7 @@ class Projet extends REST_Controller {
                         'message' => 'No request found'
                             ], REST_Controller::HTTP_BAD_REQUEST);
                 }
+				// Ajout d'un enregistrement
                 $dataId = $this->ProjetManager->add($data);              
                 if (!is_null($dataId)) {
                     $this->response([
@@ -226,6 +219,7 @@ class Projet extends REST_Controller {
                         'message' => 'No request found'
                             ], REST_Controller::HTTP_BAD_REQUEST);
                 }
+				// Mise à jour d'un enregistrement
                 $update = $this->ProjetManager->update($id, $data);              
                 if(!is_null($update)){
                     $this->response([
@@ -248,6 +242,7 @@ class Projet extends REST_Controller {
             'message' => 'No request found'
                 ], REST_Controller::HTTP_BAD_REQUEST);
             }
+			// Suppression d'un enregistrement
             $delete = $this->ProjetManager->delete($id);          
             if (!is_null($delete)) {
                 $this->response([

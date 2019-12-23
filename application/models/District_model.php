@@ -4,6 +4,7 @@ class District_model extends CI_Model {
     protected $table = 'district';
 
     public function add($district) {
+		// Ajout d'un enregitrement
         $this->db->set($this->_set($district))
                             ->insert($this->table);
         if($this->db->affected_rows() === 1) {
@@ -13,6 +14,7 @@ class District_model extends CI_Model {
         }                    
     }
     public function update($id, $district) {
+		// Mise à jour d'un enregitrement
         $this->db->set($this->_set($district))
                             ->where('id', (int) $id)
                             ->update($this->table);
@@ -24,6 +26,7 @@ class District_model extends CI_Model {
         }                      
     }
     public function _set($district) {
+		// Affectation des valeurs
         return array(
             'code'          =>      $district['code'],
             'nom'           =>      $district['nom'],
@@ -31,6 +34,7 @@ class District_model extends CI_Model {
         );
     }
     public function delete($id) {
+		// Suppression d'un enregitrement
         $this->db->where('id', (int) $id)->delete($this->table);
         if($this->db->affected_rows() === 1)
         {
@@ -40,18 +44,7 @@ class District_model extends CI_Model {
         }  
     }
     public function findAll() {
-/*		$requete='select d.id,d.nom,d.code,d.region_id,r.nom as region,r.site_id,s.nom as nom_site
-		from district as d
-		left outer join region as r on r.id=d.region_id
-		left outer join site as s on s.id=r.site_id
-		order by r.site_id,d.nom,r.nom	';				
-		$query= $this->db->query($requete);
-        if($query->result()) {
-			return $query->result();
-            // return $result;
-        }else{
-            return null;
-        }  */               
+		// Selection de tous les enregitrements
         $result =  $this->db->select('*')
                         ->from($this->table)
                         ->order_by('nom')
@@ -65,6 +58,7 @@ class District_model extends CI_Model {
         }                 
     }
     public function findAllByRegion($region_id) {
+		// Selection district par région
         $result =  $this->db->select('*')
                         ->from($this->table)
                         ->order_by('nom')
@@ -78,6 +72,7 @@ class District_model extends CI_Model {
         }                 
     }
     public function findById($id) {
+		// Selection par id
         $result =  $this->db->select('*')
                         ->from($this->table)
                         ->where("id", $id)
@@ -91,24 +86,11 @@ class District_model extends CI_Model {
         }                 
     }		
     public function findByIdOLD($id)  {
+		// Selection par id
         $this->db->where("id", $id);
         $q = $this->db->get($this->table);
         if ($q->num_rows() > 0) {
             return $q->row();
         }
-        // return null;
-	/*	$requete='select d.id,d.nom,d.code,d.region_id,r.nom as region,r.site_id,s.nom as nom_site
-		from district as d
-		left outer join region as r on r.id=d.region_id
-		left outer join site as s on s.id=r.site_id where d.id='.$id
-		.' order by r.site_id,d.nom,r.nom ';				
-			$query= $this->db->query($requete);*/
-			// if($query->result())
-			// {
-				// return $query->row();
-				// return $result;
-			// }else{
-				// return null;
-			// }   
     }
 }

@@ -47,6 +47,7 @@ class Bailleur_projet extends REST_Controller {
         }
     }
     public function index_post() {
+		// Affectation des valeurs de chaque colonne de la table
         $id = $this->post('id') ;
         $supprimer = $this->post('supprimer') ;
 		$data = array(
@@ -66,6 +67,7 @@ class Bailleur_projet extends REST_Controller {
                         'message' => 'No request found'
                             ], REST_Controller::HTTP_BAD_REQUEST);
                 }
+				// Ajout d'un enregistrement
                 $dataId = $this->BailleurprojetManager->add($data);
                 if (!is_null($dataId)) {
                     $this->response([
@@ -88,6 +90,7 @@ class Bailleur_projet extends REST_Controller {
                         'message' => 'No request found'
                             ], REST_Controller::HTTP_BAD_REQUEST);
                 }
+				// Mise à jour d'un enregistrement
                 $update = $this->BailleurprojetManager->update($id, $data);
                 if(!is_null($update)) {
                     $this->response([
@@ -110,6 +113,7 @@ class Bailleur_projet extends REST_Controller {
                 'message' => 'No request found'
                     ], REST_Controller::HTTP_BAD_REQUEST);
             }
+			// Suppression d'un enregistrement
             $delete = $this->BailleurprojetManager->delete($id);
             if (!is_null($delete)) {
                 $this->response([

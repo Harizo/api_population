@@ -10,7 +10,6 @@ class Historique_utilisateur extends REST_Controller {
         parent::__construct();
         $this->load->model('utilisateurs_model', 'UserManager');
         $this->load->model('historique_utilisateur_model', 'HistoriqueutilisateurManager');
-        $this->load->model('site_model', 'SiteManager');
     }
 	// Cette classe définit tous les actions faites par les utlisateurs : ajout,suppression,modification,consultation
     //recuperation donnée
@@ -63,8 +62,6 @@ class Historique_utilisateur extends REST_Controller {
                     $data[$key]['action'] = $value->action;
                     $data[$key]['date_action'] = $value->date_action;
                     $data[$key]['id_utilisateur'] = $value->id_utilisateur;
-                    //$data[$key]['user'] = $user;
-                    $data[$key]['site'] = $this->SiteManager->findById($user->site_id);
                     $data[$key]['nom'] = $user->nom;
                     $data[$key]['prenom'] = $user->prenom;
                     $data[$key]['telephone'] = $user->telephone;
@@ -73,9 +70,6 @@ class Historique_utilisateur extends REST_Controller {
             } else
                 $data = array();
         }
-        
-        
-
         if (count($data)>0)
         {
             $this->response([
@@ -115,7 +109,7 @@ class Historique_utilisateur extends REST_Controller {
                 'message' => 'No request found'
                     ], REST_Controller::HTTP_BAD_REQUEST);
         }
-
+		// Ajout d'un enregistrement
         $dataId = $this->HistoriqueutilisateurManager->add($data);
 
         if (!is_null($dataId))

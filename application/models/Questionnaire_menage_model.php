@@ -4,6 +4,7 @@ class Enquete_menage_model extends CI_Model {
     protected $table = 'enquete_menage';
 
     public function add($enquete_menage)  {
+		// Ajout d'un enregitrement
         $this->db->set($this->_set($enquete_menage))
                             ->insert($table);
         if($this->db->affected_rows() === 1)  {
@@ -13,6 +14,7 @@ class Enquete_menage_model extends CI_Model {
         }                    
     }
     public function update($id, $enquete_menage)  {
+		// Mise à jour d'un enregitrement
         $this->db->set($this->_set($enquete_menage))
                             ->where('id', (int) $id)
                             ->update($table);
@@ -23,6 +25,7 @@ class Enquete_menage_model extends CI_Model {
         }                      
     }
     public function _set($enquete_menage) {
+		// Affectation des valeurs
         return array(
             'id_menage' => $enquete_menage['id_menage'],
             'type_logement' => $enquete_menage['type_logement'],
@@ -46,6 +49,7 @@ class Enquete_menage_model extends CI_Model {
         );
     }
     public function delete($id) {
+		// Suppression d'un enregitrement
         $this->db->where('id', (int) $id)->delete($table);
         if($this->db->affected_rows() === 1)  {
             return true;
@@ -54,6 +58,7 @@ class Enquete_menage_model extends CI_Model {
         }  
     }
     public function findAll() {
+		// Selection de tous les enregitrements
         $result =  $this->db->select('*')
                         ->from($table)
                         ->order_by('id')
@@ -66,6 +71,7 @@ class Enquete_menage_model extends CI_Model {
         }                 
     }
     public function findById($id) {
+		// Selection par id
         $result =  $this->db->select('*')
                         ->from($table)
                         ->where("id", $id)

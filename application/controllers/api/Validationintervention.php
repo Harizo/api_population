@@ -132,8 +132,8 @@ class Validationintervention extends CI_Controller {
 		$premier=0; 
 		$remplacer=array("'");
 		$trouver= array("’");
-		$remplacer=array('&eacute;','e','e','a','o','c','_');
-		$trouver= array('é','è','ê','à','ö','ç',' ');
+		$trouver= array("é","è","ê","à","ö","ç","'","ô");
+		$remplacer=array("e","e","e","a","o","c","","o");
 		$nombre_erreur=0; // compter le nombre d'erreur afin de pouvoir renvoyer le fichier à l'envoyeur
 		foreach($rowIterator as $row) {
 			$ligne = $row->getRowIndex ();
@@ -201,6 +201,9 @@ class Validationintervention extends CI_Controller {
 						 );													
 					} else {
 						// Vérifier si intitule_intervention existe dans la BDD
+						$trouve= array("é","è","ê","à","ö","ç","'","ô"," ");
+						$remplace=array("e","e","e","a","o","c","","o","");
+						$intitule_intervention=str_replace($trouve,$remplace,$intitule_intervention);
 						$retour = $this->InterventionManager->findByIntitule($intitule_intervention);
 						if(!$retour) {
 							$sheet->getStyle("D2")->getFill()->applyFromArray(

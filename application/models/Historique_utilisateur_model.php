@@ -42,7 +42,6 @@ class Historique_utilisateur_model extends CI_Model
             'id_utilisateur' => $historique_utilisateur['id_utilisateur']                       
         );
     }
-
 	// Suppression : inutilie pour le moment (voir commentaire controlers : index_post)
     public function delete($id)
     {

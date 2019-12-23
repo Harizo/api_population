@@ -4,6 +4,7 @@ class Financement_programme_model extends CI_Model {
     protected $table = 'financement_programme';
 
     public function add($finprg)  {
+		// Ajout d'un enregitrement
         $this->db->set($this->_set($finprg))
                             ->insert($this->table);
         if($this->db->affected_rows() === 1)  {
@@ -13,6 +14,7 @@ class Financement_programme_model extends CI_Model {
         }                    
     }
     public function update($id, $finprg)  {
+		// Mise à jour d'un enregitrement
         $this->db->set($this->_set($finprg))
                             ->where('id', (int) $id)
                             ->update($this->table);
@@ -23,6 +25,7 @@ class Financement_programme_model extends CI_Model {
         }                      
     }
     public function _set($finprg) {
+		// Affectation des valeurs
         return array(
             'id_programme' => $finprg['id_programme'],
             'id_source_financement' => $finprg['id_source_financement'],
@@ -34,6 +37,7 @@ class Financement_programme_model extends CI_Model {
         );
     }
     public function delete($id) {
+		// Suppression d'un enregitrement
         $this->db->where('id', (int) $id)->delete($this->table);
         if($this->db->affected_rows() === 1)  {
             return true;
@@ -42,6 +46,7 @@ class Financement_programme_model extends CI_Model {
         }  
     }
     public function findAll() {
+		// Selection de tous les enregitrements
         $result =  $this->db->select('*')
                         ->from($this->table)
                         ->order_by('id')
@@ -67,6 +72,7 @@ class Financement_programme_model extends CI_Model {
         }                 
     }
     public function findByIdProgramme($id) {
+		// Selection par id
         $result =  $this->db->select('*')
                         ->from($this->table)
                         ->where("id_programme", $id)

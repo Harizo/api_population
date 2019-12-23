@@ -99,12 +99,6 @@ class Acteur_model extends CI_Model {
 		$requete= "select * from acteur where lower(nom) like '%".$nom."%'";
 		$query = $this->db->query($requete);
         $result= $query->result();				
-        /*$result =  $this->db->select('*')
-                        ->from($this->table)
-                        ->where('lower(nom)', $nom)
-                        ->order_by('nom', 'asc')
-                        ->get()
-                        ->result();*/
         if($result) {
             return $result;
         }else{

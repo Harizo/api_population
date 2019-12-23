@@ -12,23 +12,23 @@ class Commune extends REST_Controller {
         $this->load->model('commune_model', 'CommuneManager');
         $this->load->model('district_model', 'DistrictManager');
     }
-    //recuperation commune
+    
     public function index_get() {
         $id = $this->get('id');
         $cle_etrangere = $this->get('cle_etrangere');
         $id_commune = $this->get('id_commune');
         $id_district = $this->get('id_district');
         $id_region = $this->get('id_region');
-		$taiza="";
         if ($cle_etrangere) {
-            //$data = $this->CommuneManager->findAllByDistrict($cle_etrangere);
             $data = array();
-            $tmp = $this->CommuneManager->findAllByDistrict($cle_etrangere);
-            if ($tmp) 
+			// Récupération des enregistrements par district
+            $temporaire = $this->CommuneManager->findAllByDistrict($cle_etrangere);
+            if ($temporaire) 
             {
-                foreach ($tmp as $key => $value) 
+                foreach ($temporaire as $key => $value) 
                 {
                     $district = array();
+					// Récupération description district
                     $district = $this->DistrictManager->findByIdOLD($value->district_id);
                     $data[$key]['id'] = $value->id;
                     $data[$key]['code'] = $value->code;
@@ -38,23 +38,24 @@ class Commune extends REST_Controller {
             }           
         } else {
             if ($id)  {
+				// Récupération par id (id=clé primaire)
                 $data = array();
                 $data = $this->CommuneManager->findById($id);
             } else if($id_commune) {
-				$taiza="Ato ambony ary id_commune=".$id_commune."  ary id_region=".$id_region; 
 				$menu = $this->CommuneManager->find_Fokontany_avec_District_et_Region($id_commune);
                 if ($menu) {
 					$data=$menu;
                 } else
                     $data = array();
 			} else if($id_district) {	
+				// Récupération des communes par district 
 				$menu = $this->CommuneManager->find_Commune_avec_District_et_Region($id_district);
                 if ($menu) {
 					$data=$menu;
                 } else
                     $data = array();
 			} else {
-				$taiza="findAll no nataony";
+				// Récupération de tous les enregistrements
                 $menu = $this->CommuneManager->findAll();
                 if ($menu) {
                     foreach ($menu as $key => $value) {
@@ -74,8 +75,7 @@ class Commune extends REST_Controller {
             $this->response([
                 'status' => TRUE,
                 'response' => $data,
-                'message' => $taiza,
-                // 'message' => 'Get data success',
+                'message' => 'Get data success',
             ], REST_Controller::HTTP_OK);
         } else {
             $this->response([
@@ -103,6 +103,7 @@ class Commune extends REST_Controller {
                         'message' => 'No request found'
                             ], REST_Controller::HTTP_BAD_REQUEST);
                 }
+				// Ajout d'un enregistrement
                 $dataId = $this->CommuneManager->add($data);
                 if (!is_null($dataId))  {
                     $this->response([
@@ -130,6 +131,7 @@ class Commune extends REST_Controller {
                         'message' => 'No request found'
                             ], REST_Controller::HTTP_BAD_REQUEST);
                 }
+				// Mise à jour d'un enregistrement
                 $update = $this->CommuneManager->update($id, $data);
                 if(!is_null($update)) {
                     $this->response([
@@ -152,6 +154,7 @@ class Commune extends REST_Controller {
                 'message' => 'No request found'
                     ], REST_Controller::HTTP_BAD_REQUEST);
             }
+			// Suppression d'un enregistrement
             $delete = $this->CommuneManager->delete($id);
             if (!is_null($delete)) {
                 $this->response([

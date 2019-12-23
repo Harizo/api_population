@@ -153,8 +153,7 @@ class Axe_strategique extends REST_Controller {
                     'message' => "Delete data success"
                         ], REST_Controller::HTTP_OK);
             } 
-            else 
-            {
+            else {
                 $this->response([
                     'status' => FALSE,
                     'response' => 0,

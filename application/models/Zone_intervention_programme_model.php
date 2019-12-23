@@ -4,6 +4,7 @@ class Zone_intervention_programme_model extends CI_Model {
     protected $table = 'zone_intervention_programme';
 
     public function add($ziprg)  {
+		// Ajout d'un enregitrement
         $this->db->set($this->_set($ziprg))
                             ->insert($this->table);
         if($this->db->affected_rows() === 1)  {
@@ -13,6 +14,7 @@ class Zone_intervention_programme_model extends CI_Model {
         }                    
     }
     public function update($id, $ziprg)  {
+		// Mise à jour d'un enregitrement
         $this->db->set($this->_set($ziprg))
                             ->where('id', (int) $id)
                             ->update($this->table);
@@ -23,6 +25,7 @@ class Zone_intervention_programme_model extends CI_Model {
         }                      
     }
     public function _set($ziprg) {
+		// Affectation des valeurs
         return array(
             'id_programme' => $ziprg['id_programme'],
             'id_district' => $ziprg['id_district'],
@@ -32,6 +35,7 @@ class Zone_intervention_programme_model extends CI_Model {
         );
     }
     public function delete($id) {
+		// Suppression d'un enregitrement
         $this->db->where('id', (int) $id)->delete($this->table);
         if($this->db->affected_rows() === 1)  {
             return true;
@@ -40,6 +44,7 @@ class Zone_intervention_programme_model extends CI_Model {
         }  
     }
     public function findAll() {
+		// Selection de tous les enregitrements
         $result =  $this->db->select('*')
                         ->from($this->table)
                         ->order_by('id')
@@ -52,6 +57,7 @@ class Zone_intervention_programme_model extends CI_Model {
         }                 
     }
     public function findById($id) {
+		// Selection par id
         $result =  $this->db->select('*')
                         ->from($this->table)
                         ->where("id", $id)
@@ -65,6 +71,7 @@ class Zone_intervention_programme_model extends CI_Model {
         }                 
     }
     public function findByIdProgramme($id) {
+		// Selection par id_programme
         $result =  $this->db->select('*')
                         ->from($this->table)
                         ->where("id_programme", $id)

@@ -1,38 +1,37 @@
 <?php
 
 defined('BASEPATH') OR exit('No direct script access allowed');
-//harizo
-// afaka fafana refa ts ilaina
-
-
 require APPPATH . '/libraries/REST_Controller.php';
 
-class Site extends REST_Controller {
+class Nomenclature_intervention1 extends REST_Controller {
 
     public function __construct() {
         parent::__construct();
-        $this->load->model('site_model', 'SiteManager');
+        $this->load->model('nomenclature_intervention1_model', 'Nomenclatureintervention1Manager');
     }
+    //recuperation nomenclature intervention
     public function index_get() {
         $id = $this->get('id');
-        if ($id) {
-            $data = $this->SiteManager->findById($id);
-            if (!$data)
+            if ($id) {
                 $data = array();
-        } else {
-			$data=array();
-				$menu = $this->SiteManager->findAll();	
-            if ($menu) {
-                foreach ($menu as $key => $value) {
-                    $data[$key]['id'] = $value->id;
-                    $data[$key]['code'] = $value->code;
-                    $data[$key]['libelle'] = $value->libelle;
-                    $data[$key]['adresse'] = $value->adresse;
-                }
+				// Selection par id
+                $nomenclature = $this->Nomenclatureintervention1Manager->findById($id);
+                $data['id'] = $nomenclature->id;
+                $data['code'] = $nomenclature->code;
+                $data['description'] = $nomenclature->description;
+            } else {
+				// Selection de tous les enregistrements
+                $nomenclature = $this->Nomenclatureintervention1Manager->findAll();
+                if ($nomenclature) {
+                    foreach ($nomenclature as $key => $value) {
+                        
+                        $data[$key]['id'] = $value->id;
+                        $data[$key]['code'] = $value->code;
+                        $data[$key]['description'] = $value->description;
+                    };
+                } else
+                    $data = array();
             }
-            if (!$data)
-                $data = array();
-        }
         if (count($data)>0) {
             $this->response([
                 'status' => TRUE,
@@ -47,16 +46,16 @@ class Site extends REST_Controller {
             ], REST_Controller::HTTP_OK);
         }
     }
+    //insertion,modification,suppression nomenclature intervention niveau 1
     public function index_post() {
         $id = $this->post('id') ;
         $supprimer = $this->post('supprimer') ;
         if ($supprimer == 0) {
             if ($id == 0) {
                 $data = array(
-                    'code'    => $this->post('code'),
-                    'libelle' => $this->post('libelle'),
-                    'adresse' => $this->post('adresse')
-                );
+                    'code' => $this->post('code'),
+                    'description' => $this->post('description'),
+                );               
                 if (!$data) {
                     $this->response([
                         'status' => FALSE,
@@ -64,7 +63,8 @@ class Site extends REST_Controller {
                         'message' => 'No request found'
                             ], REST_Controller::HTTP_BAD_REQUEST);
                 }
-                $dataId = $this->SiteManager->add($data);
+				// Ajout d'un enregistrement
+                $dataId = $this->Nomenclatureintervention1Manager->add($data);              
                 if (!is_null($dataId)) {
                     $this->response([
                         'status' => TRUE,
@@ -80,10 +80,9 @@ class Site extends REST_Controller {
                 }
             } else {
                 $data = array(
-                    'code'    => $this->post('code'),
-                    'libelle' => $this->post('libelle'),
-                    'adresse' => $this->post('adresse')
-                );
+                    'code' => $this->post('code'),
+                    'description' => $this->post('description')
+                );              
                 if (!$data || !$id) {
                     $this->response([
                         'status' => FALSE,
@@ -91,29 +90,31 @@ class Site extends REST_Controller {
                         'message' => 'No request found'
                             ], REST_Controller::HTTP_BAD_REQUEST);
                 }
-                $update = $this->SiteManager->update($id, $data);               
-                if(!is_null($update)) {
+				// Mise à jour d'un enregistrement
+                $update = $this->Nomenclatureintervention1Manager->update($id, $data);              
+                if(!is_null($update)){
                     $this->response([
-                        'status' => TRUE,
+                        'status' => TRUE, 
                         'response' => 1,
                         'message' => 'Update data success'
                             ], REST_Controller::HTTP_OK);
-                } else  {
+                } else {
                     $this->response([
                         'status' => FALSE,
                         'message' => 'No request found'
                             ], REST_Controller::HTTP_OK);
                 }
             }
-        } else  {
+        } else {
             if (!$id) {
             $this->response([
-                'status' => FALSE,
-                'response' => 0,
-                'message' => 'No request found'
-                    ], REST_Controller::HTTP_BAD_REQUEST);
+            'status' => FALSE,
+            'response' => 0,
+            'message' => 'No request found'
+                ], REST_Controller::HTTP_BAD_REQUEST);
             }
-            $delete = $this->SiteManager->delete($id);
+			// Suppression d'un enregistrement
+            $delete = $this->Nomenclatureintervention1Manager->delete($id);          
             if (!is_null($delete)) {
                 $this->response([
                     'status' => TRUE,
@@ -125,11 +126,9 @@ class Site extends REST_Controller {
                     'status' => FALSE,
                     'response' => 0,
                     'message' => 'No request found'
-                        ], REST_Controller::HTTP_BAD_REQUEST);
+                        ], REST_Controller::HTTP_OK);
             }
-        }
+        }   
     }
 }
-/* End of file controllername.php */
-/* Location: ./application/controllers/controllername.php */
 ?>

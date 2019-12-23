@@ -27,7 +27,7 @@ class Suivi_menage extends REST_Controller {
         $id_menage = $this->get('id_menage');
         $data = array() ;
         if ($cle_etrangere) 
-        {
+        {	// Selection par ménage
             $suivi_menage = $this->SuivimenageManager->findAllByMenage($cle_etrangere);
 
             
@@ -46,6 +46,7 @@ class Suivi_menage extends REST_Controller {
 			{ 
 				$id_i=$id_intervention;
                 $id_prog = '"%'.$id_intervention.'%"' ;
+				// Selection par programme et par ménage
                 $list_suivi_menage = $this->SuivimenageManager->findAllByProgrammeAndMenage($id_intervention,$id_menage);
                 if ($list_suivi_menage) 
                 {
@@ -56,7 +57,9 @@ class Suivi_menage extends REST_Controller {
                     {
 						$intervention=array();
 						$typetransfert=array();
+						// Selection description intervention
 						$intervention = $this->InterventionManager->findById($id_i);
+						// Selection description type transfert
 						$typetransfert = $this->TypetransfertManager->findById($value->id_type_transfert);
  						$tmp=array();
 						$tmp['id'] = $value->id;
@@ -93,7 +96,7 @@ class Suivi_menage extends REST_Controller {
                 $id_prog = '"'.$id_intervention.'"' ;
                 $list_suivi_menage = $this->SuivimenageManager->findAllByProgramme($id_prog);
                 if ($list_suivi_menage) 
-                {
+                {	// Affectation des valeurs dans un tableau
                     foreach ($list_suivi_menage as $key => $value) 
                     {
                         $data[$key]['id'] = $value->id;
@@ -102,21 +105,18 @@ class Suivi_menage extends REST_Controller {
                         $data[$key]['AgeInscrire'] = ($value->AgeInscrire);
                         $data[$key]['Addresse'] = ($value->Addresse);
                         $data[$key]['NumeroEnregistrement'] = ($value->NumeroEnregistrement);
-                       // $data['id_menage'] = ($suivi_menage->id_menage);
                         $data[$key]['id_intervention'] = ($id_intervention);
-                        //$data[$key]['menage'] = $this->menageManager->findById($value->id_menage);
-                       
                     }
                 }
             }
             else
             {
                 if ($id) 
-                {
+                {	// Selection par id
                     $data = $this->SuivimenageManager->findById($id);
                 } 
                 else 
-                {
+                {	// Selection de tous les enregistrements
                     $data = $this->SuivimenageManager->findAll();                   
                 }
             }
@@ -158,7 +158,7 @@ class Suivi_menage extends REST_Controller {
                         'message' => 'No request found'
                             ], REST_Controller::HTTP_BAD_REQUEST);
                 }
-
+				// Ajout d'un enregistrement
                 $dataId = $this->SuivimenageManager->add($data);
 
                 if (!is_null($dataId)) 
@@ -183,6 +183,7 @@ class Suivi_menage extends REST_Controller {
                         'message' => 'No request found'
                             ], REST_Controller::HTTP_BAD_REQUEST);
                 }
+				// Mise à jour d'un enregistrement
                 $update = $this->SuivimenageManager->update($id, $data);              
                 if(!is_null($update)){
                     $this->response([
@@ -205,6 +206,7 @@ class Suivi_menage extends REST_Controller {
             'message' => 'No request found'
                 ], REST_Controller::HTTP_BAD_REQUEST);
             }
+			// Suppression d'un enregistrement
             $delete = $this->SuivimenageManager->delete($id);          
             if (!is_null($delete)) {
                 $this->response([

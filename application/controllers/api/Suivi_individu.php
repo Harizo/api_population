@@ -26,17 +26,13 @@ class Suivi_individu extends REST_Controller {
         $id_individu = $this->get('id_individu');
         $data = array() ;
         if ($cle_etrangere) 
-        {
+        {    // Selection détails intervention par individu
             $suivi_individu = $this->SuiviindividuManager->findAllByIndividu($cle_etrangere);
-
-            
-
             if ($suivi_individu) 
             {
                 $data['id'] = ($suivi_individu->id);
                 $data['id_individu'] = ($suivi_individu->id_individu);
-                $data['id_intervention'] = unserialize($suivi_individu->id_intervention);
-                
+                $data['id_intervention'] = unserialize($suivi_individu->id_intervention);                
             }
         }
         else
@@ -46,6 +42,7 @@ class Suivi_individu extends REST_Controller {
 				$data=array();
  				$id_i=$id_intervention;
                $id_prog = '"%'.$id_intervention.'%"' ;
+			   // Selection par programme et par individu
                 $list_suivi_individu = $this->SuiviindividuManager->findAllByProgrammeAndIndividu($id_intervention,$id_individu);
                 if ($list_suivi_individu) 
                 {
@@ -54,6 +51,7 @@ class Suivi_individu extends REST_Controller {
                     foreach ($list_suivi_individu as $key => $value) 
                     {
 						$intervention=array();
+						// Selection description intervention
 						$intervention = $this->InterventionManager->findById($id_i);
 						$tmp=array();
 						
@@ -74,6 +72,7 @@ class Suivi_individu extends REST_Controller {
             if ($id_intervention) 
             {
                 $id_prog = '"'.$id_intervention.'"' ;
+				// Selection par programme
                 $list_suivi_individu = $this->SuiviindividuManager->findAllByProgramme($id_prog);
                 if ($list_suivi_individu) 
                 {
@@ -93,11 +92,11 @@ class Suivi_individu extends REST_Controller {
             else
             {
                 if ($id) 
-                {
+                {	// Selection par id
                     $data = $this->SuiviindividuManager->findById($id);
                 } 
                 else 
-                {
+                {	// Selection de tous les enregistrements
                     $data = $this->SuiviindividuManager->findAll();                   
                 }
             }
@@ -139,7 +138,7 @@ class Suivi_individu extends REST_Controller {
                         'message' => 'No request found'
                             ], REST_Controller::HTTP_BAD_REQUEST);
                 }
-
+				// Ajout d'un enregistrement
                 $dataId = $this->SuiviindividuManager->add($data);
 
                 if (!is_null($dataId)) 
@@ -164,6 +163,7 @@ class Suivi_individu extends REST_Controller {
                         'message' => 'No request found'
                             ], REST_Controller::HTTP_BAD_REQUEST);
                 }
+				// Mise à jour d'un enregistrement
                 $update = $this->SuiviindividuManager->update($id, $data);              
                 if(!is_null($update)){
                     $this->response([
@@ -186,6 +186,7 @@ class Suivi_individu extends REST_Controller {
             'message' => 'No request found'
                 ], REST_Controller::HTTP_BAD_REQUEST);
             }
+			// Suppression d'un enregistrement
             $delete = $this->SuiviindividuManager->delete($id);          
             if (!is_null($delete)) {
                 $this->response([

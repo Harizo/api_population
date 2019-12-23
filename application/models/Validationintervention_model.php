@@ -88,6 +88,6 @@ class Validationintervention_model extends CI_Model
 			$requete="select count(*) as nombre from suivi_individu_entete where date_suivi='".$date_intervention."' and id_fokontany=".$id_fokontany." and id_intervention=".$id_intervention;
 			$query = $this->db->query($requete);			
 		}	
-		return $query->result();						
+		return $query->result();					
 	}
 }

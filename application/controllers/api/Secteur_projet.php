@@ -14,11 +14,13 @@ class Secteur_projet extends REST_Controller {
     public function index_get() {
         $id = $this->get('id');
         if ($id) {
+			// Selection par id
             $data = $this->SecteurprojetManager->findById($id);
             if (!$data)
                 $data = array();
         } else {
 			$data=array();
+			// Selection de tous les enregistrements
 			$menu = $this->SecteurprojetManager->findAll();	
             if ($menu) {
                 foreach ($menu as $key => $value) {
@@ -45,6 +47,7 @@ class Secteur_projet extends REST_Controller {
     public function index_post() {
         $id = $this->post('id') ;
         $supprimer = $this->post('supprimer') ;
+		// Affectation des valeurs
 		$data = array(
 			'id_projet'           => $this->post('id_projet'),
 			'id_secteur'         => $this->post('id_secteur'),
@@ -58,6 +61,7 @@ class Secteur_projet extends REST_Controller {
                         'message' => 'No request found'
                             ], REST_Controller::HTTP_BAD_REQUEST);
                 }
+				// Ajout d'un enregistrement
                 $dataId = $this->SecteurprojetManager->add($data);
                 if (!is_null($dataId)) {
                     $this->response([
@@ -80,6 +84,7 @@ class Secteur_projet extends REST_Controller {
                         'message' => 'No request found'
                             ], REST_Controller::HTTP_BAD_REQUEST);
                 }
+				// Mise à jour d'un enregistrement
                 $update = $this->SecteurprojetManager->update($id, $data);
                 if(!is_null($update)) {
                     $this->response([
@@ -102,6 +107,7 @@ class Secteur_projet extends REST_Controller {
                 'message' => 'No request found'
                     ], REST_Controller::HTTP_BAD_REQUEST);
             }
+			// Suppression d'un enregistrement
             $delete = $this->SecteurprojetManager->delete($id);
             if (!is_null($delete)) {
                 $this->response([

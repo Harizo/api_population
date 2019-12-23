@@ -15,14 +15,16 @@ class Type_acteur extends REST_Controller {
         $id = $this->get('id');
 		$data = array();
 		if ($id) {
-			$tmp = $this->TypeacteurManager->findById($id);
-			if($tmp) {
-				$data=$tmp;
+			// Selection par id
+			$temporaire = $this->TypeacteurManager->findById($id);
+			if($temporaire) {
+				$data=$temporaire;
 			}
-		} else {			
-			$tmp = $this->TypeacteurManager->findAll();
-			if ($tmp) {
-				$data=$tmp;
+		} else {	
+			// Selection de tous les enregistrements
+			$temporaire = $this->TypeacteurManager->findAll();
+			if ($temporaire) {
+				$data=$temporaire;
 			}
 		}
         if (count($data)>0) {
@@ -54,6 +56,7 @@ class Type_acteur extends REST_Controller {
                         'message' => 'No request found'
                             ], REST_Controller::HTTP_BAD_REQUEST);
                 }
+				// Ajour d'un enregistrement
                 $dataId = $this->TypeacteurManager->add($data);              
                 if (!is_null($dataId)) {
                     $this->response([
@@ -76,6 +79,7 @@ class Type_acteur extends REST_Controller {
                         'message' => 'No request found'
                             ], REST_Controller::HTTP_BAD_REQUEST);
                 }
+				// Mise à jour d'un enregistrement
                 $update = $this->TypeacteurManager->update($id, $data);              
                 if(!is_null($update)){
                     $this->response([
@@ -98,6 +102,7 @@ class Type_acteur extends REST_Controller {
             'message' => 'No request found'
                 ], REST_Controller::HTTP_BAD_REQUEST);
             }
+			// Suppression d'un enregistrement
             $delete = $this->TypeacteurManager->delete($id);          
             if (!is_null($delete)) {
                 $this->response([

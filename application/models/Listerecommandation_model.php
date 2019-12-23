@@ -4,6 +4,7 @@ class Listerecommandation_model extends CI_Model {
     protected $table = 'liste_recommandations';
 
     public function add($typeavancement) {
+		// Ajout d'un enregitrement
         $this->db->set($this->_set($typeavancement))
                  ->insert($this->table);
         if($this->db->affected_rows() === 1) {
@@ -13,6 +14,7 @@ class Listerecommandation_model extends CI_Model {
         }                    
     }
     public function update($id, $typeavancement) {
+		// Mise à jour d'un enregitrement
         $this->db->set($this->_set($typeavancement))
                             ->where('id', (int) $id)
                             ->update($this->table);
@@ -23,6 +25,7 @@ class Listerecommandation_model extends CI_Model {
         }                      
     }
     public function _set($typeavancement) {
+		// Affectation des valeurs
         return array(
             'resume'         => $typeavancement['resume'],
             'url'            => $typeavancement['url'],
@@ -36,6 +39,7 @@ class Listerecommandation_model extends CI_Model {
         );
     }
     public function delete($id) {
+		// Suppression d'un enregitrement
         $this->db->where('id', (int) $id)->delete($this->table);
         if($this->db->affected_rows() === 1) {
             return true;
@@ -44,6 +48,7 @@ class Listerecommandation_model extends CI_Model {
         }  
     }
     public function findAll() {
+		// Selection de tous les enregitrements
         $result =  $this->db->select('*')
                         ->from($this->table)
                         ->order_by('id', 'desc')
@@ -56,6 +61,7 @@ class Listerecommandation_model extends CI_Model {
         }                 
     }
 	public function getlesrecommandations() {
+		// Selection de tous les recommandations
 		$requete="select r.id,r.resume,r.url,r.validation,r.utilisateur_id,r.site_id as site,r.nom_fichier,r.repertoire,r.date_upload,"
 				."r.fait,concat_ws(' ',u.nom,u.prenom) as nomutilisateur"
 				." from liste_recommandations as r"
@@ -65,6 +71,7 @@ class Listerecommandation_model extends CI_Model {
       return $query->result();
 	}
 	public function getlesnonfait() {
+		// Selection des recommandations non faits
 		$valide =1;
 		$fait =0;
         $result = $this->db->select('*')
@@ -81,6 +88,7 @@ class Listerecommandation_model extends CI_Model {
         }                  
 	}
     public function findById($id) {
+		// Selection par id
         $this->db->where("id", $id);
         $q = $this->db->get($this->table);
         if ($q->num_rows() > 0) {

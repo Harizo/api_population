@@ -26,7 +26,7 @@ class Suivi_individu_entete extends REST_Controller {
         $id_individu = $this->get('id_individu');
         $data = array() ;
         if ($cle_etrangere) 
-        {
+        {	// Selection par individu
             $suivi_individu_entete = $this->SuiviindividuenteteManager->findAllByIndividu($cle_etrangere);
 
             
@@ -48,6 +48,7 @@ class Suivi_individu_entete extends REST_Controller {
 				$data=array();
  				$id_i=$id_intervention;
                $id_prog = '"%'.$id_intervention.'%"' ;
+			   // Selection par programme et par individu
                 $list_suivi_individu = $this->SuiviindividuenteteManager->findAllByProgrammeAndIndividu($id_intervention,$id_individu);
                 if ($list_suivi_individu) 
                 {
@@ -58,7 +59,7 @@ class Suivi_individu_entete extends REST_Controller {
 						$promotion_genre=array();
 					
                     foreach ($list_suivi_individu as $key => $value) 
-                    {
+                    {	// Selection par id
 						$intervention=array();
 						$intervention = $this->InterventionManager->findById($id_i);
 						$temporaire=array();
@@ -83,6 +84,7 @@ class Suivi_individu_entete extends REST_Controller {
             if ($id_intervention) 
             {
                 $id_prog = '"'.$id_intervention.'"' ;
+				// Selection par programme
                 $list_suivi_individu = $this->SuiviindividuenteteManager->findAllByProgramme($id_prog);
                 if ($list_suivi_individu) 
                 {
@@ -95,23 +97,20 @@ class Suivi_individu_entete extends REST_Controller {
                         $data[$key]['Addresse'] = ($value->Addresse);
                         $data[$key]['NumeroEnregistrement'] = ($value->NumeroEnregistrement);
                         $data[$key]['id_liste_validation_intervention'] = ($value->id_liste_validation_intervention);
-                       // $data['id_individu'] = ($suivi_individu_entete->id_individu);
                         $data[$key]['id_intervention'] = ($id_intervention);
                         $data[$key]['id_fokontany'] = ($id_fokontany);
                         $data[$key]['date_suivi'] = ($date_suivi);
-                        //$data[$key]['menage'] = $this->menageManager->findById($value->id_individu);
-                       
                     }
                 }
             }
             else
             {
                 if ($id) 
-                {
+                {	// Selection par id
                     $data = $this->SuiviindividuenteteManager->findById($id);
                 } 
                 else 
-                {
+                {	// Selection de tous les enregistrements
                     $data = $this->SuiviindividuenteteManager->findAll();                   
                 }
             }
@@ -140,6 +139,7 @@ class Suivi_individu_entete extends REST_Controller {
         $id = $this->post('id') ;
         $supprimer = $this->post('supprimer') ;
         if ($supprimer == 0) {
+			// Affectation des valeurs
 			$data = array(
 				'id_intervention' => $this->post('id_intervention'),
 				'date_suivi' => $this->post('date_suivi'),
@@ -156,7 +156,7 @@ class Suivi_individu_entete extends REST_Controller {
                         'message' => 'No request found'
                             ], REST_Controller::HTTP_BAD_REQUEST);
                 }
-
+				// Ajout d'un enregistrement
                 $dataId = $this->SuiviindividuenteteManager->add($data);
 
                 if (!is_null($dataId)) 
@@ -181,6 +181,7 @@ class Suivi_individu_entete extends REST_Controller {
                         'message' => 'No request found'
                             ], REST_Controller::HTTP_BAD_REQUEST);
                 }
+				// Mise à jour d'un enregistrement
                 $update = $this->SuiviindividuenteteManager->update($id, $data);              
                 if(!is_null($update)){
                     $this->response([
@@ -203,6 +204,7 @@ class Suivi_individu_entete extends REST_Controller {
             'message' => 'No request found'
                 ], REST_Controller::HTTP_BAD_REQUEST);
             }
+			// Suppression d'un enregistrement
             $delete = $this->SuiviindividuenteteManager->delete($id);          
             if (!is_null($delete)) {
                 $this->response([

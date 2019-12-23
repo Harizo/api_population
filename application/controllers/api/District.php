@@ -18,12 +18,13 @@ class District extends REST_Controller {
         $cle_etrangere = $this->get('cle_etrangere');
         if ($cle_etrangere){
             $data = array();
-
+			// Récupération de tous les district par région
             $tmp = $this->DistrictManager->findAllByRegion($cle_etrangere);
             if ($tmp) 
             {
                 foreach ($tmp as $key => $value) 
                 {
+					// Récupération description région
                     $region = array();
                     $region = $this->RegionManager->findById($value->region_id);
                     $data[$key]['id'] = $value->id;
@@ -36,15 +37,10 @@ class District extends REST_Controller {
         } else {
             if ($id) {
                 $data = array();
+				// Récupération par id
                 $data = $this->DistrictManager->findById($id);
-               /* $district = $this->DistrictManager->findById($id);
-                $region = $this->RegionManager->findByIdArray($district->region_id);
-                $data['id'] = $district->id;
-                $data['code'] = $district->code;
-                $data['nom'] = $district->nom;
-                $data['region_id'] = $district->region_id;
-                $data['region'] = $region;*/
             } else {
+				// Récupération de tous les districts
                 $menu = $this->DistrictManager->findAll();
                 if ($menu) {
                     foreach ($menu as $key => $value) {
@@ -92,6 +88,7 @@ class District extends REST_Controller {
                         'message' => 'No request found'
                             ], REST_Controller::HTTP_BAD_REQUEST);
                 }
+				// Ajout d'un enregistrement
                 $dataId = $this->DistrictManager->add($data);
                 if (!is_null($dataId)) {
                     $this->response([
@@ -119,6 +116,7 @@ class District extends REST_Controller {
                         'message' => 'No request found'
                     ], REST_Controller::HTTP_BAD_REQUEST);
                 }
+				// Mise à jour d'un enregistrement
                 $update = $this->DistrictManager->update($id, $data);
                 if(!is_null($update)) {
                     $this->response([
@@ -141,6 +139,7 @@ class District extends REST_Controller {
                     'message' => 'No request found'
                         ], REST_Controller::HTTP_BAD_REQUEST);
             }
+			// Suppression d'un enregistrement
             $delete = $this->DistrictManager->delete($id);         
             if (!is_null($delete)) {
                 $this->response([

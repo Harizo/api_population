@@ -10,6 +10,7 @@ class Importationintervention_model extends CI_Model
 		$query = $this->db->query($requete);
         return $query->result();				
 	}
+	// Séléction region par id
 	public function selectionregionparid($id) {
 		$requete="select id,nom,code from region where id='".$id."'";
 		$query = $this->db->query($requete);
@@ -86,3 +87,4 @@ class Importationintervention_model extends CI_Model
 			return "OK";						
 	}
 }
+?>

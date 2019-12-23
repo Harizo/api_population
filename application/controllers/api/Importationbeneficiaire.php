@@ -179,6 +179,9 @@ class Importationbeneficiaire extends CI_Controller {
 						$id_acteur=null;
 					}
 					// récupération id_intervention  dans la BDD
+					$trouve= array("é","è","ê","à","ö","ç","'","ô"," ");
+					$remplace=array("e","e","e","a","o","c","","o","");
+					$intitule_intervention=str_replace($trouve,$remplace,$intitule_intervention);
 					$retour = $this->InterventionManager->findByIntitule($intitule_intervention);
 					if(count($retour) >0) {
 						foreach($retour as $k=>$v) {
@@ -192,8 +195,12 @@ class Importationbeneficiaire extends CI_Controller {
 					$menage_ou_individu = strtolower($menage_ou_individu);
 					$menage_ou_individu = substr($menage_ou_individu,3);
 					$menage_ou_groupe = strtolower($menage_ou_groupe);	
-					$menage_ou_groupe = substr($menage_ou_groupe,3);						
+					$menage_ou_groupe = substr($menage_ou_groupe,3);
+					$etat_groupe =0;					
 					if($menage_ou_individu=="ménage" || $menage_ou_individu=="menage" || $menage_ou_individu=="groupe") {
+						if($menage_ou_individu=="groupe") {
+							$etat_groupe =1;
+						}
 						$menage_ou_individu="menage";
 					} else {
 						$menage_ou_individu="individu";
@@ -944,7 +951,8 @@ class Importationbeneficiaire extends CI_Controller {
 									'depense_mensuel'        => null,
 									'id_fokontany'           => $id_fokontany,
 									'id_acteur'              => $id_acteur,
-									'id_type_beneficiaire'   => 1
+									'id_type_beneficiaire'   => 1,
+									'etat_groupe'   => $etat_groupe
 								);
 								$id_menage = $this->MenageManager->addchefmenage($data);
 								$sheet->setCellValue("AC".$ligne, $code_region."-".$code_district."-".$code_commune."-".$code_fokontany."-".$identifiant_unique);

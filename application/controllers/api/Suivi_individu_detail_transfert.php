@@ -26,11 +26,11 @@ class Suivi_individu_detail_transfert extends REST_Controller {
         $id_individu = $this->get('id_individu');
         $data = array() ;
         if ($cle_etrangere) 
-        {
+        {	// Selection par individu
             $suivi_individu_detail_transfert = $this->SuiviindividuenteteManager->findAllByIndividu($cle_etrangere);
 
             
-
+			// Selection détail transfert
             if ($suivi_individu_detail_transfert) 
             {
                 $data['id'] = ($suivi_individu_detail_transfert->id);
@@ -47,6 +47,7 @@ class Suivi_individu_detail_transfert extends REST_Controller {
 				$data=array();
  				$id_i=$id_intervention;
                $id_prog = '"%'.$id_intervention.'%"' ;
+			   // Selection par programme et par individu
                 $list_suivi_individu = $this->SuiviindividuenteteManager->findAllByProgrammeAndIndividu($id_intervention,$id_individu);
                 if ($list_suivi_individu) 
                 {
@@ -57,7 +58,7 @@ class Suivi_individu_detail_transfert extends REST_Controller {
 						$promotion_genre=array();
 					
                     foreach ($list_suivi_individu as $key => $value) 
-                    {
+                    {	// Selection description de l'in tervention
 						$intervention=array();
 						$intervention = $this->InterventionManager->findById($id_i);
 						$temporaire=array();
@@ -80,6 +81,7 @@ class Suivi_individu_detail_transfert extends REST_Controller {
             if ($id_intervention) 
             {
                 $id_prog = '"'.$id_intervention.'"' ;
+				// Selection par programme
                 $list_suivi_individu = $this->SuiviindividuenteteManager->findAllByProgramme($id_prog);
                 if ($list_suivi_individu) 
                 {
@@ -91,21 +93,18 @@ class Suivi_individu_detail_transfert extends REST_Controller {
                         $data[$key]['AgeInscrire'] = ($value->AgeInscrire);
                         $data[$key]['Addresse'] = ($value->Addresse);
                         $data[$key]['NumeroEnregistrement'] = ($value->NumeroEnregistrement);
-                       // $data['id_individu'] = ($suivi_individu_detail_transfert->id_individu);
                         $data[$key]['id_intervention'] = ($id_intervention);
-                        //$data[$key]['menage'] = $this->menageManager->findById($value->id_individu);
-                       
                     }
                 }
             }
             else
             {
                 if ($id) 
-                {
+                {	// Selection par id
                     $data = $this->SuiviindividuenteteManager->findById($id);
                 } 
                 else 
-                {
+                {	// Selection de tous les enregistrements
                     $data = $this->SuiviindividuenteteManager->findAll();                   
                 }
             }
@@ -134,6 +133,7 @@ class Suivi_individu_detail_transfert extends REST_Controller {
         $id = $this->post('id') ;
         $supprimer = $this->post('supprimer') ;
         if ($supprimer == 0) {
+			// Affectation des valeurs
 			$data = array(
 				'id_suivi_individu_entete' => $this->post('id_suivi_individu_entete'),
 				'id_detail_type_transfert' => $this->post('id_detail_type_transfert'),
@@ -148,7 +148,7 @@ class Suivi_individu_detail_transfert extends REST_Controller {
                         'message' => 'No request found'
                             ], REST_Controller::HTTP_BAD_REQUEST);
                 }
-
+				// Ajout d'un enregistrement
                 $dataId = $this->SuiviindividuenteteManager->add($data);
 
                 if (!is_null($dataId)) 
@@ -173,6 +173,7 @@ class Suivi_individu_detail_transfert extends REST_Controller {
                         'message' => 'No request found'
                             ], REST_Controller::HTTP_BAD_REQUEST);
                 }
+				// Mise à jour d'un enregistrement
                 $update = $this->SuiviindividuenteteManager->update($id, $data);              
                 if(!is_null($update)){
                     $this->response([
@@ -195,6 +196,7 @@ class Suivi_individu_detail_transfert extends REST_Controller {
             'message' => 'No request found'
                 ], REST_Controller::HTTP_BAD_REQUEST);
             }
+			// Suppression d'un enregistrement
             $delete = $this->SuiviindividuenteteManager->delete($id);          
             if (!is_null($delete)) {
                 $this->response([

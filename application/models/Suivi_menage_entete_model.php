@@ -17,7 +17,6 @@ class Suivi_menage_entete_model extends CI_Model
             return null;
         }                    
     }
-
 	// Cette fonction met à jour un enregistrement dans la table
     public function update($id, $suivi_menage_entete)
     {
@@ -43,7 +42,6 @@ class Suivi_menage_entete_model extends CI_Model
             'id_liste_validation_intervention' => $suivi_menage_entete['id_liste_validation_intervention'],                      
         );
     }
-
 	// Cette fonction permet de supprimer un enregitrement dans la table
     public function delete($id)
     {
@@ -133,5 +131,5 @@ class Suivi_menage_entete_model extends CI_Model
             return null;
         }                  
     }
-
 }
+?>

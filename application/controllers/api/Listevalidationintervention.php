@@ -8,6 +8,7 @@ class Listevalidationintervention extends REST_Controller {
 
     public function __construct() {
         parent::__construct();
+		// Ouverture des modèles utilisées
         $this->load->model('listevalidationintervention_model', 'ListevalidationinterventionManager');
         $this->load->model('utilisateurs_model', 'UtilisateursManager');
     }
@@ -23,20 +24,25 @@ class Listevalidationintervention extends REST_Controller {
 			} else {
 				$etat=1;
 			}
+			// Selection liste des données par état : 0 non validées , 1 : validées
 			$listedonnees = $this->ListevalidationinterventionManager->findByValidation($etat);
 		} else if($donnees_validees && $id_utilisateur) {	
+			// Selection liste des données par état et par utlisateur
 			$listedonnees = $this->ListevalidationinterventionManager->findByValidationAndUtilisateur($donnees_validees,$id_utilisateur);
-		} else {			
+		} else {	
+			// Selection de tous les enregistrements de la table
 			$listedonnees = $this->ListevalidationinterventionManager->findAll();
 		}
 		if ($listedonnees) {
 			foreach ($listedonnees as $key => $value) {
 				if($value->id_utilisateur) {
+					// Selection description d'un utilisateur
 					$utilisateur = $this->UtilisateursManager->findById($value->id_utilisateur);
 				} else {
 					$utilisateur=array();
 				}	
 				if($value->id_utilisateur_validation) {
+					// Selection description d'un utilisateur qui valide les données
 					$utilisateur_validation = $this->UtilisateursManager->findById($value->id_utilisateur_validation);
 				} else {
 					$utilisateur_validation=array();
@@ -90,6 +96,7 @@ class Listevalidationintervention extends REST_Controller {
         }
     }
     public function index_post() {
+		// Intitialisation des valeurs à null pour éviter le ZERO inséré dans la BDD
         $id = $this->post('id') ;
         $supprimer = $this->post('supprimer') ;
 		$id_utilisateur=null;
@@ -123,7 +130,9 @@ class Listevalidationintervention extends REST_Controller {
                         'message' => 'No request found'
                             ], REST_Controller::HTTP_BAD_REQUEST);
                 }
-                $Id_data_inserted = $this->ListevalidationinterventionManager->add($data);  
+				// Ajout d'un enregistrement
+                $Id_data_inserted = $this->ListevalidationinterventionManager->add($data); 
+				// Selection d'un enregistrement nouvellement inséré	
 				$retour = 	$this->ListevalidationinterventionManager->findById($Id_data_inserted);
 				$valeur_retour=array();
 				foreach($retour as $k=>$v) {
@@ -154,6 +163,7 @@ class Listevalidationintervention extends REST_Controller {
                         'message' => 'No request found'
                             ], REST_Controller::HTTP_BAD_REQUEST);
                 }
+				// Mise à jour d'un enregistrement
                 $update = $this->ListevalidationinterventionManager->update($id, $data);              
                 if(!is_null($update)){
                     $this->response([
@@ -176,6 +186,7 @@ class Listevalidationintervention extends REST_Controller {
             'message' => 'No request found'
                 ], REST_Controller::HTTP_BAD_REQUEST);
             }
+			// Suppression d'un enregistrement
             $delete = $this->ListevalidationinterventionManager->delete($id);          
             if (!is_null($delete)) {
                 $this->response([

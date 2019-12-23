@@ -14,11 +14,13 @@ class Tutelle_projet extends REST_Controller {
     public function index_get() {
         $id = $this->get('id');
         if ($id) {
+			// Selection par id
             $data = $this->TutelleprojetManager->findById($id);
             if (!$data)
                 $data = array();
         } else {
 			$data=array();
+			// Selection de tous les enregitrements de la table
 			$menu = $this->TutelleprojetManager->findAll();	
             if ($menu) {
                 foreach ($menu as $key => $value) {
@@ -58,6 +60,7 @@ class Tutelle_projet extends REST_Controller {
                         'message' => 'No request found'
                             ], REST_Controller::HTTP_BAD_REQUEST);
                 }
+				// Ajout d'un enregitrement
                 $dataId = $this->TutelleprojetManager->add($data);
                 if (!is_null($dataId)) {
                     $this->response([
@@ -80,6 +83,7 @@ class Tutelle_projet extends REST_Controller {
                         'message' => 'No request found'
                             ], REST_Controller::HTTP_BAD_REQUEST);
                 }
+				// Mise à jour d'un enregitrement
                 $update = $this->TutelleprojetManager->update($id, $data);
                 if(!is_null($update)) {
                     $this->response([
@@ -102,6 +106,7 @@ class Tutelle_projet extends REST_Controller {
                 'message' => 'No request found'
                     ], REST_Controller::HTTP_BAD_REQUEST);
             }
+			// Suppression d'un enregitrement
             $delete = $this->TutelleprojetManager->delete($id);
             if (!is_null($delete)) {
                 $this->response([

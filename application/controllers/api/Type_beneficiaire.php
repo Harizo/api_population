@@ -15,14 +15,16 @@ class Type_beneficiaire extends REST_Controller {
         $id = $this->get('id');
 		$data = array();
 		if ($id) {
-			$tmp = $this->TypebeneficiaireManager->findById($id);
-			if($tmp) {
-				$data=$tmp;
+			// Selection par id
+			$temporaire = $this->TypebeneficiaireManager->findById($id);
+			if($temporaire) {
+				$data=$temporaire;
 			}
-		} else {			
-			$tmp = $this->TypebeneficiaireManager->findAll();
-			if ($tmp) {
-				$data=$tmp;
+		} else {	
+			// Selection de tous les enregitrements de la table
+			$temporaire = $this->TypebeneficiaireManager->findAll();
+			if ($temporaire) {
+				$data=$temporaire;
 			}
 		}
         if (count($data)>0) {
@@ -54,6 +56,7 @@ class Type_beneficiaire extends REST_Controller {
                         'message' => 'No request found'
                             ], REST_Controller::HTTP_BAD_REQUEST);
                 }
+				// Ajout d'un enregitrement
                 $dataId = $this->TypebeneficiaireManager->add($data);              
                 if (!is_null($dataId)) {
                     $this->response([
@@ -76,6 +79,7 @@ class Type_beneficiaire extends REST_Controller {
                         'message' => 'No request found'
                             ], REST_Controller::HTTP_BAD_REQUEST);
                 }
+				// Mise à jour d'un enregitrement
                 $update = $this->TypebeneficiaireManager->update($id, $data);              
                 if(!is_null($update)){
                     $this->response([
@@ -98,6 +102,7 @@ class Type_beneficiaire extends REST_Controller {
             'message' => 'No request found'
                 ], REST_Controller::HTTP_BAD_REQUEST);
             }
+			// Suppression d'un enregitrement
             $delete = $this->TypebeneficiaireManager->delete($id);          
             if (!is_null($delete)) {
                 $this->response([

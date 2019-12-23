@@ -53,7 +53,6 @@ class Action_strategique extends REST_Controller {
 				}
 			}
 		}
-
         //Début Etat de sortie
         if (count($data)>0) //S'il y a des données dans la table,retourne le tableau $data
         {
