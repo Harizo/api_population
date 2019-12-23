@@ -1306,7 +1306,7 @@ class Systeme_protection_social_model extends CI_Model
                             join type_transfert as tt on tt.id = dtt.id_type_transfert
                     where tt.id = ".$id_type_transfert." and sme.date_suivi BETWEEN '".$date_debut."' AND '".$date_fin."'
 
-                    group by um.id, int.id, dtt.id,int.id
+                    group by um.id, int.id, dtt.id
 
 
 
@@ -1335,7 +1335,7 @@ class Systeme_protection_social_model extends CI_Model
                             join type_transfert as tt on tt.id = dtt.id_type_transfert
                     where tt.id = ".$id_type_transfert." and sme.date_suivi BETWEEN '".$date_debut."' AND '".$date_fin."'
 
-                    group by um.id, int.id, dtt.id,int.id
+                    group by um.id, int.id, dtt.id
 
 
 
@@ -1526,6 +1526,228 @@ class Systeme_protection_social_model extends CI_Model
             }          
         }
 
+        public function proportion_des_intervention_par_type_de_cible()
+        {
+          $sql = "
+
+                    select 
+                        pplee2.intitule_intervention as intitule_intervention,
+
+                        ROUND((((sum(pplee2.total_montant_menage)) * 100)/((sum(pplee2.total_montant_menage)) + (sum(pplee2.total_montant_groupe)) + (sum(pplee2.total_montant_individu)))),2) as stat_montant_menage,
+
+                        ROUND((((sum(pplee2.total_montant_groupe)) * 100)/((sum(pplee2.total_montant_menage)) + (sum(pplee2.total_montant_groupe)) + (sum(pplee2.total_montant_individu)))),2) as stat_montant_groupe,
+
+                        ROUND((((sum(pplee2.total_montant_individu)) * 100)/((sum(pplee2.total_montant_menage)) + (sum(pplee2.total_montant_groupe)) + (sum(pplee2.total_montant_individu)))),2) as stat_montant_individu,
+
+                        ROUND((((MAX(pplee2.nombre_menage)) * 100)/((MAX(pplee2.nombre_menage)) + (MAX(pplee2.nombre_groupe)) + (MAX(pplee2.nombre_individu)))),2) as stat_menage,
+                        ROUND((((MAX(pplee2.nombre_groupe)) * 100)/((MAX(pplee2.nombre_menage)) + (MAX(pplee2.nombre_groupe)) + (MAX(pplee2.nombre_individu)))),2) as stat_groupe,
+                        ROUND((((MAX(pplee2.nombre_individu)) * 100)/((MAX(pplee2.nombre_menage)) + (MAX(pplee2.nombre_groupe)) + (MAX(pplee2.nombre_individu)))),2) as stat_individu
+
+
+                    from
+
+                        (
+                        select sum(principale.nombre_menage)  as nombre_menage, 
+                            sum(principale.nombre_groupe) as nombre_groupe,
+                            sum(principale.nombre_individu) as nombre_individu,
+                            principale.montant_transfert_menage,
+                            principale.montant_transfert_groupe,
+                            principale.montant_transfert_individu,
+                            (principale.montant_transfert_menage * principale.nombre_menage) as total_montant_menage,
+                            (principale.montant_transfert_groupe * principale.nombre_groupe) as total_montant_groupe,
+                            (principale.montant_transfert_individu * principale.nombre_individu) as total_montant_individu,
+                            principale.intitule_intervention as intitule_intervention
+
+
+                        FROM (
+                            select  count(DISTINCT(sm.id_menage)) as nombre_menage, 
+                                0 as nombre_groupe ,
+                                0 as nombre_individu ,
+                                int.intitule as intitule_intervention,
+                                sme.montant_transfert as montant_transfert_menage,
+                                0 as montant_transfert_groupe,
+                                0 as montant_transfert_individu
+                            from suivi_menage as sm
+                                join suivi_menage_entete as sme on sme.id = sm.id_suivi_menage_entete
+                                join menage as m on m.id = sm.id_menage
+                                join intervention as int on int.id = sme.id_intervention
+                                where m.etat_groupe = 0
+                                group by sme.id_intervention ,int.id, sme.montant_transfert
+
+                            UNION 
+
+                            select  0 as nombre_menage, 
+                                count(DISTINCT(sm.id_menage)) as nombre_groupe ,
+                                0 as nombre_individu ,
+                                int.intitule as intitule_intervention,
+                                0 as montant_transfert_menage,
+                                sme.montant_transfert as montant_transfert_groupe,
+                                0 as montant_transfert_individu
+                            from suivi_menage as sm
+                                join suivi_menage_entete as sme on sme.id = sm.id_suivi_menage_entete
+                                join menage as m on m.id = sm.id_menage
+                                join intervention as int on int.id = sme.id_intervention
+                                where m.etat_groupe = 1
+                                group by sme.id_intervention , int.id, sme.montant_transfert
+
+                            UNION 
+
+                            select  0 as nombre_menage, 
+                                0 as nombre_groupe ,
+                                count(DISTINCT(si.id_individu)) as nombre_individu ,
+                                int.intitule as intitule_intervention,
+                                0 as montant_transfert_menage,
+                                0 as montant_transfert_groupe,
+                                sie.montant_transfert as montant_transfert_individu
+                            from suivi_individu as si
+                                join suivi_individu_entete as sie on sie.id = si.id_suivi_individu_entete
+                                join menage as m on m.id = si.id_individu
+                                join intervention as int on int.id = sie.id_intervention
+                                group by sie.id_intervention , int.id, sie.montant_transfert
+
+                        ) principale 
+
+                        group by  principale.intitule_intervention, 
+                        principale.montant_transfert_menage,
+                        principale.montant_transfert_groupe,
+                        principale.montant_transfert_individu,
+                        principale.nombre_menage,
+                        principale.nombre_groupe,
+                        principale.nombre_individu
+                    ) pplee2 group by  pplee2.intitule_intervention
+              
+                  " ;
+
+
+              return $this->db->query($sql)->result();
+        }
+        //proportion_des_intervention_par_type_de_cible affichage complet
+        /* public function proportion_des_intervention_par_type_de_cible()
+        {
+          $sql = "
+
+                  select sum(pplee2.total_montant_menage) as montant_globale_menage,
+                           sum(pplee2.total_montant_groupe) as montant_globale_groupe,
+                           sum(pplee2.total_montant_individu) as montant_globale_individu,
+                           pplee2.intitule_intervention as intitule_intervention,
+                           MAX(pplee2.nombre_menage) as nbr_menage_max,
+                           MAX(pplee2.nombre_groupe) as nbr_groupe_max,
+                           MAX(pplee2.nombre_individu) as nbr_individu_max,
+
+
+                           ((sum(pplee2.total_montant_menage)) + (sum(pplee2.total_montant_groupe)) + (sum(pplee2.total_montant_individu))) as montant_transfert_globale ,
+
+                           ROUND((((sum(pplee2.total_montant_menage)) * 100)/((sum(pplee2.total_montant_menage)) + (sum(pplee2.total_montant_groupe)) + (sum(pplee2.total_montant_individu)))),2) as stat_montant_menage,
+
+                           ROUND((((sum(pplee2.total_montant_groupe)) * 100)/((sum(pplee2.total_montant_menage)) + (sum(pplee2.total_montant_groupe)) + (sum(pplee2.total_montant_individu)))),2) as stat_montant_groupe,
+
+                           ROUND((((sum(pplee2.total_montant_individu)) * 100)/((sum(pplee2.total_montant_menage)) + (sum(pplee2.total_montant_groupe)) + (sum(pplee2.total_montant_individu)))),2) as stat_montant_individu,
+
+                           ((MAX(pplee2.nombre_menage)) + (MAX(pplee2.nombre_groupe)) + (MAX(pplee2.nombre_individu))) as effectif_total,
+
+
+                           ROUND((((MAX(pplee2.nombre_menage)) * 100)/((MAX(pplee2.nombre_menage)) + (MAX(pplee2.nombre_groupe)) + (MAX(pplee2.nombre_individu)))),2) as stat_menage,
+                           ROUND((((MAX(pplee2.nombre_groupe)) * 100)/((MAX(pplee2.nombre_menage)) + (MAX(pplee2.nombre_groupe)) + (MAX(pplee2.nombre_individu)))),2) as stat_groupe,
+                           ROUND((((MAX(pplee2.nombre_individu)) * 100)/((MAX(pplee2.nombre_menage)) + (MAX(pplee2.nombre_groupe)) + (MAX(pplee2.nombre_individu)))),2) as stat_individu
+
+
+
+
+
+
+
+
+
+                    from
+
+                          (select sum(principale.nombre_menage)  as nombre_menage, 
+                                                                             sum(principale.nombre_groupe) as nombre_groupe,
+                                                                             sum(principale.nombre_individu) as nombre_individu,
+                                                                             principale.montant_transfert_menage,
+                                                                             principale.montant_transfert_groupe,
+                                                                             principale.montant_transfert_individu,
+                                                                             (principale.montant_transfert_menage * principale.nombre_menage) as total_montant_menage,
+                                                                             (principale.montant_transfert_groupe * principale.nombre_groupe) as total_montant_groupe,
+                                                                             (principale.montant_transfert_individu * principale.nombre_individu) as total_montant_individu,
+                          
+                                        
+                                                                              principale.intitule_intervention as intitule_intervention
+                                        
+                                        
+                                                    FROM (
+                                                                        select  count(DISTINCT(sm.id_menage)) as nombre_menage, 
+                                                                                0 as nombre_groupe ,
+                                                                                0 as nombre_individu ,
+                                                                                int.intitule as intitule_intervention,
+                                                                                sme.montant_transfert as montant_transfert_menage,
+                                                                                0 as montant_transfert_groupe,
+                                                                                0 as montant_transfert_individu
+                                  
+                                                                               
+                                                                                
+                                                                        from suivi_menage as sm
+                                                                          join suivi_menage_entete as sme on sme.id = sm.id_suivi_menage_entete
+                                                                          join menage as m on m.id = sm.id_menage
+                                                                          join intervention as int on int.id = sme.id_intervention
+                                  
+                                                                          where m.etat_groupe = 0
+                                                                          group by sme.id_intervention ,int.id, sme.montant_transfert
+                                        
+                                                                            UNION 
+                                        
+                                                                        select  0 as nombre_menage, 
+                                                                              count(DISTINCT(sm.id_menage)) as nombre_groupe ,
+                                                                              0 as nombre_individu ,
+                                                                               int.intitule as intitule_intervention,
+                                                                               0 as montant_transfert_menage,
+                                                                                sme.montant_transfert as montant_transfert_groupe,
+                                                                                0 as montant_transfert_individu
+                                                                               
+                                                                                
+                                                                        from suivi_menage as sm
+                                                                          join suivi_menage_entete as sme on sme.id = sm.id_suivi_menage_entete
+                                                                          join menage as m on m.id = sm.id_menage
+                                                                          join intervention as int on int.id = sme.id_intervention
+                                  
+                                                                          where m.etat_groupe = 1
+                                                                          group by sme.id_intervention , int.id, sme.montant_transfert
+                                        
+                                                                            UNION 
+                                        
+                                                                        select  0 as nombre_menage, 
+                                                                                0 as nombre_groupe ,
+                                                                                count(DISTINCT(si.id_individu)) as nombre_individu ,
+                                                                                int.intitule as intitule_intervention,
+                                                                                0 as montant_transfert_menage,
+                                                                                0 as montant_transfert_groupe,
+                                                                                sie.montant_transfert as montant_transfert_individu
+                                                                               
+                                                                                
+                                                                        from suivi_individu as si
+                                                                          join suivi_individu_entete as sie on sie.id = si.id_suivi_individu_entete
+                                                                          join menage as m on m.id = si.id_individu
+                                                                          join intervention as int on int.id = sie.id_intervention
+                                                                          
+                                  
+                                                                          group by sie.id_intervention , int.id, sie.montant_transfert
+                                  
+                                                    ) principale 
+                                                    group by  principale.intitule_intervention, 
+                                                              principale.montant_transfert_menage,
+                                                              principale.montant_transfert_groupe,
+                                                              principale.montant_transfert_individu,
+                                                              principale.nombre_menage,
+                                                              principale.nombre_groupe,
+                                                              principale.nombre_individu
+                                  ) pplee2 group by  pplee2.intitule_intervention
+              
+                  " ;
+
+
+              return $this->db->query($sql)->result();
+        }*/       
+
+        //fin proportion_des_intervention_par_type_de_cible
        
     //FIN CODE HARIZO
 

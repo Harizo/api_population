@@ -184,6 +184,10 @@ class Environment_et_systeme extends REST_Controller {
         {
             $data = $this->Systeme_protection_socialManager->taux_de_decaissement_par_programme() ;
         }
+        if ($menu == 'req18_theme2') 
+        {
+            $data = $this->Systeme_protection_socialManager->proportion_des_intervention_par_type_de_cible() ;
+        }
         //FIN CODE HARIZO
 
         

@@ -90,7 +90,7 @@ class Fokontany_model extends CI_Model {
             return null;
         }  
 	}
-    public function findAllByCommune($id_commune) 
+    public function findAllByCommune($id_commune) {
 		// Selection fokontany par id_commune
         $result =  $this->db->select('*')
                         ->from($this->table)

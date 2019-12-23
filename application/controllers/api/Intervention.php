@@ -14,6 +14,7 @@ class Intervention extends REST_Controller {
         $this->load->model('acteur_model', 'ActeurManager');
         $this->load->model('detail_type_transfert_intervention_model', 'DetailtypetransfertinterventionManager');
         $this->load->model('frequence_transfert_model', 'FrequencetransfertManager');
+        $this->load->model('nomenclature_intervention4_model', 'Nomenclatureintervention4Manager');
     }
 
     public function index_get() {
@@ -71,6 +72,13 @@ class Intervention extends REST_Controller {
 							$detail_transfert=$detail_transfert.$v->detail_transfert."; ";
 						}
 					}
+                    $nomenclatureintervention = array();
+					if(intval($value->id_nomenclature_intervention) >0) {
+						$nomenclature = $this->Nomenclatureintervention4Manager->findById($value->id_nomenclature_intervention);
+						if(count($nomenclature) >0) {
+							$nomenclatureintervention=$nomenclature;
+						}
+					}	
                     $data[$key]['id'] = $value->id;
                     $data[$key]['id_programme'] = $value->id_programme;
                     $data[$key]['identifiant'] = $value->identifiant;
@@ -93,12 +101,14 @@ class Intervention extends REST_Controller {
                     $data[$key]['typetransfert'] = $typetransfert;
                     $data[$key]['id_frequence_transfert'] = $value->id_frequence_transfert;
                     $data[$key]['frequencetransfert'] = $frequencetransfert;
-                    //$data[$key]['montant_transfert'] = $value->montant_transfert;
+                    $data[$key]['montant_transfert'] = $value->montant_transfert;
                     $data[$key]['flag_integration_donnees'] = $value->flag_integration_donnees;
                     $data[$key]['nouvelle_integration'] = $value->nouvelle_integration;
                     $data[$key]['commentaire'] = $value->commentaire;
                     $data[$key]['detail_transfert'] = $detail_transfert;
                     $data[$key]['detail_type_transfert_intervention'] = $detail_type_transfert_intervention;
+                    $data[$key]['id_nomenclature_intervention'] = $value->id_nomenclature_intervention;
+                    $data[$key]['nomenclatureintervention'] = $nomenclatureintervention;
                     $data[$key]['detail_financement_intervention'] = array();
                     $data[$key]['detail_zone_intervention'] = array();
                     $data[$key]['detail_charge'] = 0;
@@ -142,6 +152,20 @@ class Intervention extends REST_Controller {
 		if(isset($temporaire) && $temporaire !="" && intval($temporaire) >0) {
 			$id_frequence_transfert=$temporaire;
 		}
+		$montant_transfert=null;
+		$temporaire=$this->post('montant_transfert');
+		if(isset($temporaire) && $temporaire !="" && intval($temporaire) >0) {
+			$montant_transfert=$temporaire;
+		}
+		$id_nomenclature_intervention=null;
+		$temporaire=$this->post('id_nomenclature_intervention');
+		if(isset($temporaire) && $temporaire !="" && intval($temporaire) >0) {
+			$id_nomenclature_intervention=$temporaire;
+		}
+		$trouver= array("é","è","ê","à","ö","ç","'","ô"," ");
+		$remplacer=array("e","e","e","a","o","c","","o","");
+		$intitule2=$this->post('intitule');
+		$intitule2=str_replace($trouver,$remplacer,$intitule2);
 		// Affectation des valeurs
  		$data = array(
 			'id_programme' => $this->post('id_programme'),
@@ -152,6 +176,7 @@ class Intervention extends REST_Controller {
 			'email_informateur' => $this->post('email_informateur'),
 			'ministere_tutelle' => $this->post('ministere_tutelle'),
 			'intitule' => $this->post('intitule'),
+			'intitule2' => $intitule2,
 			'id_acteur' => $id_acteur,
 			'categorie_intervention' => $this->post('categorie_intervention'),
 			'id_type_action' => $id_type_action,
@@ -164,6 +189,8 @@ class Intervention extends REST_Controller {
 			'flag_integration_donnees' => $this->post('flag_integration_donnees'),
 			'nouvelle_integration' => $this->post('nouvelle_integration'),
 			'commentaire' => $this->post('commentaire'),
+			'montant_transfert' => $montant_transfert,
+			'id_nomenclature_intervention' => $id_nomenclature_intervention,
 		); 
 		$detail_type_transfert=array();
 		$nombre_detail_type_transfert = intval($this->post('nombre_detail_type_transfert'));

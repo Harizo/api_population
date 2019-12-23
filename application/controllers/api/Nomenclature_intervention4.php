@@ -1,69 +1,61 @@
 <?php
-
 defined('BASEPATH') OR exit('No direct script access allowed');
+
 require APPPATH . '/libraries/REST_Controller.php';
 
-class Fokontany extends REST_Controller {
+class Nomenclature_intervention4 extends REST_Controller {
 
     public function __construct() {
         parent::__construct();
-        $this->load->model('fokontany_model', 'FokontanyManager');        
-        $this->load->model('commune_model', 'CommuneManager');
+        $this->load->model('nomenclature_intervention4_model', 'Nomenclatureintervention4Manager');
+        $this->load->model('nomenclature_intervention3_model', 'Nomenclatureintervention3Manager');
     }
-    //recuperation fokontany
+    //recuperation nomenclature intervention  niveau 2
     public function index_get() {
-		set_time_limit(0);
         $id = $this->get('id');
         $cle_etrangere = $this->get('cle_etrangere');
-
-        if ($cle_etrangere) {
+        if ($cle_etrangere){
             $data = array();
-			// Récupération des fokontany par commune
-            $tmp = $this->FokontanyManager->findAllByCommune($cle_etrangere);
-            if ($tmp) 
+			// Récupération de tous les nomenclature intervention par id_nomenclature3
+            $temporaire = $this->Nomenclatureintervention4Manager->findAllByNomenclature3($cle_etrangere);
+            if ($temporaire) 
             {
-                foreach ($tmp as $key => $value) 
+                foreach ($temporaire as $key => $value) 
                 {
-					// Récupérationdescription commune
-                    $commune = array();
-                    $commune = $this->CommuneManager->findByIdOLD($value->id_commune);
+					// Récupération description nomenclature intervention niveau 1
+                    $nomenclature3 = array();
+                    $nomenclature3 = $this->Nomenclatureintervention3Manager->findById($value->id_nomenclature3);
                     $data[$key]['id'] = $value->id;
                     $data[$key]['code'] = $value->code;
-                    $data[$key]['nom'] = $value->nom;
-                    $data[$key]['latitude'] = $value->latitude;
-                    $data[$key]['longitude'] = $value->longitude;
-                    $data[$key]['commune'] = $commune;
+                    $data[$key]['description'] = $value->description;
+                    $data[$key]['nomenclature3'] = $nomenclature3;
                 }
-            }    
+            }
+            
         } else {
             if ($id) {
                 $data = array();
 				// Récupération par id
-                $fokontany = $this->FokontanyManager->findById($id);
-                $commune = $this->CommmuneManager->findById($fokontany->id_commune);
-                $data['id'] = $fokontany->id;
-                $data['code'] = $fokontany->code;
-                $data['nom'] = $fokontany->nom;
-                $data['latitude'] = $fokontany->latitude;
-                $data['longitude'] = $fokontany->longitude;
-                $data['commune'] = $commune;
-                
+                $data = $this->Nomenclatureintervention4Manager->findById($id);
             } else {
-				// Récupération de tous les fokontany
-                $fokontany = $this->FokontanyManager->findAll();
-                if ($fokontany) {
-                    foreach ($fokontany as $key => $value) {
-                        $commune = array();
-                        $commune = $this->CommuneManager->findById($value->id_commune);
+				// Récupération de tous les nomenclature intervention niveau 4
+                $menu = $this->Nomenclatureintervention4Manager->findAll();
+                if ($menu) {
+                    foreach ($menu as $key => $value) {
+                        $nomenclature3 = array();
+                        $nomenclature3 = $this->Nomenclatureintervention3Manager->findById($value->id_nomenclature3);
                         $data[$key]['id'] = $value->id;
                         $data[$key]['code'] = $value->code;
-                        $data[$key]['nom'] = $value->nom;
-                        $data[$key]['id_commune'] = $value->id_commune;
-                        $data[$key]['latitude'] = $value->latitude;
-                        $data[$key]['longitude'] = $value->longitude;
-                        $data[$key]['commune'] = $commune;
-
-                    };
+                        $data[$key]['description'] = $value->description;
+                        $data[$key]['code1'] = $value->code1;
+                        $data[$key]['description1'] = $value->description1;
+                        $data[$key]['code2'] = $value->code2;
+                        $data[$key]['description2'] = $value->description2;
+                        $data[$key]['code3'] = $value->code3;
+                        $data[$key]['description3'] = $value->description3;
+                        $data[$key]['id_nomenclature3'] = $value->id_nomenclature3;
+                        $data[$key]['nomenclature3'] = $nomenclature3;
+                    }
                 } else
                     $data = array();
             }
@@ -76,25 +68,23 @@ class Fokontany extends REST_Controller {
             ], REST_Controller::HTTP_OK);
         } else {
             $this->response([
-                'status' => TRUE,
+                'status' => FALSE,
                 'response' => array(),
                 'message' => 'No data were found'
             ], REST_Controller::HTTP_OK);
         }
     }
-    //insertion,modification,suppression fokontany
+    //insertion,modification,suppression nomenclateure niveau 4
     public function index_post() {
         $id = $this->post('id') ;
         $supprimer = $this->post('supprimer') ;
-		$data = array(
-			'code' => $this->post('code'),
-			'nom' => $this->post('nom'),
-			'latitude' => $this->post('latitude'),
-			'longitude' => $this->post('longitude'),
-			'id_commune' => $this->post('id_commune')
-		);               
         if ($supprimer == 0) {
             if ($id == 0) {
+                $data = array(
+                    'code' => $this->post('code'),
+                    'description' => $this->post('description'),
+                    'id_nomenclature3' => $this->post('id_nomenclature3')
+                );
                 if (!$data) {
                     $this->response([
                         'status' => FALSE,
@@ -103,7 +93,7 @@ class Fokontany extends REST_Controller {
                             ], REST_Controller::HTTP_BAD_REQUEST);
                 }
 				// Ajout d'un enregistrement
-                $dataId = $this->FokontanyManager->add($data);              
+                $dataId = $this->Nomenclatureintervention4Manager->add($data);
                 if (!is_null($dataId)) {
                     $this->response([
                         'status' => TRUE,
@@ -118,38 +108,43 @@ class Fokontany extends REST_Controller {
                             ], REST_Controller::HTTP_BAD_REQUEST);
                 }
             } else {
+                $data = array(
+                    'code' => $this->post('code'),
+                    'description' => $this->post('description'),
+                    'id_nomenclature3' => $this->post('id_nomenclature3')
+                );
                 if (!$data || !$id) {
                     $this->response([
                         'status' => FALSE,
                         'response' => 0,
                         'message' => 'No request found'
-                            ], REST_Controller::HTTP_BAD_REQUEST);
+                    ], REST_Controller::HTTP_BAD_REQUEST);
                 }
 				// Mise à jour d'un enregistrement
-                $update = $this->FokontanyManager->update($id, $data);              
-                if(!is_null($update)){
+                $update = $this->Nomenclatureintervention4Manager->update($id, $data);
+                if(!is_null($update)) {
                     $this->response([
-                        'status' => TRUE, 
+                        'status' => TRUE,
                         'response' => 1,
                         'message' => 'Update data success'
-                            ], REST_Controller::HTTP_OK);
+                    ], REST_Controller::HTTP_OK);
                 } else {
                     $this->response([
                         'status' => FALSE,
                         'message' => 'No request found'
-                            ], REST_Controller::HTTP_OK);
+                    ], REST_Controller::HTTP_OK);
                 }
             }
         } else {
             if (!$id) {
-            $this->response([
-            'status' => FALSE,
-            'response' => 0,
-            'message' => 'No request found'
-                ], REST_Controller::HTTP_BAD_REQUEST);
+                $this->response([
+                    'status' => FALSE,
+                    'response' => 0,
+                    'message' => 'No request found'
+                        ], REST_Controller::HTTP_BAD_REQUEST);
             }
 			// Suppression d'un enregistrement
-            $delete = $this->FokontanyManager->delete($id);          
+            $delete = $this->Nomenclatureintervention4Manager->delete($id);         
             if (!is_null($delete)) {
                 $this->response([
                     'status' => TRUE,
@@ -163,8 +158,7 @@ class Fokontany extends REST_Controller {
                     'message' => 'No request found'
                         ], REST_Controller::HTTP_OK);
             }
-        }   
+        }        
     }
 }
-/* End of file controllername.php */
-/* Location: ./application/controllers/controllername.php */
+?>

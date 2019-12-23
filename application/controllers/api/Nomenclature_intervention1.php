@@ -1,39 +1,33 @@
 <?php
 
 defined('BASEPATH') OR exit('No direct script access allowed');
-//harizo
-// afaka fafana refa ts ilaina
 require APPPATH . '/libraries/REST_Controller.php';
 
-class Region extends REST_Controller {
+class Nomenclature_intervention1 extends REST_Controller {
 
     public function __construct() {
         parent::__construct();
-        $this->load->model('region_model', 'RegionManager');
+        $this->load->model('nomenclature_intervention1_model', 'Nomenclatureintervention1Manager');
     }
-    //recuperation region
+    //recuperation nomenclature intervention
     public function index_get() {
         $id = $this->get('id');
             if ($id) {
                 $data = array();
 				// Selection par id
-                $region = $this->RegionManager->findById($id);
-                $data['id'] = $region->id;
-                $data['code'] = $region->code;
-                $data['nom'] = $region->nom;
-                $data['chef_lieu'] = $region->chef_lieu;
-                
+                $nomenclature = $this->Nomenclatureintervention1Manager->findById($id);
+                $data['id'] = $nomenclature->id;
+                $data['code'] = $nomenclature->code;
+                $data['description'] = $nomenclature->description;
             } else {
 				// Selection de tous les enregistrements
-                $region = $this->RegionManager->findAll();
-                if ($region) {
-                    foreach ($region as $key => $value) {
+                $nomenclature = $this->Nomenclatureintervention1Manager->findAll();
+                if ($nomenclature) {
+                    foreach ($nomenclature as $key => $value) {
                         
                         $data[$key]['id'] = $value->id;
                         $data[$key]['code'] = $value->code;
-                        $data[$key]['nom'] = $value->nom;
-                        $data[$key]['chef_lieu'] = $value->chef_lieu;
-                        
+                        $data[$key]['description'] = $value->description;
                     };
                 } else
                     $data = array();
@@ -52,7 +46,7 @@ class Region extends REST_Controller {
             ], REST_Controller::HTTP_OK);
         }
     }
-    //insertion,modification,suppression region
+    //insertion,modification,suppression nomenclature intervention niveau 1
     public function index_post() {
         $id = $this->post('id') ;
         $supprimer = $this->post('supprimer') ;
@@ -60,8 +54,7 @@ class Region extends REST_Controller {
             if ($id == 0) {
                 $data = array(
                     'code' => $this->post('code'),
-                    'nom' => $this->post('nom'),
-                    'chef_lieu' => $this->post('chef_lieu'),
+                    'description' => $this->post('description'),
                 );               
                 if (!$data) {
                     $this->response([
@@ -71,7 +64,7 @@ class Region extends REST_Controller {
                             ], REST_Controller::HTTP_BAD_REQUEST);
                 }
 				// Ajout d'un enregistrement
-                $dataId = $this->RegionManager->add($data);              
+                $dataId = $this->Nomenclatureintervention1Manager->add($data);              
                 if (!is_null($dataId)) {
                     $this->response([
                         'status' => TRUE,
@@ -88,7 +81,7 @@ class Region extends REST_Controller {
             } else {
                 $data = array(
                     'code' => $this->post('code'),
-                    'nom' => $this->post('nom')
+                    'description' => $this->post('description')
                 );              
                 if (!$data || !$id) {
                     $this->response([
@@ -98,7 +91,7 @@ class Region extends REST_Controller {
                             ], REST_Controller::HTTP_BAD_REQUEST);
                 }
 				// Mise à jour d'un enregistrement
-                $update = $this->RegionManager->update($id, $data);              
+                $update = $this->Nomenclatureintervention1Manager->update($id, $data);              
                 if(!is_null($update)){
                     $this->response([
                         'status' => TRUE, 
@@ -121,7 +114,7 @@ class Region extends REST_Controller {
                 ], REST_Controller::HTTP_BAD_REQUEST);
             }
 			// Suppression d'un enregistrement
-            $delete = $this->RegionManager->delete($id);          
+            $delete = $this->Nomenclatureintervention1Manager->delete($id);          
             if (!is_null($delete)) {
                 $this->response([
                     'status' => TRUE,
@@ -138,5 +131,4 @@ class Region extends REST_Controller {
         }   
     }
 }
-/* End of file controllername.php */
-/* Location: ./application/controllers/controllername.php */
+?>
