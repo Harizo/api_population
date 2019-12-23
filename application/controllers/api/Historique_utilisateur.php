@@ -10,6 +10,8 @@ class Historique_utilisateur extends REST_Controller {
         parent::__construct();
         $this->load->model('utilisateurs_model', 'UserManager');
         $this->load->model('historique_utilisateur_model', 'HistoriqueutilisateurManager');
+       // $this->load->model('site_model', 'SiteManager');
+
     }
 	// Cette classe définit tous les actions faites par les utlisateurs : ajout,suppression,modification,consultation
     //recuperation donnée
