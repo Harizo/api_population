@@ -324,7 +324,160 @@ class Systeme_protection_social_model extends CI_Model
     }
 
   //requete Répartition géographique des interventions
-   public function req14theme2_interven_nbrinter_budgetinit_peffectif_pcout_region_district($requete)
+    public function req14theme2_interven_nbrinter_budgetinit_peffectif_pcout_region_district($requete)
+    {  
+       $result = $this->db->query( "
+
+          
+
+             select 
+                pple.id_reg as id_reg,
+                pple.nom_reg as nom_reg,
+                pple.id_dist as id_dist,
+                pple.nom_dist as nom_dist,
+                pple.intitule_interven as intitule_interven,
+                sum(pple.total_cout_beneficiair_interv_dist) as cout_total_intervention,
+                pple.total_cout_beneficiair_interv_dist as ccccc
+
+             from (select 
+                    detail.id_region as id_reg,
+                    detail.nom_region as nom_reg,
+                    detail.id_district as id_dist,
+                    detail.nom_dist as nom_dist,
+                    detail.intitule_interven as intitule_interven,
+                    (sum(detail.nbr_mena) + sum(detail.nbr_ind)) as total_beneficiair_interv_dist,
+                    (sum(detail.cout_men) + sum(detail.cout_ind) )as total_cout_beneficiair_interv_dist
+                    
+
+
+              FROM 
+                    (select 
+                            reg.id as id_region,
+                            reg.nom as nom_region,
+                            dist.id as id_district,
+                            dist.nom as nom_dist,
+                            interven.intitule as intitule_interven,
+                            count(DISTINCT(sui_men.id_menage)) as nbr_mena,  
+                            0 as nbr_ind,
+                            0 as cout_men,
+                            0 as cout_ind
+                        from 
+                            suivi_menage_entete as sui_men_ent                      
+                            
+                            join suivi_menage as sui_men on sui_men.id_suivi_menage_entete=sui_men_ent.id
+                            join intervention as interven on interven.id=sui_men_ent.id_intervention
+                            join fokontany as foko on foko.id=sui_men_ent.id_fokontany
+                            join commune as com on com.id=foko.id_commune
+                            join district as dist on dist.id=com.district_id
+                            join region as reg on reg.id=dist.region_id
+                    
+                       
+                    
+                        group by  reg.id,reg.nom,dist.id,dist.nom,interven.id,interven.intitule
+
+                    UNION
+
+                    select 
+                            reg.id as id_region,
+                            reg.nom as nom_region,
+                            dist.id as id_district,
+                            dist.nom as nom_dist,
+                            interven.intitule as intitule_interven,
+                            0 as nbr_mena, 
+                            count(DISTINCT(sui_ind.id_individu)) as nbr_ind,
+                            0 as cout_men,
+                            0 as cout_ind
+                        from 
+                            suivi_individu_entete as sui_ind_ent                      
+                            
+                            join suivi_individu as sui_ind on sui_ind.id_suivi_individu_entete=sui_ind_ent.id
+                            join intervention as interven on interven.id=sui_ind_ent.id_intervention
+                            join fokontany as foko on foko.id=sui_ind_ent.id_fokontany
+                            join commune as com on com.id=foko.id_commune
+                            join district as dist on dist.id=com.district_id
+                            join region as reg on reg.id=dist.region_id
+                            
+                    
+                    
+                        group by  reg.id,reg.nom,dist.id,dist.nom,interven.id,interven.intitule
+
+                    UNION
+
+                    select 
+                            reg.id as id_region,
+                            reg.nom as nom_region,
+                            dist.id as id_district,
+                            dist.nom as nom_dist,
+                            interven.intitule as intitule_interven,
+                            0 as nbr_mena,
+                            0 as nbr_ind,
+                            ((sui_men_ent.montant_transfert)*count((sui_men.id_menage))) as cout_men,
+                            0 as cout_ind
+                        from 
+                            suivi_menage_entete as sui_men_ent
+                            
+                            join suivi_menage as sui_men on sui_men.id_suivi_menage_entete=sui_men_ent.id
+                            join intervention as interven on interven.id=sui_men_ent.id_intervention
+                            join fokontany as foko on foko.id=sui_men_ent.id_fokontany
+                            join commune as com on com.id=foko.id_commune
+                            join district as dist on dist.id=com.district_id
+                            join region as reg on reg.id=dist.region_id
+                    
+                    
+                        group by  reg.id,reg.nom,dist.id,dist.nom,interven.id,interven.intitule,sui_men_ent.montant_transfert
+
+                    UNION
+
+                    select 
+                            reg.id as id_region,
+                            reg.nom as nom_region,
+                            dist.id as id_district,
+                            dist.nom as nom_dist,
+                            interven.intitule as intitule_interven,
+                            0 as nbr_mena,
+                            0 as nbr_ind,
+                            0 as cout_men,
+                            ((sui_ind_ent.montant_transfert)*count((sui_ind.id_individu))) as cout_ind
+                        from 
+                            suivi_individu_entete as sui_ind_ent
+                            
+                            join suivi_individu as sui_ind on sui_ind.id_suivi_individu_entete=sui_ind_ent.id
+                            join intervention as interven on interven.id=sui_ind_ent.id_intervention
+                            join fokontany as foko on foko.id=sui_ind_ent.id_fokontany
+                            join commune as com on com.id=foko.id_commune
+                            join district as dist on dist.id=com.district_id
+                            join region as reg on reg.id=dist.region_id
+                    
+                       
+                    
+                        group by  reg.id,reg.nom,dist.id,dist.nom,interven.id,interven.intitule,sui_ind_ent.montant_transfert
+                        ) as detail 
+
+                        group by detail.id_region,
+                                detail.nom_region,
+                                detail.id_district,
+                                detail.nom_dist ,
+                                detail.intitule_interven )pple 
+                                                            group by pple.id_reg,
+                                                            pple.nom_reg,
+                                                            pple.id_dist,
+                                                            pple.nom_dist ,
+                                                            pple.intitule_interven,pple.total_cout_beneficiair_interv_dist
+            
+       
+        ")
+//group by detail.id_region,detail.nom_region,detail.id_district,detail.nom_dist,detail.intitule_interven 
+      ->result();
+      
+      if($result)
+        {
+            return $result;
+        }else{
+            return null;
+        }
+
+    }
+   /*public function req14theme2_interven_nbrinter_budgetinit_peffectif_pcout_region_district($requete)
     {  
        $result = $this->db->query( "
         select 
@@ -500,7 +653,7 @@ class Systeme_protection_social_model extends CI_Model
             return null;
         }
 
-    }
+    }*/
 
     //Proportion des interventions avec critères d'âge
    public function req19theme2_interven_pourcenenfan_pourcensco_pourcentra_pourcenage_pcout($enfant,$scolaire_min,$scolaire_max,$travail_min,$travail_max,$agee)
@@ -736,6 +889,198 @@ class Systeme_protection_social_model extends CI_Model
                       0 as nbr_indi_agee,
                       0 as nbr_mena_agetra, 
                       0 as nbr_mena_agee,
+                      0 as intervention_prevu,
+                      0 as budget_init,
+                      0 as budget_modif,
+                      detail_trans_inter.valeur_quantite as v_quantite
+                  from 
+                      zone_intervention as zone_inter
+                      join intervention as interven on interven.id=zone_inter.id_intervention
+                      
+                      join detail_type_transfert_intervention as detail_trans_inter on detail_trans_inter.id_intervention = interven.id 
+              
+                  where  detail_trans_inter.id_detail_type_transfert=1
+              
+                  group by interven.id,interven.intitule,detail_trans_inter.id_intervention,v_quantite
+
+              ) as detail
+        
+      group by detail.intitule_interven
+      order by detail.intitule_interven
+        ")
+      ->result();
+      
+      if($result)
+        {
+            return $result;
+        }else{
+            return null;
+        }
+
+    }
+
+    //Proportion des interventions avec critères d'âge
+   public function req20theme2_interven_pourcenfille_pourcenhomme_pcout()
+    {  
+       $result = $this->db->query( "
+        select               
+              detail.intitule_interven as intitule_intervention,
+              sum(detail.nbr_indi_f) as bene_f,
+              sum(detail.nbr_indi_h) as bene_h,
+              sum(detail.nbr_indi_f+detail.nbr_mena_f) as total_bene_f,
+              sum(detail.nbr_indi_h+detail.nbr_mena_h) as total_bene_h,
+              sum(detail.intervention_prevu) as total_intervention_prevu,
+              sum(detail.budget_init) as budget_initial,
+              sum(detail.budget_modif) as budget_modif,
+              sum(detail.v_quantite) as va_quantite,
+              CASE  WHEN 
+                      sum(detail.intervention_prevu) =0 THEN 0
+                    ELSE 
+                    (sum(detail.nbr_indi_f+detail.nbr_mena_f)*100)/sum(detail.intervention_prevu)
+              END as pourcen_f,
+              CASE  WHEN 
+                      sum(detail.intervention_prevu) =0 THEN 0
+                    ELSE 
+                    (sum(detail.nbr_indi_h+detail.nbr_mena_h)*100)/sum(detail.intervention_prevu)
+              END as pourcen_h,              
+              CASE  WHEN 
+                      sum(detail.budget_modif) =0 THEN 0
+                    ELSE 
+                    (sum(detail.v_quantite)*100)/sum(detail.budget_modif)
+              END as pourcen_cout
+        FROM 
+              (select                       
+                      interven.intitule as intitule_interven,
+                      count(indi_bene.id) as nbr_indi_f,
+                      0 as nbr_indi_h,
+                      0 as nbr_mena_f,
+                      0 as nbr_mena_h,
+                      0 as intervention_prevu,
+                      0 as budget_init,
+                      0 as budget_modif,
+                      0 as v_quantite
+                  from 
+                      individu_beneficiaire as indi_bene
+                      
+                      join individu as indi on indi.id=indi_bene.id_individu
+                      join intervention as interven on interven.id=indi_bene.id_intervention
+              
+                  where indi.sexe = 'F'
+              
+                  group by  interven.id,interven.intitule
+
+              UNION
+
+              select                       
+                      interven.intitule as intitule_interven,
+                      0 as nbr_indi_f,
+                      count(indi_bene.id) as nbr_indi_h,
+                      0 as nbr_mena_f,
+                      0 as nbr_mena_h,
+                      0 as intervention_prevu,
+                      0 as budget_init,
+                      0 as budget_modif,
+                      0 as v_quantite
+                  from 
+                      individu_beneficiaire as indi_bene
+                      
+                      join individu as indi on indi.id=indi_bene.id_individu
+                      join intervention as interven on interven.id=indi_bene.id_intervention
+              
+                  where indi.sexe = 'H'
+              
+                  group by  interven.id,interven.intitule
+
+              UNION
+
+              select                       
+                      interven.intitule as intitule_interven,
+                      0 as nbr_indi_f,
+                      0 as nbr_indi_h,
+                      count(mena_bene.id) as nbr_mena_f,
+                      0 as nbr_mena_h,
+                      0 as intervention_prevu,
+                      0 as budget_init,
+                      0 as budget_modif,
+                      0 as v_quantite
+                  from 
+                      menage_beneficiaire as mena_bene
+                      
+                      join menage as mena on mena.id=mena_bene.id_menage
+                      join intervention as interven on interven.id=mena_bene.id_intervention
+              
+                  where mena.sexe = 'F'
+              
+                  group by  interven.id,interven.intitule
+
+              UNION
+
+              select                       
+                      interven.intitule as intitule_interven,
+                      0 as nbr_indi_f,
+                      0 as nbr_indi_h,
+                      0 as nbr_mena_f, 
+                      count(mena_bene.id) as nbr_mena_h,
+                      0 as intervention_prevu,
+                      0 as budget_init,
+                      0 as budget_modif,
+                      0 as v_quantite
+                  from 
+                      menage_beneficiaire as mena_bene
+                      
+                      join menage as mena on mena.id=mena_bene.id_menage
+                      join intervention as interven on interven.id=mena_bene.id_intervention
+              
+                  where mena.sexe = 'H'
+              
+                  group by  interven.id,interven.intitule
+
+              UNION
+
+              select
+                      interven.intitule as intitule_interven,
+                      0 as nbr_indi_f,
+                      0 as nbr_indi_h,
+                      0 as nbr_mena_f, 
+                      0 as nbr_mena_h,
+                      sum(zone_inter.menage_beneficiaire_prevu + zone_inter.individu_beneficiaire_prevu) as intervention_prevu,
+                      0 as budget_init,
+                      0 as budget_modif,
+                      0 as v_quantite
+                  from 
+                      zone_intervention as zone_inter
+                      join intervention as interven on interven.id=zone_inter.id_intervention
+              
+                  group by interven.id,interven.intitule
+
+              UNION
+
+              select
+                      interven.intitule as intitule_interven,
+                      0 as nbr_indi_f,
+                      0 as nbr_indi_h,
+                      0 as nbr_mena_f, 
+                      0 as nbr_mena_h,
+                      0 as intervention_prevu,
+                      financ_inte.budget_initial as budget_init,
+                      financ_inte.budget_modifie as budget_modif,
+                      0 as v_quantite
+                  from 
+                      financement_intervention as financ_inte
+                      join intervention as interven on interven.id=financ_inte.id_intervention
+                      
+                      join zone_intervention as zone_inter on zone_inter.id_intervention=interven.id             
+              
+                  group by interven.id,interven.intitule,financ_inte.id_intervention,budget_init,budget_modif
+
+              UNION
+
+              select
+                      interven.intitule as intitule_interven,
+                      0 as nbr_indi_f,
+                      0 as nbr_indi_h,
+                      0 as nbr_mena_f, 
+                      0 as nbr_mena_h,
                       0 as intervention_prevu,
                       0 as budget_init,
                       0 as budget_modif,

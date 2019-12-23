@@ -256,6 +256,16 @@ class Environment_et_systeme extends REST_Controller {
             }else $data = array();
 
         }
+
+        if ($menu=='req20theme2_interven_pourcenfille_pourcenhomme_pcout')
+        {
+            $tmp = $this->Systeme_protection_socialManager->req20theme2_interven_pourcenfille_pourcenhomme_pcout();
+            if($tmp)
+            {
+                $data=$tmp;
+            }else $data = array();
+
+        }
         //Bruce
 
 
