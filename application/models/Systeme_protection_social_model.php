@@ -323,160 +323,8 @@ class Systeme_protection_social_model extends CI_Model
 
     }
 
-  //requete Répartition géographique des interventions
-    public function req14theme2_interven_nbrinter_budgetinit_peffectif_pcout_region_district($requete)
-    {  
-       $result = $this->db->query( "
-
-          
-
-             select 
-                pple.id_reg as id_reg,
-                pple.nom_reg as nom_reg,
-                pple.id_dist as id_dist,
-                pple.nom_dist as nom_dist,
-                pple.intitule_interven as intitule_interven,
-                sum(pple.total_cout_beneficiair_interv_dist) as cout_total_intervention,
-                pple.total_cout_beneficiair_interv_dist as ccccc
-
-             from (select 
-                    detail.id_region as id_reg,
-                    detail.nom_region as nom_reg,
-                    detail.id_district as id_dist,
-                    detail.nom_dist as nom_dist,
-                    detail.intitule_interven as intitule_interven,
-                    (sum(detail.nbr_mena) + sum(detail.nbr_ind)) as total_beneficiair_interv_dist,
-                    (sum(detail.cout_men) + sum(detail.cout_ind) )as total_cout_beneficiair_interv_dist
-                    
-
-
-              FROM 
-                    (select 
-                            reg.id as id_region,
-                            reg.nom as nom_region,
-                            dist.id as id_district,
-                            dist.nom as nom_dist,
-                            interven.intitule as intitule_interven,
-                            count(DISTINCT(sui_men.id_menage)) as nbr_mena,  
-                            0 as nbr_ind,
-                            0 as cout_men,
-                            0 as cout_ind
-                        from 
-                            suivi_menage_entete as sui_men_ent                      
-                            
-                            join suivi_menage as sui_men on sui_men.id_suivi_menage_entete=sui_men_ent.id
-                            join intervention as interven on interven.id=sui_men_ent.id_intervention
-                            join fokontany as foko on foko.id=sui_men_ent.id_fokontany
-                            join commune as com on com.id=foko.id_commune
-                            join district as dist on dist.id=com.district_id
-                            join region as reg on reg.id=dist.region_id
-                    
-                       
-                    
-                        group by  reg.id,reg.nom,dist.id,dist.nom,interven.id,interven.intitule
-
-                    UNION
-
-                    select 
-                            reg.id as id_region,
-                            reg.nom as nom_region,
-                            dist.id as id_district,
-                            dist.nom as nom_dist,
-                            interven.intitule as intitule_interven,
-                            0 as nbr_mena, 
-                            count(DISTINCT(sui_ind.id_individu)) as nbr_ind,
-                            0 as cout_men,
-                            0 as cout_ind
-                        from 
-                            suivi_individu_entete as sui_ind_ent                      
-                            
-                            join suivi_individu as sui_ind on sui_ind.id_suivi_individu_entete=sui_ind_ent.id
-                            join intervention as interven on interven.id=sui_ind_ent.id_intervention
-                            join fokontany as foko on foko.id=sui_ind_ent.id_fokontany
-                            join commune as com on com.id=foko.id_commune
-                            join district as dist on dist.id=com.district_id
-                            join region as reg on reg.id=dist.region_id
-                            
-                    
-                    
-                        group by  reg.id,reg.nom,dist.id,dist.nom,interven.id,interven.intitule
-
-                    UNION
-
-                    select 
-                            reg.id as id_region,
-                            reg.nom as nom_region,
-                            dist.id as id_district,
-                            dist.nom as nom_dist,
-                            interven.intitule as intitule_interven,
-                            0 as nbr_mena,
-                            0 as nbr_ind,
-                            ((sui_men_ent.montant_transfert)*count((sui_men.id_menage))) as cout_men,
-                            0 as cout_ind
-                        from 
-                            suivi_menage_entete as sui_men_ent
-                            
-                            join suivi_menage as sui_men on sui_men.id_suivi_menage_entete=sui_men_ent.id
-                            join intervention as interven on interven.id=sui_men_ent.id_intervention
-                            join fokontany as foko on foko.id=sui_men_ent.id_fokontany
-                            join commune as com on com.id=foko.id_commune
-                            join district as dist on dist.id=com.district_id
-                            join region as reg on reg.id=dist.region_id
-                    
-                    
-                        group by  reg.id,reg.nom,dist.id,dist.nom,interven.id,interven.intitule,sui_men_ent.montant_transfert
-
-                    UNION
-
-                    select 
-                            reg.id as id_region,
-                            reg.nom as nom_region,
-                            dist.id as id_district,
-                            dist.nom as nom_dist,
-                            interven.intitule as intitule_interven,
-                            0 as nbr_mena,
-                            0 as nbr_ind,
-                            0 as cout_men,
-                            ((sui_ind_ent.montant_transfert)*count((sui_ind.id_individu))) as cout_ind
-                        from 
-                            suivi_individu_entete as sui_ind_ent
-                            
-                            join suivi_individu as sui_ind on sui_ind.id_suivi_individu_entete=sui_ind_ent.id
-                            join intervention as interven on interven.id=sui_ind_ent.id_intervention
-                            join fokontany as foko on foko.id=sui_ind_ent.id_fokontany
-                            join commune as com on com.id=foko.id_commune
-                            join district as dist on dist.id=com.district_id
-                            join region as reg on reg.id=dist.region_id
-                    
-                       
-                    
-                        group by  reg.id,reg.nom,dist.id,dist.nom,interven.id,interven.intitule,sui_ind_ent.montant_transfert
-                        ) as detail 
-
-                        group by detail.id_region,
-                                detail.nom_region,
-                                detail.id_district,
-                                detail.nom_dist ,
-                                detail.intitule_interven )pple 
-                                                            group by pple.id_reg,
-                                                            pple.nom_reg,
-                                                            pple.id_dist,
-                                                            pple.nom_dist ,
-                                                            pple.intitule_interven,pple.total_cout_beneficiair_interv_dist
-            
-       
-        ")
-//group by detail.id_region,detail.nom_region,detail.id_district,detail.nom_dist,detail.intitule_interven 
-      ->result();
-      
-      if($result)
-        {
-            return $result;
-        }else{
-            return null;
-        }
-
-    }
+    
+    
    /*public function req14theme2_interven_nbrinter_budgetinit_peffectif_pcout_region_district($requete)
     {  
        $result = $this->db->query( "
@@ -655,7 +503,7 @@ class Systeme_protection_social_model extends CI_Model
 
     }*/
 
-    //Proportion des interventions avec critères d'âge
+    //Proportion des interventions avec critères d'âge TSY METY ITY 
    public function req19theme2_interven_pourcenenfan_pourcensco_pourcentra_pourcenage_pcout($enfant,$scolaire_min,$scolaire_max,$travail_min,$travail_max,$agee)
     {  
        $result = $this->db->query( "
@@ -1621,169 +1469,1175 @@ class Systeme_protection_social_model extends CI_Model
 
               return $this->db->query($sql)->result();
         }
-        //proportion_des_intervention_par_type_de_cible affichage complet
-        /* public function proportion_des_intervention_par_type_de_cible()
-        {
-          $sql = "
+        
 
-                  select sum(pplee2.total_montant_menage) as montant_globale_menage,
-                           sum(pplee2.total_montant_groupe) as montant_globale_groupe,
-                           sum(pplee2.total_montant_individu) as montant_globale_individu,
-                           pplee2.intitule_intervention as intitule_intervention,
-                           MAX(pplee2.nombre_menage) as nbr_menage_max,
-                           MAX(pplee2.nombre_groupe) as nbr_groupe_max,
-                           MAX(pplee2.nombre_individu) as nbr_individu_max,
+        //requete Répartition géographique des interventions
 
 
-                           ((sum(pplee2.total_montant_menage)) + (sum(pplee2.total_montant_groupe)) + (sum(pplee2.total_montant_individu))) as montant_transfert_globale ,
+        public function req14theme2_interven_nbrinter_budgetinit_peffectif_pcout_region_district()
+        {  
+           
 
-                           ROUND((((sum(pplee2.total_montant_menage)) * 100)/((sum(pplee2.total_montant_menage)) + (sum(pplee2.total_montant_groupe)) + (sum(pplee2.total_montant_individu)))),2) as stat_montant_menage,
+            $sql= "
+                    select
+                      niveau_1.intitule_intervention as intitule_inter,
+                      niveau_1.id_interv as id_inter,
+                      niveau_1.id_region as id_reg,
+                      niveau_1.nom_region as nom_reg,
+                      niveau_1.id_district as id_dist,
+                      niveau_1.nom_district as nom_dist,
+                      (sum(niveau_1.valeur_par_entete_menage) + sum(niveau_1.valeur_par_entete_individu)) as total_cout_district,
 
-                           ROUND((((sum(pplee2.total_montant_groupe)) * 100)/((sum(pplee2.total_montant_menage)) + (sum(pplee2.total_montant_groupe)) + (sum(pplee2.total_montant_individu)))),2) as stat_montant_groupe,
+                      (sum(niveau_1.nbr_intervention_total_menage) + sum(niveau_1.nbr_intervention_total_individu)) as nbr_total_interv,
 
-                           ROUND((((sum(pplee2.total_montant_individu)) * 100)/((sum(pplee2.total_montant_menage)) + (sum(pplee2.total_montant_groupe)) + (sum(pplee2.total_montant_individu)))),2) as stat_montant_individu,
+                      (sum(nbr_intervention_menage_par_district) + sum(nbr_intervention_individu_par_district)) as nbr_interv_par_district,
 
-                           ((MAX(pplee2.nombre_menage)) + (MAX(pplee2.nombre_groupe)) + (MAX(pplee2.nombre_individu))) as effectif_total,
+                      (((sum(nbr_intervention_menage_par_district) + sum(nbr_intervention_individu_par_district)) * 100)/(sum(niveau_1.nbr_intervention_total_menage) + sum(niveau_1.nbr_intervention_total_individu))) as effectif_intervention,
+
+                      ( select
+
+                          sum(srq_niveau_1.cout_menage_par_entete) + sum(srq_niveau_1.cout_individu_par_entete) as total_cout_menage
+
+                        from ( select 
+
+                                  (count(suivi_menage.id_menage) * suivi_menage_entete.montant_transfert) as cout_menage_par_entete,
+                                  0 as cout_individu_par_entete,
+                                  intervention.id as id_int
+
+                                from 
+                                  suivi_menage_entete,
+                                  suivi_menage,
+                                  intervention
+
+                                where 
+                                  suivi_menage_entete.id = suivi_menage.id_suivi_menage_entete
+                                  and intervention.id = suivi_menage_entete.id_intervention
+                                  and intervention.id = niveau_1.id_interv
+                                group by 
+                                  suivi_menage_entete.id, id_int
+
+                              UNION
+
+                              select 
+
+                                  0 as cout_menage_par_entete,
+                                  (count(suivi_individu.id_individu) * suivi_individu_entete.montant_transfert) as cout_individu_par_entete,
+                                  intervention.id as id_int
+
+                                from 
+                                  suivi_individu_entete,
+                                  suivi_individu,
+                                  intervention
+
+                                where 
+                                  suivi_individu_entete.id = suivi_individu.id_suivi_individu_entete
+                                  and intervention.id = suivi_individu_entete.id_intervention
+                                  and intervention.id = niveau_1.id_interv
+                                group by 
+                                  suivi_individu_entete.id, id_int
+
+                              ) srq_niveau_1
+
+                              group by srq_niveau_1.id_int
+
+                            
+                      )
+
+                    from  (
+                            select 
+                              
+                              intervention.intitule as intitule_intervention,
+                              intervention.id as id_interv,
+                              district.id as id_district,
+                              district.nom as nom_district,
+                              region.id as id_region,
+                              region.nom as nom_region,
+                              count(suivi_menage.id_menage) as nbr_menage_par_entete,
+                              ((count(suivi_menage.id_menage)) * suivi_menage_entete.montant_transfert) as valeur_par_entete_menage,
+                              0 as valeur_par_entete_individu,
+
+                              count(DISTINCT(suivi_menage_entete.id)) as nbr_intervention_menage_par_district,
+                              (select count(id) from suivi_menage_entete where id_intervention = intervention.id) as nbr_intervention_total_menage,
+
+                              0 as nbr_intervention_individu_par_district,
+                              0 as nbr_intervention_total_individu
+
+                            from 
+                              suivi_menage_entete, 
+                              suivi_menage, 
+                              intervention,
+                              fokontany,
+                              commune,
+                              district,
+                              region
+
+                            where 
+
+                              suivi_menage_entete.id = suivi_menage.id_suivi_menage_entete
+                              and intervention.id = suivi_menage_entete.id_intervention
+                              and fokontany.id = suivi_menage_entete.id_fokontany
+                              and commune.id = fokontany.id_commune
+                                and district.id = commune.district_id
+                                and region.id = district.region_id
+                            group by 
+                              suivi_menage_entete.id,
+                              id_interv,
+                              district.id,
+                              region.id
+
+                            UNION
+
+                            select 
+                              
+                              intervention.intitule as intitule_intervention,
+                              intervention.id as id_interv,
+                              district.id as id_district,
+                              district.nom as nom_district,
+                              region.id as id_region,
+                              region.nom as nom_region,
+                              count(suivi_individu.id_individu) as nbr_individu_par_entete,
+                              0 as valeur_par_entete_menage,
+                              ((count(suivi_individu.id_individu)) * suivi_individu_entete.montant_transfert) as valeur_par_entete_individu,
+
+                              count(DISTINCT(suivi_individu_entete.id)) as nbr_intervention_individu_par_district,
+                              (select count(id) from suivi_individu_entete where id_intervention = intervention.id) as nbr_intervention_total_individu,
+
+                              0 as nbr_intervention_menage_par_district,
+                              0 as nbr_intervention_total_menage
+
+                            from 
+                              suivi_individu_entete, 
+                              suivi_individu, 
+                              intervention,
+                              fokontany,
+                              commune,
+                              district,
+                              region
+
+                            where 
+
+                              suivi_individu_entete.id = suivi_individu.id_suivi_individu_entete
+                              and intervention.id = suivi_individu_entete.id_intervention
+                              and fokontany.id = suivi_individu_entete.id_fokontany
+                              and commune.id = fokontany.id_commune
+                                and district.id = commune.district_id
+                                and region.id = district.region_id
+                            group by 
+                              suivi_individu_entete.id,
+                              id_interv,
+                              district.id,
+                              region.id
+
+                          ) niveau_1
 
 
-                           ROUND((((MAX(pplee2.nombre_menage)) * 100)/((MAX(pplee2.nombre_menage)) + (MAX(pplee2.nombre_groupe)) + (MAX(pplee2.nombre_individu)))),2) as stat_menage,
-                           ROUND((((MAX(pplee2.nombre_groupe)) * 100)/((MAX(pplee2.nombre_menage)) + (MAX(pplee2.nombre_groupe)) + (MAX(pplee2.nombre_individu)))),2) as stat_groupe,
-                           ROUND((((MAX(pplee2.nombre_individu)) * 100)/((MAX(pplee2.nombre_menage)) + (MAX(pplee2.nombre_groupe)) + (MAX(pplee2.nombre_individu)))),2) as stat_individu
+                          group by 
 
+                                  niveau_1.intitule_intervention ,
+                                  niveau_1.id_interv ,
+                                  niveau_1.id_region ,
+                                  niveau_1.nom_region ,
+                                  niveau_1.id_district,
+                                  niveau_1.nom_district 
 
-
-
-
-
-
-
-
-                    from
-
-                          (select sum(principale.nombre_menage)  as nombre_menage, 
-                                                                             sum(principale.nombre_groupe) as nombre_groupe,
-                                                                             sum(principale.nombre_individu) as nombre_individu,
-                                                                             principale.montant_transfert_menage,
-                                                                             principale.montant_transfert_groupe,
-                                                                             principale.montant_transfert_individu,
-                                                                             (principale.montant_transfert_menage * principale.nombre_menage) as total_montant_menage,
-                                                                             (principale.montant_transfert_groupe * principale.nombre_groupe) as total_montant_groupe,
-                                                                             (principale.montant_transfert_individu * principale.nombre_individu) as total_montant_individu,
                           
-                                        
-                                                                              principale.intitule_intervention as intitule_intervention
-                                        
-                                        
-                                                    FROM (
-                                                                        select  count(DISTINCT(sm.id_menage)) as nombre_menage, 
-                                                                                0 as nombre_groupe ,
-                                                                                0 as nombre_individu ,
-                                                                                int.intitule as intitule_intervention,
-                                                                                sme.montant_transfert as montant_transfert_menage,
-                                                                                0 as montant_transfert_groupe,
-                                                                                0 as montant_transfert_individu
-                                  
-                                                                               
-                                                                                
-                                                                        from suivi_menage as sm
-                                                                          join suivi_menage_entete as sme on sme.id = sm.id_suivi_menage_entete
-                                                                          join menage as m on m.id = sm.id_menage
-                                                                          join intervention as int on int.id = sme.id_intervention
-                                  
-                                                                          where m.etat_groupe = 0
-                                                                          group by sme.id_intervention ,int.id, sme.montant_transfert
-                                        
-                                                                            UNION 
-                                        
-                                                                        select  0 as nombre_menage, 
-                                                                              count(DISTINCT(sm.id_menage)) as nombre_groupe ,
-                                                                              0 as nombre_individu ,
-                                                                               int.intitule as intitule_intervention,
-                                                                               0 as montant_transfert_menage,
-                                                                                sme.montant_transfert as montant_transfert_groupe,
-                                                                                0 as montant_transfert_individu
-                                                                               
-                                                                                
-                                                                        from suivi_menage as sm
-                                                                          join suivi_menage_entete as sme on sme.id = sm.id_suivi_menage_entete
-                                                                          join menage as m on m.id = sm.id_menage
-                                                                          join intervention as int on int.id = sme.id_intervention
-                                  
-                                                                          where m.etat_groupe = 1
-                                                                          group by sme.id_intervention , int.id, sme.montant_transfert
-                                        
-                                                                            UNION 
-                                        
-                                                                        select  0 as nombre_menage, 
-                                                                                0 as nombre_groupe ,
-                                                                                count(DISTINCT(si.id_individu)) as nombre_individu ,
-                                                                                int.intitule as intitule_intervention,
-                                                                                0 as montant_transfert_menage,
-                                                                                0 as montant_transfert_groupe,
-                                                                                sie.montant_transfert as montant_transfert_individu
-                                                                               
-                                                                                
-                                                                        from suivi_individu as si
-                                                                          join suivi_individu_entete as sie on sie.id = si.id_suivi_individu_entete
-                                                                          join menage as m on m.id = si.id_individu
-                                                                          join intervention as int on int.id = sie.id_intervention
-                                                                          
-                                  
-                                                                          group by sie.id_intervention , int.id, sie.montant_transfert
-                                  
-                                                    ) principale 
-                                                    group by  principale.intitule_intervention, 
-                                                              principale.montant_transfert_menage,
-                                                              principale.montant_transfert_groupe,
-                                                              principale.montant_transfert_individu,
-                                                              principale.nombre_menage,
-                                                              principale.nombre_groupe,
-                                                              principale.nombre_individu
-                                  ) pplee2 group by  pplee2.intitule_intervention
-              
+
+
+
+
                   " ;
+                  return $this->db->query($sql)->result();
 
-
-              return $this->db->query($sql)->result();
-        }*/       
+        }     
 
         //fin proportion_des_intervention_par_type_de_cible
+
+        /*Proportion des interventions avec critères de sexe*/
+        public function proportion_des_intervention_avec_critere_sexe()
+        {
+
+            $sql =  " 
+                      select
+                        niveau_1.intitule_intervention as intitule_interv,
+                        niveau_1.id_intervention id_interv,
+               
+                        (sum(niveau_1.cout_par_entete_menage_h) + sum(niveau_1.cout_par_entete_individu_h)) cout_total_intervention_h,
+                        (sum(niveau_1.cout_par_entete_menage_f) + sum(niveau_1.cout_par_entete_individu_f)) cout_total_intervention_f,
+
+                        ( select
+                            (sum(nbr_homme.nbr_menage_h) + sum(nbr_homme.nbr_indiviu_h)) as nbr_total_homme
+                          from 
+                          ( 
+                            select
+                              count(DISTINCT(srq_sm.id_menage)) as nbr_menage_h,
+                              0 as nbr_indiviu_h
+                            from
+                              suivi_menage_entete as srq_sme,
+                              suivi_menage srq_sm,
+                              menage srq_m,
+                              intervention as sqr_int
+
+                            where 
+                              sqr_int.id = srq_sme.id_intervention
+                              and srq_sme.id = srq_sm.id_suivi_menage_entete
+                              and srq_m.id = srq_sm.id_menage
+                              and srq_m.sexe = 'H'
+                              and sqr_int.id = niveau_1.id_intervention
+
+                            UNION
+
+                            select
+                              0 as nbr_menage_h,
+                              count(DISTINCT(srq_si.id_individu)) as nbr_indiviu_h
+                            from
+                              suivi_individu_entete as srq_sie,
+                              suivi_individu srq_si,
+                              individu srq_i,
+                              intervention as sqr_int
+
+                            where 
+                              sqr_int.id = srq_sie.id_intervention
+                              and srq_sie.id = srq_si.id_suivi_individu_entete
+                              and srq_i.id = srq_si.id_individu
+                              and srq_i.sexe = 'H'
+                              and sqr_int.id = niveau_1.id_intervention
+
+
+                          ) nbr_homme
+
+                        ),
+
+                        ( select
+                            (sum(nbr_homme.nbr_menage_f) + sum(nbr_homme.nbr_indiviu_f)) as nbr_total_femme
+                          from 
+                          ( 
+                            select
+                              count(DISTINCT(srq_sm.id_menage)) as nbr_menage_f,
+                              0 as nbr_indiviu_f
+                            from
+                              suivi_menage_entete as srq_sme,
+                              suivi_menage srq_sm,
+                              menage srq_m,
+                              intervention as sqr_int
+
+                            where 
+                              sqr_int.id = srq_sme.id_intervention
+                              and srq_sme.id = srq_sm.id_suivi_menage_entete
+                              and srq_m.id = srq_sm.id_menage
+                              and srq_m.sexe = 'F'
+                              and sqr_int.id = niveau_1.id_intervention
+
+                            UNION
+
+                            select
+                              0 as nbr_menage_f,
+                              count(DISTINCT(srq_si.id_individu)) as nbr_indiviu_f
+                            from
+                              suivi_individu_entete as srq_sie,
+                              suivi_individu srq_si,
+                              individu srq_i,
+                              intervention as sqr_int
+
+                            where 
+                              sqr_int.id = srq_sie.id_intervention
+                              and srq_sie.id = srq_si.id_suivi_individu_entete
+                              and srq_i.id = srq_si.id_individu
+                              and srq_i.sexe = 'F'
+                              and sqr_int.id = niveau_1.id_intervention
+
+
+                          ) nbr_homme
+
+                        ),
+                        ( select
+
+                          sum(srq_niveau_1.cout_menage_par_entete) + sum(srq_niveau_1.cout_individu_par_entete) as total_cout_menage
+
+                        from ( select 
+
+                                  (count(suivi_menage.id_menage) * suivi_menage_entete.montant_transfert) as cout_menage_par_entete,
+                                  0 as cout_individu_par_entete,
+                                  intervention.id as id_int
+
+                                from 
+                                  suivi_menage_entete,
+                                  suivi_menage,
+                                  intervention
+
+                                where 
+                                  suivi_menage_entete.id = suivi_menage.id_suivi_menage_entete
+                                  and intervention.id = suivi_menage_entete.id_intervention
+                                  and intervention.id = niveau_1.id_intervention
+                                group by 
+                                  suivi_menage_entete.id, id_int
+
+                              UNION
+
+                              select 
+
+                                  0 as cout_menage_par_entete,
+                                  (count(suivi_individu.id_individu) * suivi_individu_entete.montant_transfert) as cout_individu_par_entete,
+                                  intervention.id as id_int
+
+                                from 
+                                  suivi_individu_entete,
+                                  suivi_individu,
+                                  intervention
+
+                                where 
+                                  suivi_individu_entete.id = suivi_individu.id_suivi_individu_entete
+                                  and intervention.id = suivi_individu_entete.id_intervention
+                                  and intervention.id = niveau_1.id_intervention
+                                group by 
+                                  suivi_individu_entete.id, id_int
+
+                              ) srq_niveau_1
+
+                              group by srq_niveau_1.id_int
+
+                            
+                      ),
+
+                      ( select
+                          (sum(srq_2_niveau_1.nbr_beneficiaires_menage) + sum(srq_2_niveau_1.nbr_beneficiaires_individu)) as total_beneficiaire 
+                        from  ( 
+
+                                select
+                                  count(DISTINCT(srq_sm.id_menage)) as nbr_beneficiaires_menage,
+                                  0 as nbr_beneficiaires_individu
+                                from
+                                  suivi_menage_entete as srq_sme,
+                                  suivi_menage srq_sm,
+                                  menage srq_m,
+                                  intervention as sqr_int
+
+                                where 
+                                  sqr_int.id = srq_sme.id_intervention
+                                  and srq_sme.id = srq_sm.id_suivi_menage_entete
+                                  and srq_m.id = srq_sm.id_menage
+                                 
+                                  and sqr_int.id = niveau_1.id_intervention
+
+                                UNION
+
+                                select
+                                  0 as nbr_beneficiaires_menage,
+                                  count(DISTINCT(srq_si.id_individu)) as nbr_beneficiaires_individu
+                                from
+                                  suivi_individu_entete as srq_sie,
+                                  suivi_individu srq_si,
+                                  individu srq_i,
+                                  intervention as sqr_int
+
+                                where 
+                                  sqr_int.id = srq_sie.id_intervention
+                                  and srq_sie.id = srq_si.id_suivi_individu_entete
+                                  and srq_i.id = srq_si.id_individu
+                                 
+                                  and sqr_int.id = niveau_1.id_intervention
+                              ) srq_2_niveau_1
+                      )
+
+                      from  (
+
+                          select 
+                            intervention.intitule as intitule_intervention,
+                            intervention.id as id_intervention,
+
+                            (count(suivi_menage.id_menage) * suivi_menage_entete.montant_transfert) as cout_par_entete_menage_h,
+                            0 as cout_par_entete_menage_f,
+
+                            0 as cout_par_entete_individu_h,
+                            0 as cout_par_entete_individu_f
+
+                          from 
+                            suivi_menage_entete,
+                            suivi_menage,
+                            menage,
+                            intervention
+                          where
+                            intervention.id = suivi_menage_entete.id_intervention
+                            and suivi_menage_entete.id = suivi_menage.id_suivi_menage_entete
+                            and menage.id = suivi_menage.id_menage
+                            and menage.sexe = 'H'
+
+                          group by 
+                            intervention.id,
+                            suivi_menage_entete.id
+
+                          UNION
+
+                          select 
+                            intervention.intitule as intitule_intervention,
+                            intervention.id as id_intervention,
+
+                            0 as cout_par_entete_menage_h,
+                            (count(suivi_menage.id_menage) * suivi_menage_entete.montant_transfert) as cout_par_entete_menage_f,
+
+                            0 as cout_par_entete_individu_h,
+                            0 as cout_par_entete_individu_f
+
+                          from 
+                            suivi_menage_entete,
+                            suivi_menage,
+                            menage,
+                            intervention
+                          where
+                            intervention.id = suivi_menage_entete.id_intervention
+                            and suivi_menage_entete.id = suivi_menage.id_suivi_menage_entete
+                            and menage.id = suivi_menage.id_menage
+                            and menage.sexe = 'F'
+
+                          group by 
+                            intervention.id,
+                            suivi_menage_entete.id
+
+                          UNION
+
+                          select 
+                            intervention.intitule as intitule_intervention,
+                            intervention.id as id_intervention,
+
+                            (count(suivi_individu.id_individu) * suivi_individu_entete.montant_transfert) as cout_par_entete_individu_h,
+                            0 as cout_par_entete_individu_f,
+
+                            0 as cout_par_entete_menage_h,
+                            0 as cout_par_entete_menage_f
+
+                          from 
+                            suivi_individu_entete,
+                            suivi_individu,
+                            individu,
+                            intervention
+                          where
+                            intervention.id = suivi_individu_entete.id_intervention
+                            and suivi_individu_entete.id = suivi_individu.id_suivi_individu_entete
+                            and individu.id = suivi_individu.id_individu
+                            and individu.sexe = 'H'
+
+                          group by 
+                            intervention.id,
+                            suivi_individu_entete.id
+
+                          UNION
+
+                          select 
+                            intervention.intitule as intitule_intervention,
+                            intervention.id as id_intervention,
+
+                            0 as cout_par_entete_individu_h,
+                            (count(suivi_individu.id_individu) * suivi_individu_entete.montant_transfert) as cout_par_entete_individu_f,
+
+                            0 as cout_par_entete_menage_h,
+                            0 as cout_par_entete_menage_f
+
+                          from 
+                            suivi_individu_entete,
+                            suivi_individu,
+                            individu,
+                            intervention
+                          where
+                            intervention.id = suivi_individu_entete.id_intervention
+                            and suivi_individu_entete.id = suivi_individu.id_suivi_individu_entete
+                            and individu.id = suivi_individu.id_individu
+                            and individu.sexe = 'F'
+
+                          group by 
+                            intervention.id,
+                            suivi_individu_entete.id
+                            ) niveau_1
+
+                      group by 
+                        niveau_1.id_intervention,
+                        niveau_1.intitule_intervention
+
+                    " ;
+
+            return $this->db->query($sql)->result(); 
+
+        }
+        /*Fin Proportion des interventions avec critères de sexe*/
+
+
+        /*Proportion des interventions avec critères Age*/
+
+        public function proportion_des_intervention_avec_critere_age()
+        {
+
+
+              $sql =  " 
+                        select
+                          intitule_intervention,
+                          id_intervention,
+
+                          (sum(cout_par_entete_enfant_menage)) + (sum(cout_par_entete_enfant_individu)) as cout_enfant,
+                          (sum(cout_par_entete_age_scolaire_menage)) + (sum(cout_par_entete_age_scolaire_individu)) as cout_age_scolaire,
+                          (sum(cout_par_entete_age_travail_menage)) + (sum(cout_par_entete_age_travail_individu)) as cout_age_travail,
+                          (sum(cout_par_entete_agee_menage)) + (sum(cout_par_entete_agee_individu)) as cout_agee,
+
+                          (sum(nbr_enfant_par_entete_menage)) + (sum(nbr_enfant_par_entete_individu)) as nbr_enfant,
+                          (sum(nbr_age_scolaire_par_entete_menage)) + (sum(nbr_age_scolaire_par_entete_individu)) as nbr_age_scolaire,
+                          (sum(nbr_age_travail_par_entete_menage)) + (sum(nbr_age_travail_par_entete_individu)) as nbr_age_travail,
+                          (sum(nbr_agee_par_entete_menage)) + (sum(nbr_agee_par_entete_individu)) as nbr_agee,
+
+
+
+                          ((sum(nbr_enfant_par_entete_menage)) + (sum(nbr_enfant_par_entete_individu))) + 
+                          ((sum(nbr_age_scolaire_par_entete_menage)) + (sum(nbr_age_scolaire_par_entete_individu))) + 
+                          ((sum(nbr_age_travail_par_entete_menage)) + (sum(nbr_age_travail_par_entete_individu))) + 
+                          ((sum(nbr_agee_par_entete_menage)) + (sum(nbr_agee_par_entete_individu))) as nbr_total_benaficiare,
+
+
+                          ( select
+
+                            sum(srq_niveau_1.cout_menage_par_entete) + sum(srq_niveau_1.cout_individu_par_entete) as total_cout
+
+                          from ( select 
+
+                                    (count(suivi_menage.id_menage) * suivi_menage_entete.montant_transfert) as cout_menage_par_entete,
+                                    0 as cout_individu_par_entete,
+                                    intervention.id as id_int
+
+                                  from 
+                                    suivi_menage_entete,
+                                    suivi_menage,
+                                    intervention
+
+                                  where 
+                                    suivi_menage_entete.id = suivi_menage.id_suivi_menage_entete
+                                    and intervention.id = suivi_menage_entete.id_intervention
+                                    and intervention.id = niveau_1.id_intervention
+                                  group by 
+                                    suivi_menage_entete.id, id_int
+
+                                UNION
+
+                                select 
+
+                                    0 as cout_menage_par_entete,
+                                    (count(suivi_individu.id_individu) * suivi_individu_entete.montant_transfert) as cout_individu_par_entete,
+                                    intervention.id as id_int
+
+                                  from 
+                                    suivi_individu_entete,
+                                    suivi_individu,
+                                    intervention
+
+                                  where 
+                                    suivi_individu_entete.id = suivi_individu.id_suivi_individu_entete
+                                    and intervention.id = suivi_individu_entete.id_intervention
+                                    and intervention.id = niveau_1.id_intervention
+                                  group by 
+                                    suivi_individu_entete.id, id_int
+
+                                ) srq_niveau_1
+
+                                group by srq_niveau_1.id_int
+
+                              
+                        )
+
+
+                        from (  select 
+                                  intervention.intitule as intitule_intervention,
+                                  intervention.id as id_intervention,
+
+                                  
+                                  (count(suivi_menage.id_menage) * suivi_menage_entete.montant_transfert) as cout_par_entete_enfant_menage,
+                                  0 as cout_par_entete_age_scolaire_menage,
+                                  0 as cout_par_entete_age_travail_menage,
+                                  0 as cout_par_entete_agee_menage,
+
+                                  count(suivi_menage.id_menage) as nbr_enfant_par_entete_menage,
+                                  0 as nbr_age_scolaire_par_entete_menage,
+                                  0 as nbr_age_travail_par_entete_menage,
+                                  0 as nbr_agee_par_entete_menage,
+
+
+                                  0 as cout_par_entete_enfant_individu,
+                                  0 as cout_par_entete_age_scolaire_individu,
+                                  0 as cout_par_entete_age_travail_individu,
+                                  0 as cout_par_entete_agee_individu,
+
+                                  0 as nbr_enfant_par_entete_individu,
+                                  0 as nbr_age_scolaire_par_entete_individu,
+                                  0 as nbr_age_travail_par_entete_individu,
+                                  0 as nbr_agee_par_entete_individu
+
+                                  
+
+                                from 
+                                  suivi_menage_entete,
+                                  suivi_menage,
+                                  menage,
+                                  intervention
+                                where
+                                  intervention.id = suivi_menage_entete.id_intervention
+                                  and suivi_menage_entete.id = suivi_menage.id_suivi_menage_entete
+                                  and menage.id = suivi_menage.id_menage
+
+                                  and (SELECT DATE_PART('year', suivi_menage_entete.date_suivi) - DATE_PART('year', menage.date_naissance)) < 7
+                              
+
+                                group by 
+                                  intervention.id,
+                                  suivi_menage_entete.id
+
+
+                              UNION
+
+                              select 
+                                  intervention.intitule as intitule_intervention,
+                                  intervention.id as id_intervention,
+
+                                  
+                                  0 as cout_par_entete_enfant_menage,
+                                  (count(suivi_menage.id_menage) * suivi_menage_entete.montant_transfert) as cout_par_entete_age_scolaire_menage,
+                                  0 as cout_par_entete_age_travail_menage,
+                                  0 as cout_par_entete_agee_menage,
+
+                                  0 as nbr_enfant_par_entete_menage,
+                                  count(suivi_menage.id_menage) as nbr_age_scolaire_par_entete_menage,
+                                  0 as nbr_age_travail_par_entete_menage,
+                                  0 as nbr_agee_par_entete_menage,
+
+
+                                  0 as cout_par_entete_enfant_individu,
+                                  0 as cout_par_entete_age_scolaire_individu,
+                                  0 as cout_par_entete_age_travail_individu,
+                                  0 as cout_par_entete_agee_individu,
+
+                                  0 as nbr_enfant_par_entete_individu,
+                                  0 as nbr_age_scolaire_par_entete_individu,
+                                  0 as nbr_age_travail_par_entete_individu,
+                                  0 as nbr_agee_par_entete_individu
+                                  
+
+                                from 
+                                  suivi_menage_entete,
+                                  suivi_menage,
+                                  menage,
+                                  intervention
+                                where
+                                  intervention.id = suivi_menage_entete.id_intervention
+                                  and suivi_menage_entete.id = suivi_menage.id_suivi_menage_entete
+                                  and menage.id = suivi_menage.id_menage
+
+                                  and (SELECT DATE_PART('year', suivi_menage_entete.date_suivi) - DATE_PART('year', menage.date_naissance)) >= 7
+                                  and (SELECT DATE_PART('year', suivi_menage_entete.date_suivi) - DATE_PART('year', menage.date_naissance)) < 18
+                              
+
+                                group by 
+                                  intervention.id,
+                                  suivi_menage_entete.id
+
+
+                              UNION
+
+                              select 
+                                  intervention.intitule as intitule_intervention,
+                                  intervention.id as id_intervention,
+
+                                  
+                                  0 as cout_par_entete_enfant_menage,
+                                  0 as cout_par_entete_age_scolaire_menage,
+                                  (count(suivi_menage.id_menage) * suivi_menage_entete.montant_transfert) as cout_par_entete_age_travail_menage,
+                                  0 as cout_par_entete_agee_menage,
+
+                                  0 as nbr_enfant_par_entete_menage,
+                                  0 as nbr_age_scolaire_par_entete_menage,
+                                  count(suivi_menage.id_menage) as nbr_age_travail_par_entete_menage,
+                                  0 as nbr_agee_par_entete_menage,
+
+
+                                  0 as cout_par_entete_enfant_individu,
+                                  0 as cout_par_entete_age_scolaire_individu,
+                                  0 as cout_par_entete_age_travail_individu,
+                                  0 as cout_par_entete_agee_individu,
+
+                                  0 as nbr_enfant_par_entete_individu,
+                                  0 as nbr_age_scolaire_par_entete_individu,
+                                  0 as nbr_age_travail_par_entete_individu,
+                                  0 as nbr_agee_par_entete_individu
+                                  
+
+                                from 
+                                  suivi_menage_entete,
+                                  suivi_menage,
+                                  menage,
+                                  intervention
+                                where
+                                  intervention.id = suivi_menage_entete.id_intervention
+                                  and suivi_menage_entete.id = suivi_menage.id_suivi_menage_entete
+                                  and menage.id = suivi_menage.id_menage
+
+                                  and (SELECT DATE_PART('year', suivi_menage_entete.date_suivi) - DATE_PART('year', menage.date_naissance)) >= 18
+                                  and (SELECT DATE_PART('year', suivi_menage_entete.date_suivi) - DATE_PART('year', menage.date_naissance)) < 60
+                              
+
+                                group by 
+                                  intervention.id,
+                                  suivi_menage_entete.id
+
+                              UNION
+
+                              select 
+                                  intervention.intitule as intitule_intervention,
+                                  intervention.id as id_intervention,
+
+                                  
+                                  0 as cout_par_entete_enfant_menage,
+                                  0 as cout_par_entete_age_scolaire_menage,
+                                  0 as cout_par_entete_age_travail_menage,
+                                  (count(suivi_menage.id_menage) * suivi_menage_entete.montant_transfert) as cout_par_entete_agee_menage,
+
+                                  0 as nbr_enfant_par_entete_menage,
+                                  0 as nbr_age_scolaire_par_entete_menage,
+                                  0 as nbr_age_travail_par_entete_menage,
+                                  count(suivi_menage.id_menage) as nbr_agee_par_entete_menage,
+
+
+                                  0 as cout_par_entete_enfant_individu,
+                                  0 as cout_par_entete_age_scolaire_individu,
+                                  0 as cout_par_entete_age_travail_individu,
+                                  0 as cout_par_entete_agee_individu,
+
+                                  0 as nbr_enfant_par_entete_individu,
+                                  0 as nbr_age_scolaire_par_entete_individu,
+                                  0 as nbr_age_travail_par_entete_individu,
+                                  0 as nbr_agee_par_entete_individu
+                                  
+
+                                from 
+                                  suivi_menage_entete,
+                                  suivi_menage,
+                                  menage,
+                                  intervention
+                                where
+                                  intervention.id = suivi_menage_entete.id_intervention
+                                  and suivi_menage_entete.id = suivi_menage.id_suivi_menage_entete
+                                  and menage.id = suivi_menage.id_menage
+
+                                  and (SELECT DATE_PART('year', suivi_menage_entete.date_suivi) - DATE_PART('year', menage.date_naissance)) >= 60
+                                  
+                              
+
+                                group by 
+                                  intervention.id,
+                                  suivi_menage_entete.id
+
+                              UNION
+
+                              select 
+                                  intervention.intitule as intitule_intervention,
+                                  intervention.id as id_intervention,
+
+                                  0 as cout_par_entete_enfant_menage,
+                                  0 as cout_par_entete_age_scolaire_menage,
+                                  0 as cout_par_entete_age_travail_menage,
+                                  0 as cout_par_entete_agee_menage,
+
+                                  0 as nbr_enfant_par_entete_menage,
+                                  0 as nbr_age_scolaire_par_entete_menage,
+                                  0 as nbr_age_travail_par_entete_menage,
+                                  0 as nbr_agee_par_entete_menage,
+
+                                  
+                                  (count(suivi_individu.id_individu) * suivi_individu_entete.montant_transfert) as cout_par_entete_enfant_individu,
+                                  0 as cout_par_entete_age_scolaire_individu,
+                                  0 as cout_par_entete_age_travail_individu,
+                                  0 as cout_par_entete_agee_individu,
+
+                                  count(suivi_individu.id_individu) as nbr_enfant_par_entete_individu,
+                                  0 as nbr_age_scolaire_par_entete_individu,
+                                  0 as nbr_age_travail_par_entete_individu,
+                                  0 as nbr_agee_par_entete_individu
+
+                                  
+
+                                from 
+                                  suivi_individu_entete,
+                                  suivi_individu,
+                                  individu,
+                                  intervention
+                                where
+                                  intervention.id = suivi_individu_entete.id_intervention
+                                  and suivi_individu_entete.id = suivi_individu.id_suivi_individu_entete
+                                  and individu.id = suivi_individu.id_individu
+
+                                  and (SELECT DATE_PART('year', suivi_individu_entete.date_suivi) - DATE_PART('year', individu.date_naissance)) < 7
+                              
+
+                                group by 
+                                  intervention.id,
+                                  suivi_individu_entete.id
+
+
+                              UNION
+
+                              select 
+                                  intervention.intitule as intitule_intervention,
+                                  intervention.id as id_intervention,
+
+                                  0 as cout_par_entete_enfant_menage,
+                                  0 as cout_par_entete_age_scolaire_menage,
+                                  0 as cout_par_entete_age_travail_menage,
+                                  0 as cout_par_entete_agee_menage,
+
+                                  0 as nbr_enfant_par_entete_menage,
+                                  0 as nbr_age_scolaire_par_entete_menage,
+                                  0 as nbr_age_travail_par_entete_menage,
+                                  0 as nbr_agee_par_entete_menage,
+                                  
+                                  0 as cout_par_entete_enfant_individu,
+                                  (count(suivi_individu.id_individu) * suivi_individu_entete.montant_transfert) as cout_par_entete_age_scolaire_individu,
+                                  0 as cout_par_entete_age_travail_individu,
+                                  0 as cout_par_entete_agee_individu,
+
+                                  0 as nbr_enfant_par_entete_individu,
+                                  count(suivi_individu.id_individu) as nbr_age_scolaire_par_entete_individu,
+                                  0 as nbr_age_travail_par_entete_individu,
+                                  0 as nbr_agee_par_entete_individu
+                                  
+
+                                from 
+                                  suivi_individu_entete,
+                                  suivi_individu,
+                                  individu,
+                                  intervention
+                                where
+                                  intervention.id = suivi_individu_entete.id_intervention
+                                  and suivi_individu_entete.id = suivi_individu.id_suivi_individu_entete
+                                  and individu.id = suivi_individu.id_individu
+
+                                  and (SELECT DATE_PART('year', suivi_individu_entete.date_suivi) - DATE_PART('year', individu.date_naissance)) >= 7
+                                  and (SELECT DATE_PART('year', suivi_individu_entete.date_suivi) - DATE_PART('year', individu.date_naissance)) < 18
+                              
+
+                                group by 
+                                  intervention.id,
+                                  suivi_individu_entete.id
+
+
+                              UNION
+
+                              select 
+                                  intervention.intitule as intitule_intervention,
+                                  intervention.id as id_intervention,
+
+                                  0 as cout_par_entete_enfant_menage,
+                                  0 as cout_par_entete_age_scolaire_menage,
+                                  0 as cout_par_entete_age_travail_menage,
+                                  0 as cout_par_entete_agee_menage,
+
+                                  0 as nbr_enfant_par_entete_menage,
+                                  0 as nbr_age_scolaire_par_entete_menage,
+                                  0 as nbr_age_travail_par_entete_menage,
+                                  0 as nbr_agee_par_entete_menage,
+
+                                  
+                                  0 as cout_par_entete_enfant_individu,
+                                  0 as cout_par_entete_age_scolaire_individu,
+                                  (count(suivi_individu.id_individu) * suivi_individu_entete.montant_transfert) as cout_par_entete_age_travail_individu,
+                                  0 as cout_par_entete_agee_individu,
+
+                                  0 as nbr_enfant_par_entete_individu,
+                                  0 as nbr_age_scolaire_par_entete_individu,
+                                  count(suivi_individu.id_individu) as nbr_age_travail_par_entete_individu,
+                                  0 as nbr_agee_par_entete_individu
+                                  
+
+                                from 
+                                  suivi_individu_entete,
+                                  suivi_individu,
+                                  individu,
+                                  intervention
+                                where
+                                  intervention.id = suivi_individu_entete.id_intervention
+                                  and suivi_individu_entete.id = suivi_individu.id_suivi_individu_entete
+                                  and individu.id = suivi_individu.id_individu
+
+                                  and (SELECT DATE_PART('year', suivi_individu_entete.date_suivi) - DATE_PART('year', individu.date_naissance)) >= 18
+                                  and (SELECT DATE_PART('year', suivi_individu_entete.date_suivi) - DATE_PART('year', individu.date_naissance)) < 60
+                              
+
+                                group by 
+                                  intervention.id,
+                                  suivi_individu_entete.id
+
+                              UNION
+
+                              select 
+                                  intervention.intitule as intitule_intervention,
+                                  intervention.id as id_intervention,
+
+                                  0 as cout_par_entete_enfant_menage,
+                                  0 as cout_par_entete_age_scolaire_menage,
+                                  0 as cout_par_entete_age_travail_menage,
+                                  0 as cout_par_entete_agee_menage,
+
+                                  0 as nbr_enfant_par_entete_menage,
+                                  0 as nbr_age_scolaire_par_entete_menage,
+                                  0 as nbr_age_travail_par_entete_menage,
+                                  0 as nbr_agee_par_entete_menage,
+
+                                  
+                                  0 as cout_par_entete_enfant_individu,
+                                  0 as cout_par_entete_age_scolaire_individu,
+                                  0 as cout_par_entete_age_travail_individu,
+                                  (count(suivi_individu.id_individu) * suivi_individu_entete.montant_transfert) as cout_par_entete_agee_individu,
+
+                                  0 as nbr_enfant_par_entete_individu,
+                                  0 as nbr_age_scolaire_par_entete_individu,
+                                  0 as nbr_age_travail_par_entete_individu,
+                                  count(suivi_individu.id_individu) as nbr_agee_par_entete_individu
+                                  
+
+                                from 
+                                  suivi_individu_entete,
+                                  suivi_individu,
+                                  individu,
+                                  intervention
+                                where
+                                  intervention.id = suivi_individu_entete.id_intervention
+                                  and suivi_individu_entete.id = suivi_individu.id_suivi_individu_entete
+                                  and individu.id = suivi_individu.id_individu
+
+                                  and (SELECT DATE_PART('year', suivi_individu_entete.date_suivi) - DATE_PART('year', individu.date_naissance)) >= 60
+                                  
+                              
+
+                                group by 
+                                  intervention.id,
+                                  suivi_individu_entete.id
+
+                            ) niveau_1
+
+                                group by  intitule_intervention,
+                                          id_intervention
+
+
+                      " ;
+
+              return $this->db->query($sql)->result(); 
+        }
+        /*Fin Proportion des interventions avec critères Age*/
+
+        public function nbr_nouveau_beneficiaire($date_debut, $date_fin)
+        {
+
+          $sql =  "
+                      select
+                        niveau_1.id_intervention as id_interv,
+                        niveau_1.intitule_intervention as intitule_interv,
+                        (sum(niveau_1.nbr_menage) + sum(niveau_1.nbr_individu)) as nbr_total_benaficiaire,
+                        niveau_1.nom_region as nom_reg,
+                        niveau_1.id_region as id_reg
+
+                      from(
+                          select
+                              intervention.id as id_intervention,
+                              intervention.intitule as intitule_intervention,
+                              count(menage_beneficiaire.id_menage) as nbr_menage,
+                              0 as nbr_individu,
+                              region.nom as nom_region,
+                              region.id as id_region
+
+                          from 
+                              intervention,
+                              menage,
+                              menage_beneficiaire,
+                              fokontany,
+                              commune,
+                              district,
+                              region
+                          where
+                              intervention.id = menage_beneficiaire.id_intervention
+                              and menage.id = menage_beneficiaire.id_menage
+                              and menage.id_fokontany = fokontany.id
+                              and fokontany.id_commune = commune.id
+                              and commune.district_id = district.id
+                              and district.region_id = region.id
+                              and menage_beneficiaire.date_inscription BETWEEN '".$date_debut."' AND '".$date_fin."'
+
+                          group by 
+
+                              intervention.id,
+                              region.id
+
+
+                          UNION
+
+
+                          select
+                              intervention.id as id_intervention,
+                              intervention.intitule as intitule_intervention,
+                              0 as nbr_menage,
+                              count(individu_beneficiaire.id_individu) as nbr_individu,
+                              region.nom as nom_region,
+                              region.id as id_region
+
+                          from 
+                              intervention,
+                              individu,
+                              individu_beneficiaire,
+                              fokontany,
+                              commune,
+                              district,
+                              region
+                          where
+                              intervention.id = individu_beneficiaire.id_intervention
+                              and individu.id = individu_beneficiaire.id_individu
+                              and individu.id_fokontany = fokontany.id
+                              and fokontany.id_commune = commune.id
+                              and commune.district_id = district.id
+                              and district.region_id = region.id
+                              and individu_beneficiaire.date_inscription BETWEEN '".$date_debut."' AND '".$date_fin."'
+
+                          group by 
+
+                              intervention.id,
+                              region.id
+
+                      ) niveau_1
+
+                          group by 
+                            niveau_1.id_intervention,
+                            niveau_1.intitule_intervention,
+                            niveau_1.id_region,
+                            niveau_1.nom_region
+
+
+                  " ;
+
+          return $this->db->query($sql)->result(); 
+        }
+
+
+        public function taux_atteinte_resultat()
+        {
+
+          $sql =  "
+
+                      select
+
+                        niveau_1.id_programme as id_prog,
+                        niveau_1.intitule_programme,
+                        niveau_1.id_intervention as id_interv,
+                        niveau_1.intitule_intervention,
+                        niveau_1.id_region as id_regi,
+                        niveau_1.nom_region,
+                        sum(niveau_1.nbr_menage) as nbr_menage_beneficiaire,
+                        sum(niveau_1.nbr_individu) as nbr_individu_beneficiaire,
+                        (
+                          select
+                            zip.menage_beneficiaire_prevu
+                          from
+                              zone_intervention_programme as zip
+                          where
+                              zip.id_programme = niveau_1.id_programme
+                              and zip.id_region = niveau_1.id_region
+
+
+                        ) as nbr_menage_prevu,
+
+                        (
+                          select
+                            zip.individu_beneficiaire_prevu
+                          from
+                              zone_intervention_programme as zip
+                          where
+                              zip.id_programme = niveau_1.id_programme
+                              and zip.id_region = niveau_1.id_region
+
+
+                        ) as nbr_individu_prevu
+
+                      from( select
+                                programme.id as id_programme,
+                                programme.intitule as intitule_programme,
+                                intervention.id as id_intervention,
+                                intervention.intitule as intitule_intervention,
+                                region.id as id_region,
+                                region.nom as nom_region,
+
+                                count(menage_beneficiaire.id_menage) as nbr_menage,
+                                0 as nbr_individu
+                            from 
+                                programme,
+                                intervention,
+                                menage_beneficiaire,
+                                menage,
+                                fokontany,
+                                commune,
+                                district,
+                                region
+                            where
+                                programme.id = intervention.id_programme
+                                and intervention.id = menage_beneficiaire.id_intervention
+                                and menage.id = menage_beneficiaire.id_menage
+                                and fokontany.id = menage.id_fokontany
+                                and commune.id = fokontany.id_commune
+                                and district.id = commune.district_id
+                                and region.id = district.region_id
+
+                            group by
+                                programme.id,
+                                intervention.id,
+                                region.id
+
+                            UNION
+
+
+                            select
+                                programme.id as id_programme,
+                                programme.intitule as intitule_programme,
+                                intervention.id as id_intervention,
+                                intervention.intitule as intitule_intervention,
+                                region.id as id_region,
+                                region.nom as nom_region,
+
+                                0 as nbr_menage,
+                                count(individu_beneficiaire.id_individu) as nbr_individu
+                            from 
+                                programme,
+                                intervention,
+                                individu_beneficiaire,
+                                individu,
+                                fokontany,
+                                commune,
+                                district,
+                                region
+                            where
+                                programme.id = intervention.id_programme
+                                and intervention.id = individu_beneficiaire.id_intervention
+                                and individu.id = individu_beneficiaire.id_individu
+                                and fokontany.id = individu.id_fokontany
+                                and commune.id = fokontany.id_commune
+                                and district.id = commune.district_id
+                                and region.id = district.region_id
+
+                            group by
+                                programme.id,
+                                intervention.id,
+                                region.id
+
+                        ) niveau_1
+
+                            group by 
+                                id_prog,
+                                id_interv,
+                                id_regi,
+                                niveau_1.intitule_programme,
+                                niveau_1.intitule_intervention,
+                                niveau_1.nom_region
+
+                  " ;
+          return $this->db->query($sql)->result(); 
+
+        }
        
     //FIN CODE HARIZO
 
-    /* public function repartitionBeneficiaire_sexe_age($requete,$enfant,$scolaire_min,$scolaire_max,$travail_min,$travail_max,$agee)
-    {
-      $this->db->select("intervention.id as id_int, intervention.intitule as intitule_intervention");
-
-       $this->db ->select("(select count((individu_beneficiaire.id)) from individu_beneficiaire inner join  individu as ind on ind.id= individu_beneficiaire.id_individu inner join fokontany  on ind.id_fokontany= fokontany.id inner join commune  on commune.id= fokontany.id_commune inner join district  on commune.district_id= district.id inner join region  on region.id = district.region_id  where individu_beneficiaire.id_intervention = intervention.id  and ".$requete." and ind.date_naissance >= '".$enfant."' and ind.sexe = 'H') as nbr_enfant_homme",false);
-
-       $this->db ->select("(select count((individu_beneficiaire.id)) from individu_beneficiaire inner join  individu as ind on ind.id= individu_beneficiaire.id_individu inner join fokontany  on ind.id_fokontany= fokontany.id inner join commune  on commune.id= fokontany.id_commune inner join district  on commune.district_id= district.id inner join region  on region.id = district.region_id  where individu_beneficiaire.id_intervention = intervention.id  and ".$requete." and ind.date_naissance >= '".$enfant."' and ind.sexe = 'F') as nbr_enfant_fille",false);
-
-       $this->db ->select("(select count((individu_beneficiaire.id)) from individu_beneficiaire inner join  individu as ind on ind.id= individu_beneficiaire.id_individu inner join fokontany  on ind.id_fokontany= fokontany.id inner join commune  on commune.id= fokontany.id_commune inner join district  on commune.district_id= district.id inner join region  on region.id = district.region_id  where individu_beneficiaire.id_intervention = intervention.id  and ".$requete." and ind.date_naissance BETWEEN '".$scolaire_max."' AND '".$scolaire_min."' and ind.sexe = 'F') as nbr_agescolaire_fille",false);
-
-        $this->db ->select("(select count((individu_beneficiaire.id)) from individu_beneficiaire inner join  individu as ind on ind.id= individu_beneficiaire.id_individu inner join fokontany  on ind.id_fokontany= fokontany.id inner join commune  on commune.id= fokontany.id_commune inner join district  on commune.district_id= district.id inner join region  on region.id = district.region_id  where individu_beneficiaire.id_intervention = intervention.id  and ".$requete." and ind.date_naissance BETWEEN '".$scolaire_max."' AND '".$scolaire_min."' and ind.sexe = 'H') as nbr_agescolaire_homme",false); 
-
-       $this->db ->select("((select count((individu_beneficiaire.id)) from individu_beneficiaire inner join  individu as ind on ind.id= individu_beneficiaire.id_individu inner join fokontany  on ind.id_fokontany= fokontany.id inner join commune  on commune.id= fokontany.id_commune inner join district  on commune.district_id= district.id inner join region  on region.id = district.region_id  where individu_beneficiaire.id_intervention = intervention.id  and ".$requete." and ind.date_naissance BETWEEN '".$travail_max."' AND '".$travail_min."' and ind.sexe = 'F')+(select count((menage_beneficiaire.id)) from menage_beneficiaire inner join  menage as mena on mena.id= menage_beneficiaire.id_menage  inner join fokontany  on mena.id_fokontany= fokontany.id inner join commune  on commune.id= fokontany.id_commune inner join district  on commune.district_id= district.id inner join region  on region.id = district.region_id  where menage_beneficiaire.id_intervention = intervention.id  and ".$requete." and mena.date_naissance BETWEEN '".$travail_max."' AND '".$travail_min."' and mena.sexe = 'F')) as nbr_agetravaille_fille",false);
-
-       $this->db ->select("((select count((individu_beneficiaire.id)) from individu_beneficiaire inner join  individu as ind on ind.id= individu_beneficiaire.id_individu inner join fokontany  on ind.id_fokontany= fokontany.id inner join commune  on commune.id= fokontany.id_commune inner join district  on commune.district_id= district.id inner join region  on region.id = district.region_id  where individu_beneficiaire.id_intervention = intervention.id  and ".$requete." and ind.date_naissance BETWEEN '".$travail_max."' AND '".$travail_min."' and ind.sexe = 'H')+(select count((menage_beneficiaire.id)) from menage_beneficiaire inner join  menage as mena on mena.id= menage_beneficiaire.id_menage  inner join fokontany  on mena.id_fokontany= fokontany.id inner join commune  on commune.id= fokontany.id_commune inner join district  on commune.district_id= district.id inner join region  on region.id = district.region_id  where menage_beneficiaire.id_intervention = intervention.id  and ".$requete." and mena.date_naissance BETWEEN '".$travail_max."' AND '".$travail_min."' and mena.sexe = 'H')) as nbr_agetravaille_homme",false);
-
-       $this->db ->select("((select count((individu_beneficiaire.id)) from individu_beneficiaire inner join  individu as ind on ind.id= individu_beneficiaire.id_individu inner join fokontany  on ind.id_fokontany= fokontany.id inner join commune  on commune.id= fokontany.id_commune inner join district  on commune.district_id= district.id inner join region  on region.id = district.region_id  where individu_beneficiaire.id_intervention = intervention.id  and ".$requete." and ind.date_naissance <= '".$agee."' and ind.sexe = 'F')+(select count((menage_beneficiaire.id)) from menage_beneficiaire inner join  menage as mena on mena.id= menage_beneficiaire.id_menage  inner join fokontany  on mena.id_fokontany= fokontany.id inner join commune  on commune.id= fokontany.id_commune inner join district  on commune.district_id= district.id inner join region  on region.id = district.region_id  where menage_beneficiaire.id_intervention = intervention.id  and ".$requete." and mena.date_naissance <= '".$agee."' and mena.sexe = 'F')) as nbr_agee_fille",false);
-
-       $this->db ->select("((select count((individu_beneficiaire.id)) from individu_beneficiaire inner join  individu as ind on ind.id= individu_beneficiaire.id_individu inner join fokontany  on ind.id_fokontany= fokontany.id inner join commune  on commune.id= fokontany.id_commune inner join district  on commune.district_id= district.id inner join region  on region.id = district.region_id  where individu_beneficiaire.id_intervention = intervention.id  and ".$requete." and ind.date_naissance <= '".$agee."' and ind.sexe = 'H')+(select count((menage_beneficiaire.id)) from menage_beneficiaire inner join  menage as mena on mena.id= menage_beneficiaire.id_menage  inner join fokontany  on mena.id_fokontany= fokontany.id inner join commune  on commune.id= fokontany.id_commune inner join district  on commune.district_id= district.id inner join region  on region.id = district.region_id  where menage_beneficiaire.id_intervention = intervention.id  and ".$requete." and mena.date_naissance <= '".$agee."' and mena.sexe = 'H')) as nbr_agee_homme",false);
-       
-       //HARIZO                               
-
-        $result =  $this->db->from('intervention')
-                    ->get()
-                    ->result();  
-
-        //HARIZO                            
-
-        if($result)
-        {
-            return $result;
-        }else{
-            return null;
-        }                 
-    }*/
+   
 }
