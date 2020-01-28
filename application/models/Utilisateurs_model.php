@@ -13,8 +13,8 @@ class Utilisateurs_model extends CI_Model
                  ->insert($this->table);
 			$id_utilisateur =	$this->db->insert_id(); 
 		// Sauvegarde mot de passe par défaut au cas où mdp oublié	
-        $this->db->set($this->_set_default_password($id_utilisateur,$utilisateurs['password']))
-                 ->insert("mot_de_passe_par_defaut");
+    //    $this->db->set($this->_set_default_password($id_utilisateur,$utilisateurs['password']))
+     //            ->insert("mot_de_passe_par_defaut");
 			
         if($this->db->affected_rows() === 1) {
             return $id_utilisateur;

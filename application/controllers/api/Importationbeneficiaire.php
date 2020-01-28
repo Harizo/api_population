@@ -102,7 +102,7 @@ class Importationbeneficiaire extends CI_Controller {
 		$total_non_validees =0;
 		$retour_1 = $this->ImportationbeneficiaireManager->recuperer_nombre_liste_fichier_non_importes_intervention();
 		foreach($retour_1 as $k=>$v) {
-			$total_non_validees = $total_non_validees + $v->nombre_beneficiaire_non_importes;
+			$total_non_validees = $total_non_validees + $v->nombre_intervention_non_importes;
 		}
 		echo json_encode($total_non_validees);
 	}
@@ -647,13 +647,13 @@ class Importationbeneficiaire extends CI_Controller {
 						 } else if('S' == $cell->getColumn()) {
 							$depense = $cell->getValue(); 
 						 } else if('T' == $cell->getColumn()) {
-							$date_inscription = $cell->getValue();
-							if(isset($date_inscription) && $date_inscription>"") {
+							$date_inscription_detail_beneficiaire = $cell->getValue();
+							if(isset($date_inscription_detail_beneficiaire) && $date_inscription_detail_beneficiaire>"") {
 								if(PHPExcel_Shared_Date::isDateTime($cell)) {
-									 $date_inscription = date($format='Y-m-d', PHPExcel_Shared_Date::ExcelToPHP($date_inscription)); 
+									 $date_inscription_detail_beneficiaire = date($format='Y-m-d', PHPExcel_Shared_Date::ExcelToPHP($date_inscription_detail_beneficiaire)); 
 								}
 							} else {
-								$date_inscription=null;
+								$date_inscription_detail_beneficiaire=null;
 							}								 							 
 						 } else if('U' == $cell->getColumn()) {
 							$telephone = $cell->getValue();  
@@ -934,7 +934,7 @@ class Importationbeneficiaire extends CI_Controller {
 									'profession'             => $profession,
 									'id_situation_matrimoniale' => null,
 									'sexe'                   => $sexe,
-									'date_inscription'       => $date_inscription,
+									'date_inscription'       => $date_inscription_detail_beneficiaire,
 									'nom_prenom_pere'         => null,
 									'nom_prenom_mere'         => null,
 									'telephone'               => null,
@@ -952,7 +952,9 @@ class Importationbeneficiaire extends CI_Controller {
 									'id_fokontany'           => $id_fokontany,
 									'id_acteur'              => $id_acteur,
 									'id_type_beneficiaire'   => 1,
-									'etat_groupe'   => $etat_groupe
+									'etat_groupe'   => $etat_groupe,
+									'decede'                    => 0,
+									'date_deces'                => null,
 								);
 								$id_menage = $this->MenageManager->addchefmenage($data);
 								$sheet->setCellValue("AC".$ligne, $code_region."-".$code_district."-".$code_commune."-".$code_fokontany."-".$identifiant_unique);
@@ -1019,6 +1021,8 @@ class Importationbeneficiaire extends CI_Controller {
 									'id_situation_matrimoniale' => null,
 									'id_fokontany'              => $id_fokontany,
 									'id_acteur'                 => $id_acteur,
+									'decede'                    => 0,
+									'date_deces'                => null,
 								);
 								$id_individu = $this->IndividuManager->add($data);
 								$sheet->setCellValue("AC".$ligne, $code_region."-".$code_district."-".$code_commune."-".$code_fokontany."-".$identifiant_unique);								
@@ -1086,6 +1090,8 @@ class Importationbeneficiaire extends CI_Controller {
 								'id_situation_matrimoniale' => null,
 								'id_fokontany'              => $id_fokontany,
 								'id_acteur'                 => $id_acteur,
+								'decede'                    => 0,
+								'date_deces'                => null,
 							);
 							$id_menage = $this->IndividuManager->add($data);
 							$sheet->setCellValue("AC".$ligne, $code_region."-".$code_district."-".$code_commune."-".$code_fokontany."-".$identifiant_unique);
@@ -1101,6 +1107,7 @@ class Importationbeneficiaire extends CI_Controller {
 									'id_menage'       => $id_menage,
 									'id_intervention' => $id_intervention,
 									'date_sortie' => null,
+									'date_inscription' => $date_inscription_detail_beneficiaire,
 								);
 								// Insertion dans la table menage_beneficiaire
 								$id_menage_intervention = $this->MenagebeneficiaireManager->add($data);
@@ -1110,6 +1117,7 @@ class Importationbeneficiaire extends CI_Controller {
 								'id_individu'     => $id_menage,
 								'id_intervention' => $id_intervention,
 								'date_sortie' => null,
+								'date_inscription' => $date_inscription_detail_beneficiaire,
 							);
 							// Insertion dans la table individu_beneficiaire
 							$id_individu_intervention = $this->IndividubeneficiaireManager->add($data);

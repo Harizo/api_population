@@ -27,6 +27,7 @@ class Individu_beneficiaire extends REST_Controller {
                 $data['id_individu'] = ($individu_beneficiaire->id_individu);
                 $data['id_intervention'] = ($individu_beneficiaire->id_intervention);              
                 $data['date_sortie'] = ($individu_beneficiaire->date_sortie);              
+                $data['date_inscription'] = ($individu_beneficiaire->date_inscription);              
             }
         } else {
             if ($id_intervention && $id_fokontany) 	{ 
@@ -43,6 +44,7 @@ class Individu_beneficiaire extends REST_Controller {
                         $data[$key]['id_menage'] = $value->id_menage;
                         $data[$key]['date_naissance'] = $value->date_naissance;
                         $data[$key]['date_sortie'] = $value->date_sortie;
+                        $data[$key]['date_inscription'] = $value->date_inscription;
                         $data[$key]['id_intervention'] = $id_intervention;
                         $data[$key]['detail_charge'] = 0;
                         $data[$key]['detail_suivi_individu'] = array();
@@ -67,6 +69,7 @@ class Individu_beneficiaire extends REST_Controller {
                         $data[$key]['Addresse'] = ($value->Addresse);
                         $data[$key]['NumeroEnregistrement'] = ($value->NumeroEnregistrement);
                         $data[$key]['date_sortie'] = ($value->date_sortie);
+                        $data[$key]['date_inscription'] = ($value->date_inscription);
                         $data[$key]['id_intervention'] = ($id_intervention);
                     }
                 }
@@ -97,14 +100,15 @@ class Individu_beneficiaire extends REST_Controller {
     public function index_post() {
         $id = $this->post('id') ;
         $supprimer = $this->post('supprimer') ;
+		// Affectation des valeurs de chaque colonne de la table
+		$data = array(
+			'id_individu' => $this->post('id_individu'),
+			'id_intervention' => ($this->post('id_intervention')),
+			'date_sortie' => ($this->post('date_sortie')),
+			'date_inscription' => ($this->post('date_inscription')),
+		);               
         if ($supprimer == 0)  {
             if ($id == 0) {
-				// Affectation des valeurs de chaque colonne de la table
-                $data = array(
-                    'id_individu' => $this->post('id_individu'),
-                    'id_intervention' => ($this->post('id_intervention')),
-                    'date_sortie' => ($this->post('date_sortie')),
-                );               
                 if (!$data) {
                     $this->response([
                         'status' => FALSE,
@@ -128,10 +132,6 @@ class Individu_beneficiaire extends REST_Controller {
                             ], REST_Controller::HTTP_BAD_REQUEST);
                 }
             }  else  {
-                $data = array(
-                    'id_individu' => $this->post('id_individu'),
-                    'id_intervention' => serialize($this->post('id_intervention'))
-                );                 
                 if (!$data || !$id) {
                     $this->response([
                         'status' => FALSE,

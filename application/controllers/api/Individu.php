@@ -124,6 +124,8 @@ class Individu extends REST_Controller {
                     $data[$key]['fokontany'] = $fokontany;
                     $data[$key]['id_acteur'] = $value->id_acteur;
                     $data[$key]['acteur'] = $acteur;
+                    $data[$key]['decede'] = $value->decede;
+                    $data[$key]['date_deces'] = $value->date_deces;
                 }
             }
 		}
@@ -145,6 +147,7 @@ class Individu extends REST_Controller {
         $id = $this->post('id') ;
         $supprimer = $this->post('supprimer') ;
 		$date_naissance = $this->convertDateAngular($this->post('date_naissance'));
+		$date_deces = $this->convertDateAngular($this->post('date_deces'));
 		// Initialisation null et affectation des valeurs : pour éviter le ZERO par défaut au lieu de null
 		$id_liendeparente=null;
 		$lien = $this->post('id_liendeparente') ;
@@ -240,6 +243,8 @@ class Individu extends REST_Controller {
 			'id_situation_matrimoniale' => $id_situation_matrimoniale,
 			'id_fokontany'             => $id_fokontany,
 			'id_acteur'                => $id_acteur,
+			'decede'                   => $this->post('decede'),
+			'date_deces'               => $date_deces,
 		);
         if ($supprimer == 0) {
             if ($id == 0) {

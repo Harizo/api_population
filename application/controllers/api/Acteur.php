@@ -62,6 +62,7 @@
     					}	
 
     					$data[$key]['id'] = $value->id;
+    					$data[$key]['code'] = $value->code;
     					$data[$key]['nom'] = $value->nom;
     					$data[$key]['nif'] = $value->nif;
     					$data[$key]['stat'] = $value->stat;
@@ -120,6 +121,7 @@
     		}
             //Fin Récupération des données passé en paramètre dans le controlleur angular js
      		$data = array(
+    			'code' => $this->post('code'),
     			'nom' => $this->post('nom'),
     			'nif' => $this->post('nif'),
     			'stat' => $this->post('stat'),

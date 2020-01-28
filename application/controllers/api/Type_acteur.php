@@ -45,6 +45,7 @@ class Type_acteur extends REST_Controller {
         $id = $this->post('id') ;
         $supprimer = $this->post('supprimer') ;
 		$data = array(
+			'code' => $this->post('code'),
 			'description' => $this->post('description'),
 		);               
         if ($supprimer == 0) {

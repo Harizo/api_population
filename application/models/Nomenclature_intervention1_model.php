@@ -55,7 +55,7 @@ class Nomenclature_intervention1_model extends CI_Model
     {	// Selection de tous les enregitrements
         $result =  $this->db->select('*')
                         ->from($this->table)
-                        ->order_by('description')
+                        ->order_by('code')
                         ->get()
                         ->result();
         if($result)

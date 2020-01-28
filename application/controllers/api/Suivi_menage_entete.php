@@ -35,9 +35,10 @@ class Suivi_menage_entete extends REST_Controller {
             {
                 $data['id'] = ($suivi_menage->id);
                 $data['date_suivi'] = ($suivi_menage->date_suivi);
-                $data['id_intervention'] = unserialize($suivi_menage->id_intervention);
-                $data['id_fokontany'] = unserialize($suivi_menage->id_fokontany);
-                $data['id_liste_validation_intervention'] = unserialize($suivi_menage->id_liste_validation_intervention);
+                $data['id_intervention'] = ($suivi_menage->id_intervention);
+                $data['id_fokontany'] = ($suivi_menage->id_fokontany);
+                $data['id_liste_validation_intervention'] = ($suivi_menage->id_liste_validation_intervention);
+                $data['montant_transfert'] = $suivi_menage->montant_transfert;
                 
             }
         }
@@ -76,6 +77,7 @@ class Suivi_menage_entete extends REST_Controller {
                         $temporaire['id_fokontany'] = $value->id_fokontany;
                         $temporaire['id_liste_validation_intervention'] = $value->id_liste_validation_intervention;
                         $temporaire['observation'] = $value->observation;
+                        $temporaire['montant_transfert'] = $value->montant_transfert;
 						$detail_suivi_menage []=$temporaire;
 						if(intval($id_intervention)==3) {
 							// Nutrition
@@ -109,7 +111,8 @@ class Suivi_menage_entete extends REST_Controller {
                         $data[$key]['id_liste_validation_intervention'] = ($value->id_liste_validation_intervention);
                         $data[$key]['id_intervention'] = ($id_intervention);
                         $data[$key]['id_fokontany'] = ($value->id_fokontany);
-                        $data[$key]['date_suivi'] = ($date_suivi);
+                        $data[$key]['date_suivi'] = ($value->$date_suivi);
+                        $data[$key]['montant_transfert'] = ($value->$montant_transfert);
                     }
                 }
             }
@@ -148,6 +151,11 @@ class Suivi_menage_entete extends REST_Controller {
     public function index_post() {
         $id = $this->post('id') ;
         $supprimer = $this->post('supprimer') ;
+		$montant_transfert=null;
+		$temporaire=$this->post('montant_transfert');
+		if(isset($temporaire) && $temporaire !="" && intval($temporaire) >0) {
+			$montant_transfert=$temporaire;
+		}
         if ($supprimer == 0) {
 			// Affectation des valeurs
 			$data = array(
@@ -156,6 +164,7 @@ class Suivi_menage_entete extends REST_Controller {
 				'observation' => $this->post('observation'),
 				'id_fokontany' => $this->post('id_fokontany'),
 				'id_liste_validation_intervention' => $this->post('id_liste_validation_intervention'),
+				'montant_transfert' => $montant_transfert,
 			);               
             if ($id == 0) {
                 if (!$data) 

@@ -35,6 +35,7 @@ class Acteur_model extends CI_Model {
     public function _set($acteur) //Initialisation du tableau pour l'ajout et la modification
     {
         return array(
+            'code' => $acteur['code'],
             'nom' => $acteur['nom'],
             'nif' => $acteur['nif'],
             'stat' => $acteur['stat'],

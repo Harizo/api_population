@@ -27,6 +27,7 @@ class Type_acteur_model extends CI_Model {
     public function _set($type_acteur) {
 		// Affectation des valeurs
         return array(
+            'code' => $type_acteur['code'],
             'description' => $type_acteur['description'],
         );
     }

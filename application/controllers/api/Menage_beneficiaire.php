@@ -21,6 +21,7 @@ class Menage_beneficiaire extends REST_Controller {
                 $data['id_menage'] = ($menage_programme->id_menage);
                 $data['id_intervention'] = ($menage_programme->id_intervention);                
                 $data['date_sortie'] = ($menage_programme->date_sortie);                
+                $data['date_inscription'] = ($menage_programme->date_inscription);                
             }
         } else {
             if ($id_intervention && $id_fokontany) {  
@@ -39,6 +40,7 @@ class Menage_beneficiaire extends REST_Controller {
                         $data[$key]['date_inscription'] = ($value->date_inscription);
                         $data[$key]['id_intervention'] = ($value->id_intervention);
                         $data[$key]['date_sortie'] = ($value->date_sortie);
+                        $data[$key]['date_inscription'] = ($value->date_inscription);
                         $data[$key]['detail_suivi_menage'] = array();
                         $data[$key]['detail_charge'] = 0;
                     }
@@ -57,6 +59,7 @@ class Menage_beneficiaire extends REST_Controller {
                         $data[$key]['NumeroEnregistrement'] = ($value->NumeroEnregistrement);
                         $data[$key]['id_intervention'] = ($id_intervention);
                         $data[$key]['date_sortie'] = ($value->date_sortie);
+                        $data[$key]['date_inscription'] = ($value->date_inscription);
                     }
                 }
             } else {
@@ -86,13 +89,14 @@ class Menage_beneficiaire extends REST_Controller {
     public function index_post() {
         $id = $this->post('id') ;
         $supprimer = $this->post('supprimer') ;
+		$data = array(
+			'id_menage' => $this->post('id_menage'),
+			'id_intervention' => ($this->post('id_intervention')),
+			'date_sortie' => ($this->post('date_sortie')),
+			'date_inscription' => ($this->post('date_inscription')),
+		);               
         if ($supprimer == 0) {
             if ($id == 0) {
-                $data = array(
-                    'id_menage' => $this->post('id_menage'),
-                    'id_intervention' => ($this->post('id_intervention')),
-                    'date_sortie' => ($this->post('date_sortie')),
-                );               
                 if (!$data) {
                     $this->response([
                         'status' => FALSE,
@@ -116,11 +120,6 @@ class Menage_beneficiaire extends REST_Controller {
                             ], REST_Controller::HTTP_BAD_REQUEST);
                 }
             } else {
-                $data = array(
-                    'id_serveur_centrale' => $this->post('id_serveur_centrale'),
-                    'id_menage' => $this->post('id_menage'),
-                    'id_intervention' => serialize($this->post('id_intervention'))
-                );                 
                 if (!$data || !$id) {
                     $this->response([
                         'status' => FALSE,

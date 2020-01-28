@@ -155,9 +155,11 @@ class Importationintervention extends CI_Controller {
 					if(count($retour) >0) {
 						foreach($retour as $k=>$v) {
 							$id_intervention = $v->id;
+							$montant_transfert = $v->montant_transfert;
 						}	
 					} else {
 						$id_intervention=null;
+						$montant_transfert =null;
 					}					
 					// A utliser ultérieurement si tout est OK pour lamise à jour de la table menage ou individu selon le cas
 					$menage_ou_individu = strtolower($menage_ou_individu);
@@ -323,7 +325,7 @@ class Importationintervention extends CI_Controller {
 							$parametre_table="individu";
 						} else {
 							// Si chef ménage
-							$parametre_table="ménage";
+							$parametre_table="menage";
 						}
 					if($menage_ou_individu=="ménage") {						
 						// 1- Recherche par identifiant_appariement = $identifiant_appariement et $id_acteur stocké auparavant
@@ -375,6 +377,7 @@ class Importationintervention extends CI_Controller {
 									'id_fokontany' => $id_fokontany,
 									'id_liste_validation_intervention' => $id_liste_validation_intervention,
 									'date_suivi' => $date_suivi,
+									'montant_transfert' => $montant_transfert,
 									'observation' => null,
 								);
 								$id_entete = $this->SuiviMenageEnteteManager->add($data);
@@ -450,6 +453,7 @@ class Importationintervention extends CI_Controller {
 									'id_fokontany' => $id_fokontany,
 									'id_liste_validation_intervention' => $id_liste_validation_intervention,
 									'date_suivi' => $date_suivi,
+									'montant_transfert' => $montant_transfert,
 									'observation' => null,
 								);
 								$id_entete = $this->SuiviIndividuEnteteManager->add($data);

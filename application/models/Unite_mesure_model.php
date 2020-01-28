@@ -27,7 +27,8 @@ class Unite_mesure_model extends CI_Model {
     public function _set($typetransfert) {
 		// Affectation des valeurs
         return array(
-            'description'          => $typetransfert['description'],
+            'code'        => $typetransfert['code'],
+            'description' => $typetransfert['description'],
         );
     }
     public function delete($id) {

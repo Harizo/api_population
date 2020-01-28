@@ -40,6 +40,7 @@ class Suivi_individu_entete_model extends CI_Model
             'observation'                      => $suivi_individu_entete['observation'],                      
             'id_fokontany'                     => $suivi_individu_entete['id_fokontany'],                      
             'id_liste_validation_intervention' => $suivi_individu_entete['id_liste_validation_intervention'],                      
+            'montant_transfert' => $suivi_individu_entete['montant_transfert'],                      
         );
     }
 

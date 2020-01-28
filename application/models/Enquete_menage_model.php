@@ -44,7 +44,7 @@ class Enquete_menage_model extends CI_Model {
 		// Selection de tous les enregitrements
         $result =  $this->db->select('*')
                         ->from($nom_table)
-                        ->order_by('description')
+                        ->order_by('code')
                         ->get()
                         ->result();
         if($result) {

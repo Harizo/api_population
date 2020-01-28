@@ -38,6 +38,7 @@ class Suivi_individu_entete extends REST_Controller {
                 $data['id_intervention'] = ($suivi_individu_entete->id_intervention);
                 $data['id_fokontany'] = ($suivi_individu_entete->id_fokontany);
                 $data['id_liste_validation_intervention'] = ($suivi_individu_entete->id_liste_validation_intervention);
+                $data['montant_transfert'] = ($suivi_individu_entete->montant_transfert);
                 
             }
         }
@@ -75,6 +76,7 @@ class Suivi_individu_entete extends REST_Controller {
                         $temporaire['id_intervention'] = $id_i;
                         $temporaire['intervention'] = $intervention;
                         $temporaire['observation'] = $value->observation;	
+                        $temporaire['montant_transfert'] = $value->montant_transfert;	
 						$detail_suivi_individu=$temporaire;					
 					}
 					$data[0]['detail_suivi_individu']=$detail_suivi_individu;
@@ -100,6 +102,7 @@ class Suivi_individu_entete extends REST_Controller {
                         $data[$key]['id_intervention'] = ($id_intervention);
                         $data[$key]['id_fokontany'] = ($id_fokontany);
                         $data[$key]['date_suivi'] = ($date_suivi);
+                        $data[$key]['montant_transfert'] = ($value->montant_transfert);
                     }
                 }
             }
@@ -138,6 +141,11 @@ class Suivi_individu_entete extends REST_Controller {
     public function index_post() {
         $id = $this->post('id') ;
         $supprimer = $this->post('supprimer') ;
+		$montant_transfert=null;
+		$temporaire=$this->post('montant_transfert');
+		if(isset($temporaire) && $temporaire !="" && intval($temporaire) >0) {
+			$montant_transfert=$temporaire;
+		}
         if ($supprimer == 0) {
 			// Affectation des valeurs
 			$data = array(
@@ -146,6 +154,7 @@ class Suivi_individu_entete extends REST_Controller {
 				'observation' => $this->post('observation'),
 				'id_fokontany' => $this->post('id_fokontany'),
 				'id_liste_validation_intervention' => $this->post('id_liste_validation_intervention'),
+				'montant_transfert' => $montant_transfert,
 			);               
             if ($id == 0) {
                 if (!$data) 

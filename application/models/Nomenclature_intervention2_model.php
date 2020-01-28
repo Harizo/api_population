@@ -47,7 +47,7 @@ class Nomenclature_intervention2_model extends CI_Model {
 		// Selection de tous les enregitrements
         $result =  $this->db->select('*')
                         ->from($this->table)
-                        ->order_by('description')
+                        ->order_by('code')
                         ->get()
                         ->result();
         if($result)
@@ -61,7 +61,7 @@ class Nomenclature_intervention2_model extends CI_Model {
 		// Selection nomenclature par id_nomenclature1
         $result =  $this->db->select('*')
                         ->from($this->table)
-                        ->order_by('description')
+                        ->order_by('code')
                         ->where("id_nomenclature1", $id_nomenclature1)
                         ->get()
                         ->result();

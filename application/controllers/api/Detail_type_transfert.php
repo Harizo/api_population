@@ -58,9 +58,11 @@ class Detail_type_transfert extends REST_Controller {
                     $data[$key]['unitedemesure'] = $unitedemesure;
                     $data[$key]['id_type_transfert'] = $value->id_type_transfert;
                     $data[$key]['typedetransfert'] = $typedetransfert;
+					// initialisation id_detail_type_transfert=0 et valeur_quantite=null
                     $data[$key]['id_detail_type_transfert'] = 0;
+                    $data[$key]['valeur_quantite'] = null;
 					if($id_intervetion) {
-						// Récupération détail type transfert par intervention
+						// Récupération détail valeur_quantite du type de transfert par intervention
 						$val_qte= $this->DetailtypetransfertinterventionManager->findByInterventionIdtypetransfert($id_intervetion,$value->id);
 						if($val_qte) { 
 							foreach ($val_qte as $k => $v) {	
@@ -69,11 +71,7 @@ class Detail_type_transfert extends REST_Controller {
 									$data[$key]['id_detail_type_transfert'] =$value->id;
 								}	
 							}	
-						} else {
-							$data[$key]['valeur_quantite'] =null;
 						}	
-					} else {
-						$data[$key]['valeur_quantite'] = null;
 					}	
 				}
 			}			
