@@ -41,14 +41,10 @@ class Environment_et_systeme extends REST_Controller {
         $enfant = date('Y-m-d', strtotime($now. ' -7 years +1 days'));
 
         
-        if ($menu =='req3theme1_menagenfan_menagscolai_region_dist_comm')
-        {            
-            $data = $this->Environment_demo_socioManager->findEffectif_menage_enfant($this->generer_requete_filtre($id_region,$id_district,$id_commune,'*'),$enfant,$scolaire_min,$scolaire_max);      
-           
-        }
-        if ($menu =='req38theme2_interven_petitenfan_agesco_agetrava_agee_region_dist_comm')
+        
+        if ($menu =='req38_theme2')
         {
-            $data = $this->Systeme_protection_socialManager->repartitionBeneficiaireIndividu_sexe_age($this->generer_requete_filtre($id_region,$id_district,$id_commune,$id_intervention),$enfant,$scolaire_min,$scolaire_max,$travail_min,$travail_max,$agee);
+            $data = $this->Systeme_protection_socialManager->repartition_par_age_sexe_beneficiaire();
             
             
         }
@@ -135,14 +131,45 @@ class Environment_et_systeme extends REST_Controller {
 
 
         //CODE CORRIGER Par Harizo
-        if ($menu =='req1_theme1') //Age par rapport à la date d'inscription
+        if ($menu =='req1_theme1') //Age par rapport à la date du jour 
         {
-            $data = $this->Environment_demo_socioManager->effectif_par_age_sexe_population();
+            $data = $this->Environment_demo_socioManager->effectif_par_age_sexe_population($enfant,$scolaire_min,$scolaire_max,$travail_min,$travail_max,$agee);
            
         }
         if ($menu == 'req34_theme2') //Age par rapport à la date d'inscription
         {
             $data = $this->Systeme_protection_socialManager->taux_atteinte_resultat() ;
+        }
+        if ($menu =='req3_theme1')
+        {            
+            $data = $this->Environment_demo_socioManager->menage_ayant_efant($enfant,$scolaire_min,$scolaire_max);      
+           
+        }
+        if ($menu=='req7_theme2')//situtation(en cours ou new) par rapport à la debut et fin du programme
+        {
+            $tmp = $this->Systeme_protection_socialManager->repartition_financement_programme();
+            if($tmp)
+            {
+                $data=$tmp;
+            }else $data = array();
+        }
+
+        if ($menu=='req8_theme2')//situtation(en cours ou new) par rapport à la debut et fin du programme
+        {
+            $tmp = $this->Systeme_protection_socialManager->repartition_financement_source_financement();
+            if($tmp)
+            {
+                $data=$tmp;
+            }else $data = array();
+        }
+
+        if ($menu=='req9_theme2')//situtation(en cours ou new) par rapport à la debut et fin du programme
+        {
+            $tmp = $this->Systeme_protection_socialManager->repartition_financement_tutelle();
+            if($tmp)
+            {
+                $data=$tmp;
+            }else $data = array();
         }
         //fin CODE CORRIGER Par Harizo
 
@@ -150,32 +177,7 @@ class Environment_et_systeme extends REST_Controller {
 
         
         //Bruce
-        if ($menu=='req7theme2_budgetinit_budgetmodif_situation')//mbola mila jerena
-        {
-            $tmp = $this->Systeme_protection_socialManager->req7theme2_budgetinit_budgetmodif_situation();
-            if($tmp)
-            {
-                $data=$tmp;
-            }else $data = array();
-        }
-
-        if ($menu=='req8theme2_budgetinit_budgetmodif_situation_source')//mbola mila jerena
-        {
-            $tmp = $this->Systeme_protection_socialManager->req8theme2_budgetinit_budgetmodif_situation_source();
-            if($tmp)
-            {
-                $data=$tmp;
-            }else $data = array();
-        }
-
-        if ($menu=='req9theme2_budgetinit_budgetmodif_situation_tutelle')//mbola mila jerena
-        {
-            $tmp = $this->Systeme_protection_socialManager->req9theme2_budgetinit_budgetmodif_situation_tutelle();
-            if($tmp)
-            {
-                $data=$tmp;
-            }else $data = array();
-        }
+        
 
         if ($menu=='req31theme2_interven_nbrinter_program_beneparan_beneprevu_region')
         {

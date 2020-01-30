@@ -99,6 +99,8 @@ class Systeme_protection_social_model extends CI_Model
 
     }
 
+    
+
     //requete Répartition financement par source
     public function req8theme2_budgetinit_budgetmodif_situation_source()
     {        
@@ -325,183 +327,7 @@ class Systeme_protection_social_model extends CI_Model
 
     
     
-   /*public function req14theme2_interven_nbrinter_budgetinit_peffectif_pcout_region_district($requete)
-    {  
-       $result = $this->db->query( "
-        select 
-              detail.id_region,
-              detail.nom_region,
-              detail.id_district,
-              detail.nom_dist,
-              detail.intitule_interven as intitule_intervention,
-              sum(detail.nbr_mena+detail.nbr_ind) as total_bene,
-              sum(detail.intervention_prevu) as total_intervention_prevu,
-              sum(detail.budget_init) as budget_initial,
-              sum(detail.budget_modif) as budget_modif,
-              sum(detail.v_quantite) as va_quantite,
-              CASE  WHEN 
-                      sum(detail.intervention_prevu) =0 THEN 0
-                    ELSE 
-                    (sum(detail.nbr_mena+detail.nbr_ind)*100)/sum(detail.intervention_prevu)
-              END as pourcen_effectif,
-              CASE  WHEN 
-                      sum(detail.budget_init) =0 THEN 0
-                    ELSE 
-                    (sum(detail.v_quantite)*100)/sum(detail.budget_init)
-              END as pourcen_cout
-        FROM 
-              (select 
-                      reg.id as id_region,
-                      reg.nom as nom_region,
-                      dist.id as id_district,
-                      dist.nom as nom_dist,
-                      interven.intitule as intitule_interven,
-                      count(mena_bene.id) as nbr_mena, 
-                      0 as nbr_ind,
-                      0 as intervention_prevu,
-                      0 as budget_init,
-                      0 as budget_modif,
-                      0 as v_quantite
-                  from 
-                      menage_beneficiaire as mena_bene
-                      
-                      join menage as men on men.id=mena_bene.id_menage
-                      join fokontany as foko on foko.id=men.id_fokontany
-                      join commune as com on com.id=foko.id_commune
-                      join district as dist on dist.id=com.district_id
-                      join region as reg on reg.id=dist.region_id
-                      join intervention as interven on interven.id=mena_bene.id_intervention
-              
-                  where  ".$requete."
-              
-                  group by  reg.id,reg.nom,dist.id,dist.nom,interven.id,interven.intitule
 
-              UNION
-
-              select 
-                      reg.id as id_region,
-                      reg.nom as nom_region,
-                      dist.id as id_district,
-                      dist.nom as nom_dist,
-                      interven.intitule as intitule_interven,
-                      0 as nbr_mena,
-                      count(ind_bene.id) as nbr_ind,
-                      0 as intervention_prevu,
-                      0 as budget_init,
-                      0 as budget_modif,
-                      0 as v_quantite
-                  from 
-                      individu_beneficiaire as ind_bene
-                      
-                      join individu as ind on ind.id=ind_bene.id_individu
-                      join fokontany as foko on foko.id=ind.id_fokontany
-                      join commune as com on com.id=foko.id_commune
-                      join district as dist on dist.id=com.district_id
-                      join region as reg on reg.id=dist.region_id
-                      join intervention as interven on interven.id=ind_bene.id_intervention
-              
-                  where  ".$requete."
-              
-                  group by  reg.id,reg.nom,dist.id,dist.nom,interven.id,interven.intitule
-
-              UNION
-
-              select 
-                      reg.id as id_region,
-                      reg.nom as nom_region,
-                      dist.id as id_district,
-                      dist.nom as nom_dist,
-                      interven.intitule as intitule_interven,
-                      0 as nbr_mena,
-                      0 as nbr_ind,
-                      sum(zone_inter.menage_beneficiaire_prevu + zone_inter.individu_beneficiaire_prevu) as intervention_prevu,
-                      0 as budget_init,
-                      0 as budget_modif,
-                      0 as v_quantite
-                  from 
-                      zone_intervention as zone_inter
-                      
-                      join fokontany as foko on foko.id=zone_inter.id_fokontany
-                      join commune as com on com.id=foko.id_commune
-                      join district as dist on dist.id=com.district_id
-                      join region as reg on reg.id=dist.region_id
-                      join intervention as interven on interven.id=zone_inter.id_intervention
-              
-                  where  ".$requete."
-              
-                  group by  reg.id,reg.nom,dist.id,dist.nom,interven.id,interven.intitule
-
-              UNION
-
-              select 
-                      reg.id as id_region,
-                      reg.nom as nom_region,
-                      dist.id as id_district,
-                      dist.nom as nom_dist,
-                      interven.intitule as intitule_interven,
-                      0 as nbr_mena, 
-                      0 as nbr_ind,
-                      0 as intervention_prevu,
-                      financ_inte.budget_initial as budget_init,
-                      financ_inte.budget_modifie as budget_modif,
-                      0 as v_quantite
-                  from 
-                      financement_intervention as financ_inte
-                      join intervention as interven on interven.id=financ_inte.id_intervention
-                      
-                      join zone_intervention as zone_inter on zone_inter.id_intervention=interven.id
-                      join fokontany as foko on foko.id=zone_inter.id_fokontany
-                      join commune as com on com.id=foko.id_commune
-                      join district as dist on dist.id=com.district_id
-                      join region as reg on reg.id=dist.region_id
-              
-                  where  ".$requete."
-              
-                  group by  reg.id,reg.nom,dist.id,dist.nom,interven.id,interven.intitule,financ_inte.id_intervention,budget_init,budget_modif
-
-              UNION
-
-              select 
-                      reg.id as id_region,
-                      reg.nom as nom_region,
-                      dist.id as id_district,
-                      dist.nom as nom_dist,
-                      interven.intitule as intitule_interven,
-                      0 as nbr_mena, 
-                      0 as nbr_ind,
-                      0 as intervention_prevu,
-                      0 as budget_init,
-                      0 as budget_modif,
-                      detail_trans_inter.valeur_quantite as v_quantite
-                  from 
-                      zone_intervention as zone_inter
-                      join intervention as interven on interven.id=zone_inter.id_intervention
-                      
-                      join fokontany as foko on foko.id=zone_inter.id_fokontany
-                      join commune as com on com.id=foko.id_commune
-                      join district as dist on dist.id=com.district_id
-                      join region as reg on reg.id=dist.region_id
-                      join detail_type_transfert_intervention as detail_trans_inter on detail_trans_inter.id_intervention = interven.id 
-              
-                  where  ".$requete." and detail_trans_inter.id_detail_type_transfert=1
-              
-                  group by  reg.id,reg.nom,dist.id,dist.nom,interven.id,interven.intitule,detail_trans_inter.id_intervention,v_quantite
-
-              ) as detail
-        
-      group by detail.id_region,detail.nom_region,detail.id_district,detail.nom_dist,detail.intitule_interven
-      order by detail.id_region,detail.nom_region,detail.intitule_interven
-        ")
-      ->result();
-      
-      if($result)
-        {
-            return $result;
-        }else{
-            return null;
-        }
-
-    }*/
 
     //Proportion des interventions avec critères d'âge TSY METY ITY 
    public function req19theme2_interven_pourcenenfan_pourcensco_pourcentra_pourcenage_pcout($enfant,$scolaire_min,$scolaire_max,$travail_min,$travail_max,$agee)
@@ -1577,8 +1403,8 @@ class Systeme_protection_social_model extends CI_Model
                               and intervention.id = suivi_menage_entete.id_intervention
                               and fokontany.id = suivi_menage_entete.id_fokontany
                               and commune.id = fokontany.id_commune
-                                and district.id = commune.district_id
-                                and region.id = district.region_id
+                              and district.id = commune.district_id
+                              and region.id = district.region_id
                             group by 
                               suivi_menage_entete.id,
                               id_interv,
@@ -2636,7 +2462,1025 @@ class Systeme_protection_social_model extends CI_Model
           return $this->db->query($sql)->result(); 
 
         }
-       
+
+
+    //Début Req38-theme 1
+      public function repartition_par_age_sexe_beneficiaire()
+      {
+          $sql =  "
+
+                                  select
+
+                                      niveau_1.id_intervention as id_intervention,
+                                      niveau_1.intitule_intervention as intitule_intervention,
+
+                                      niveau_1.nom_region as nom_region,
+                                      niveau_1.nom_dist as nom_dist,
+                                      niveau_1.nom_com as nom_com,
+                                      niveau_1.id_commune as id_commune,
+
+                                      sum(niveau_1.nbr_enfant_homme) as nbr_enfant_homme,
+                                      sum(niveau_1.nbr_enfant_fille) as nbr_enfant_fille,
+                                      sum(niveau_1.nbr_agescolaire_fille) as nbr_agescolaire_fille,
+                                      sum(niveau_1.nbr_agescolaire_homme) as nbr_agescolaire_homme,
+
+                                      (sum(niveau_1.nbr_agetravaille_homme_menage) + sum(niveau_1.nbr_agetravaille_homme_individu)) as nbr_agetravaille_homme,
+                                      (sum(niveau_1.nbr_agetravaille_fille_menage) + sum(niveau_1.nbr_agetravaille_fille_individu)) as nbr_agetravaille_fille,
+
+                                      (sum(niveau_1.nbr_agee_homme_menage) + sum(niveau_1.nbr_agee_homme_individu)) as nbr_agee_homme,
+                                      (sum(niveau_1.nbr_agee_fille_menage) + sum(niveau_1.nbr_agee_fille_individu)) as nbr_agee_fille
+
+
+                                  from(
+                                      (
+                                          select 
+
+                                              int.id as id_intervention,
+                                              int.intitule as intitule_intervention,
+
+                                              reg.id as id_region,
+                                              reg.nom as nom_region,
+                                              dist.id as id_district,
+                                              dist.nom as nom_dist,
+                                              com.id as id_commune,
+                                              com.nom as nom_com,
+
+
+                                              count(DISTINCT(indi.id)) as nbr_enfant_homme,
+                                              0 as nbr_enfant_fille,
+                                              0 as nbr_agescolaire_fille,
+                                              0 as nbr_agescolaire_homme,
+                                              0 as nbr_agetravaille_homme_menage,
+                                              0 as nbr_agetravaille_homme_individu,
+                                              0 as nbr_agetravaille_fille_menage,
+                                              0 as nbr_agetravaille_fille_individu,
+
+                                              0 as nbr_agee_homme_menage,
+                                              0 as nbr_agee_homme_individu,
+                                              0 as nbr_agee_fille_menage,
+                                              0 as nbr_agee_fille_individu
+
+
+                                          from    
+                                              individu as indi 
+                                              inner join fokontany as foko on indi.id_fokontany= foko.id 
+                                              inner join commune as com on com.id= foko.id_commune 
+                                              inner join district as dist on com.district_id= dist.id 
+                                              inner join region as reg on dist.region_id= reg.id 
+                                              inner join individu_beneficiaire as ib on indi.id = ib.id_individu
+                                              inner join intervention as int on int.id = ib.id_intervention
+                                          where   
+                                              
+                                               (SELECT DATE_PART('year', ib.date_inscription) - DATE_PART('year', indi.date_naissance)) < 7
+                                              and indi.sexe = 'H'
+
+                                          group by 
+                                              reg.id,
+                                              dist.id,
+                                              com.id ,
+                                              int.id,
+                                              int.intitule
+                                      )
+                                      UNION
+                                      (
+                                          select 
+
+                                              int.id as id_intervention,
+                                              int.intitule as intitule_intervention,
+
+                                              reg.id as id_region,
+                                              reg.nom as nom_region,
+                                              dist.id as id_district,
+                                              dist.nom as nom_dist,
+                                              com.id as id_commune,
+                                              com.nom as nom_com,
+
+                                              0 as nbr_enfant_homme,
+                                              count(DISTINCT(indi.id)) as nbr_enfant_fille,
+                                              0 as nbr_agescolaire_fille,
+                                              0 as nbr_agescolaire_homme,
+                                              0 as nbr_agetravaille_homme_menage,
+                                              0 as nbr_agetravaille_homme_individu,
+                                              0 as nbr_agetravaille_fille_menage,
+                                              0 as nbr_agetravaille_fille_individu,
+
+                                              0 as nbr_agee_homme_menage,
+                                              0 as nbr_agee_homme_individu,
+                                              0 as nbr_agee_fille_menage,
+                                              0 as nbr_agee_fille_individu
+
+
+                                          from    
+                                              individu as indi 
+                                              inner join fokontany as foko on indi.id_fokontany= foko.id 
+                                              inner join commune as com on com.id= foko.id_commune 
+                                              inner join district as dist on com.district_id= dist.id 
+                                              inner join region as reg on dist.region_id= reg.id 
+                                              inner join individu_beneficiaire as ib on indi.id = ib.id_individu
+                                              inner join intervention as int on int.id = ib.id_intervention
+                                          where   
+                                              
+                                               (SELECT DATE_PART('year', ib.date_inscription) - DATE_PART('year', indi.date_naissance)) < 7
+                                              and indi.sexe = 'F'
+
+                                          group by 
+                                              reg.id,
+                                              dist.id,
+                                              com.id ,
+
+                                              int.id,
+                                              int.intitule
+                                      )
+                                      UNION
+                                      (
+                                          select 
+
+                                              int.id as id_intervention,
+                                              int.intitule as intitule_intervention,
+
+                                              reg.id as id_region,
+                                              reg.nom as nom_region,
+                                              dist.id as id_district,
+                                              dist.nom as nom_dist,
+                                              com.id as id_commune,
+                                              com.nom as nom_com,
+
+                                              0 as nbr_enfant_homme,
+                                              0 as nbr_enfant_fille,
+                                              count(DISTINCT(indi.id)) as nbr_agescolaire_fille,
+                                              0 as nbr_agescolaire_homme,
+                                              0 as nbr_agetravaille_homme_menage,
+                                              0 as nbr_agetravaille_homme_individu,
+                                              0 as nbr_agetravaille_fille_menage,
+                                              0 as nbr_agetravaille_fille_individu,
+
+                                              0 as nbr_agee_homme_menage,
+                                              0 as nbr_agee_homme_individu,
+                                              0 as nbr_agee_fille_menage,
+                                              0 as nbr_agee_fille_individu
+
+
+                                          from 
+                                              individu as indi 
+                                              inner join fokontany as foko on indi.id_fokontany= foko.id 
+                                              inner join commune as com on com.id= foko.id_commune 
+                                              inner join district as dist on com.district_id= dist.id 
+                                              inner join region as reg on dist.region_id= reg.id 
+                                              inner join individu_beneficiaire as ib on indi.id = ib.id_individu
+                                              inner join intervention as int on int.id = ib.id_intervention
+                                          where 
+                                              
+                                               (SELECT DATE_PART('year', ib.date_inscription) - DATE_PART('year', indi.date_naissance)) >= 7
+                                              and (SELECT DATE_PART('year', ib.date_inscription) - DATE_PART('year', indi.date_naissance)) < 18
+                                              and indi.sexe = 'F'
+
+                                          group by 
+                                              reg.id,
+                                              dist.id,
+                                              com.id ,
+
+                                              int.id,
+                                              int.intitule
+                                      )
+                                      UNION
+                                      (
+                                          select 
+                                              int.id as id_intervention,
+                                              int.intitule as intitule_intervention,
+
+
+                                              reg.id as id_region,
+                                              reg.nom as nom_region,
+                                              dist.id as id_district,
+                                              dist.nom as nom_dist,
+                                              com.id as id_commune,
+                                              com.nom as nom_com,
+
+                                              0 as nbr_enfant_homme,
+                                              0 as nbr_enfant_fille,
+                                              0 as nbr_agescolaire_fille,
+                                              count(DISTINCT(indi.id)) as nbr_agescolaire_homme,
+                                              0 as nbr_agetravaille_homme_menage,
+                                              0 as nbr_agetravaille_homme_individu,
+                                              0 as nbr_agetravaille_fille_menage,
+                                              0 as nbr_agetravaille_fille_individu,
+
+                                              0 as nbr_agee_homme_menage,
+                                              0 as nbr_agee_homme_individu,
+                                              0 as nbr_agee_fille_menage,
+                                              0 as nbr_agee_fille_individu
+
+
+                                          from 
+                                              individu as indi 
+                                              inner join fokontany as foko on indi.id_fokontany= foko.id 
+                                              inner join commune as com on com.id= foko.id_commune 
+                                              inner join district as dist on com.district_id= dist.id
+                                              inner join region as reg on dist.region_id= reg.id 
+                                              inner join individu_beneficiaire as ib on indi.id = ib.id_individu 
+                                              inner join intervention as int on int.id = ib.id_intervention
+                                          where 
+                                              (SELECT DATE_PART('year', ib.date_inscription) - DATE_PART('year', indi.date_naissance)) >= 7
+                                              and (SELECT DATE_PART('year', ib.date_inscription) - DATE_PART('year', indi.date_naissance)) < 18
+                                              and indi.sexe = 'H'
+
+                                          group by 
+                                              reg.id,
+                                              dist.id,
+                                              com.id ,
+
+                                              int.id,
+                                              int.intitule
+                                      )
+                                      UNION
+                                      (
+                                          select 
+
+                                              int.id as id_intervention,
+                                              int.intitule as intitule_intervention,
+
+                                              reg.id as id_region,
+                                              reg.nom as nom_region,
+                                              dist.id as id_district,
+                                              dist.nom as nom_dist,
+                                              com.id as id_commune,
+                                              com.nom as nom_com,
+
+                                              0 as nbr_enfant_homme,
+                                              0 as nbr_enfant_fille,
+                                              0 as nbr_agescolaire_fille,
+                                              0 as nbr_agescolaire_homme,
+                                              count(DISTINCT(mena.id)) as nbr_agetravaille_homme_menage,
+                                              0 as nbr_agetravaille_homme_individu,
+                                              0 as nbr_agetravaille_fille_menage,
+                                              0 as nbr_agetravaille_fille_individu,
+
+                                              0 as nbr_agee_homme_menage,
+                                              0 as nbr_agee_homme_individu,
+                                              0 as nbr_agee_fille_menage,
+                                              0 as nbr_agee_fille_individu
+
+
+                                          from 
+                                              menage as mena 
+                                              inner join fokontany as foko on mena.id_fokontany= foko.id 
+                                              inner join commune as com on com.id= foko.id_commune 
+                                              inner join district as dist on com.district_id= dist.id 
+                                              inner join region as reg on dist.region_id= reg.id 
+                                              inner join menage_beneficiaire as mb on mena.id = mb.id_menage 
+                                              inner join intervention as int on int.id = mb.id_intervention
+                                          where  
+                                              (SELECT DATE_PART('year', mb.date_inscription) - DATE_PART('year', mena.date_naissance)) >= 18
+                                              and (SELECT DATE_PART('year', mb.date_inscription) - DATE_PART('year', mena.date_naissance)) < 60
+                                              and mena.sexe = 'H'
+
+                                          group by 
+                                              reg.id,
+                                              dist.id,
+                                              com.id ,
+
+                                              int.id,
+                                              int.intitule
+                                      )
+                                      UNION
+                                      (
+                                          select 
+
+                                              int.id as id_intervention,
+                                              int.intitule as intitule_intervention,
+
+
+                                              reg.id as id_region,
+                                              reg.nom as nom_region,
+                                              dist.id as id_district,
+                                              dist.nom as nom_dist,
+                                              com.id as id_commune,
+                                              com.nom as nom_com,
+
+                                              0 as nbr_enfant_homme,
+                                              0 as nbr_enfant_fille,
+                                              0 as nbr_agescolaire_fille,
+                                              0 as nbr_agescolaire_homme,
+                                              0 as nbr_agetravaille_homme_menage,
+                                              count(DISTINCT(indi.id)) as nbr_agetravaille_homme_individu,
+                                              0 as nbr_agetravaille_fille_menage,
+                                              0 as nbr_agetravaille_fille_individu,
+
+                                              0 as nbr_agee_homme_menage,
+                                              0 as nbr_agee_homme_individu,
+                                              0 as nbr_agee_fille_menage,
+                                              0 as nbr_agee_fille_individu
+
+
+                                          from 
+                                              individu as indi 
+                                              inner join fokontany as foko on indi.id_fokontany= foko.id 
+                                              inner join commune as com on com.id= foko.id_commune 
+                                              inner join district as dist on com.district_id= dist.id 
+                                              inner join region as reg on dist.region_id= reg.id 
+                                              inner join individu_beneficiaire as mb on indi.id = mb.id_individu 
+                                              inner join intervention as int on int.id = mb.id_intervention
+                                          where  
+                                              (SELECT DATE_PART('year', mb.date_inscription) - DATE_PART('year', indi.date_naissance)) >= 18
+                                              and (SELECT DATE_PART('year', mb.date_inscription) - DATE_PART('year', indi.date_naissance)) < 60
+                                              and indi.sexe = 'H'
+
+                                          group by 
+                                              reg.id,
+                                              dist.id,
+                                              com.id ,
+
+                                              int.id,
+                                              int.intitule
+                                      )
+                                      UNION
+                                      (
+                                          select 
+
+                                              int.id as id_intervention,
+                                              int.intitule as intitule_intervention,
+
+                                              reg.id as id_region,
+                                              reg.nom as nom_region,
+                                              dist.id as id_district,
+                                              dist.nom as nom_dist,
+                                              com.id as id_commune,
+                                              com.nom as nom_com,
+
+                                              0 as nbr_enfant_homme,
+                                              0 as nbr_enfant_fille,
+                                              0 as nbr_agescolaire_fille,
+                                              0 as nbr_agescolaire_homme,
+                                              0 as nbr_agetravaille_homme_menage,
+                                              0 as nbr_agetravaille_homme_individu,
+                                              count(DISTINCT(mena.id)) as nbr_agetravaille_fille_menage,
+                                              0 as nbr_agetravaille_fille_individu,
+
+                                              0 as nbr_agee_homme_menage,
+                                              0 as nbr_agee_homme_individu,
+                                              0 as nbr_agee_fille_menage,
+                                              0 as nbr_agee_fille_individu
+
+
+                                          from 
+                                              menage as mena 
+                                              inner join fokontany as foko on mena.id_fokontany= foko.id 
+                                              inner join commune as com on com.id= foko.id_commune 
+                                              inner join district as dist on com.district_id= dist.id 
+                                              inner join region as reg on dist.region_id= reg.id 
+                                              inner join menage_beneficiaire as mb on mena.id = mb.id_menage 
+                                              inner join intervention as int on int.id = mb.id_intervention
+                                          where  
+                                              (SELECT DATE_PART('year', mb.date_inscription) - DATE_PART('year', mena.date_naissance)) >= 18
+                                              and (SELECT DATE_PART('year', mb.date_inscription) - DATE_PART('year', mena.date_naissance)) < 60
+                                              and mena.sexe = 'F'
+
+                                          group by 
+                                              reg.id,
+                                              dist.id,
+                                              com.id ,
+
+                                              int.id,
+                                              int.intitule
+                                      )
+                                      UNION
+                                      (
+                                          select 
+
+                                              int.id as id_intervention,
+                                              int.intitule as intitule_intervention,
+
+                                              reg.id as id_region,
+                                              reg.nom as nom_region,
+                                              dist.id as id_district,
+                                              dist.nom as nom_dist,
+                                              com.id as id_commune,
+                                              com.nom as nom_com,
+
+                                              0 as nbr_enfant_homme,
+                                              0 as nbr_enfant_fille,
+                                              0 as nbr_agescolaire_fille,
+                                              0 as nbr_agescolaire_homme,
+                                              0 as nbr_agetravaille_homme_menage,
+                                              0 as nbr_agetravaille_homme_individu,
+                                              0 as nbr_agetravaille_fille_menage,
+                                              count(DISTINCT(indi.id)) as nbr_agetravaille_fille_individu,
+
+                                              0 as nbr_agee_homme_menage,
+                                              0 as nbr_agee_homme_individu,
+                                              0 as nbr_agee_fille_menage,
+                                              0 as nbr_agee_fille_individu
+
+
+                                          from 
+                                              individu as indi 
+                                              inner join fokontany as foko on indi.id_fokontany= foko.id 
+                                              inner join commune as com on com.id= foko.id_commune 
+                                              inner join district as dist on com.district_id= dist.id 
+                                              inner join region as reg on dist.region_id= reg.id 
+                                              inner join individu_beneficiaire as mb on indi.id = mb.id_individu
+                                              inner join intervention as int on int.id = mb.id_intervention 
+                                          where  
+                                              (SELECT DATE_PART('year', mb.date_inscription) - DATE_PART('year', indi.date_naissance)) >= 18
+                                              and (SELECT DATE_PART('year', mb.date_inscription) - DATE_PART('year', indi.date_naissance)) < 60
+                                              and indi.sexe = 'F'
+
+                                          group by 
+                                              reg.id,
+                                              dist.id,
+                                              com.id ,
+
+                                              int.id,
+                                              int.intitule
+                                      )
+                                      UNION
+                                      (
+                                          select 
+                                              int.id as id_intervention,
+                                              int.intitule as intitule_intervention,
+
+
+                                              reg.id as id_region,
+                                              reg.nom as nom_region,
+                                              dist.id as id_district,
+                                              dist.nom as nom_dist,
+                                              com.id as id_commune,
+                                              com.nom as nom_com,
+
+                                              0 as nbr_enfant_homme,
+                                              0 as nbr_enfant_fille,
+                                              0 as nbr_agescolaire_fille,
+                                              0 as nbr_agescolaire_homme,
+                                              0 as nbr_agetravaille_homme_menage,
+                                              0 as nbr_agetravaille_homme_individu,
+                                              0 as nbr_agetravaille_fille_menage,
+                                              0 as nbr_agetravaille_fille_individu,
+
+                                              count(DISTINCT(mena.id)) as nbr_agee_homme_menage,
+                                              0 as nbr_agee_homme_individu,
+                                              0 as nbr_agee_fille_menage,
+                                              0 as nbr_agee_fille_individu
+
+
+                                          from 
+                                              menage as mena 
+                                              inner join fokontany as foko on mena.id_fokontany= foko.id 
+                                              inner join commune as com on com.id= foko.id_commune 
+                                              inner join district as dist on com.district_id= dist.id 
+                                              inner join region as reg on dist.region_id= reg.id 
+                                              inner join menage_beneficiaire as mb on mena.id = mb.id_menage 
+                                              inner join intervention as int on int.id = mb.id_intervention
+                                          where  
+                                              (SELECT DATE_PART('year', mb.date_inscription) - DATE_PART('year', mena.date_naissance)) >= 60
+                                              and mena.sexe = 'H'
+
+                                          group by 
+                                              reg.id,
+                                              dist.id,
+                                              com.id ,
+
+                                              int.id,
+                                              int.intitule
+                                      )
+                                      UNION
+                                      (
+                                          select 
+
+                                              int.id as id_intervention,
+                                              int.intitule as intitule_intervention,
+
+                                              reg.id as id_region,
+                                              reg.nom as nom_region,
+                                              dist.id as id_district,
+                                              dist.nom as nom_dist,
+                                              com.id as id_commune,
+                                              com.nom as nom_com,
+
+                                              0 as nbr_enfant_homme,
+                                              0 as nbr_enfant_fille,
+                                              0 as nbr_agescolaire_fille,
+                                              0 as nbr_agescolaire_homme,
+                                              0 as nbr_agetravaille_homme_menage,
+                                              0 as nbr_agetravaille_homme_individu,
+                                              0 as nbr_agetravaille_fille_menage,
+                                              0 as nbr_agetravaille_fille_individu,
+
+                                              0 as nbr_agee_homme_menage,
+                                              count(DISTINCT(indi.id)) as nbr_agee_homme_individu,
+                                              0 as nbr_agee_fille_menage,
+                                              0 as nbr_agee_fille_individu
+
+
+                                          from 
+                                              individu as indi 
+                                              inner join fokontany as foko on indi.id_fokontany= foko.id 
+                                              inner join commune as com on com.id= foko.id_commune 
+                                              inner join district as dist on com.district_id= dist.id 
+                                              inner join region as reg on dist.region_id= reg.id 
+                                              inner join individu_beneficiaire as mb on indi.id = mb.id_individu 
+                                              inner join intervention as int on int.id = mb.id_intervention
+                                          where  
+                                              (SELECT DATE_PART('year', mb.date_inscription) - DATE_PART('year', indi.date_naissance)) >= 60
+                                              and indi.sexe = 'H'
+
+                                          group by 
+                                              reg.id,
+                                              dist.id,
+                                              com.id ,
+
+                                              int.id,
+                                              int.intitule
+                                      )
+                                      UNION
+                                      (
+                                          select 
+                                              int.id as id_intervention,
+                                              int.intitule as intitule_intervention,
+
+                                              reg.id as id_region,
+                                              reg.nom as nom_region,
+                                              dist.id as id_district,
+                                              dist.nom as nom_dist,
+                                              com.id as id_commune,
+                                              com.nom as nom_com,
+
+                                              0 as nbr_enfant_homme,
+                                              0 as nbr_enfant_fille,
+                                              0 as nbr_agescolaire_fille,
+                                              0 as nbr_agescolaire_homme,
+                                              0 as nbr_agetravaille_homme_menage,
+                                              0 as nbr_agetravaille_homme_individu,
+                                              0 as nbr_agetravaille_fille_menage,
+                                              0 as nbr_agetravaille_fille_individu,
+
+                                              0 as nbr_agee_homme_menage,
+                                              0 as nbr_agee_homme_individu,
+                                              count(DISTINCT(mena.id))  as nbr_agee_fille_menage,
+                                              0 as nbr_agee_fille_individu
+
+
+                                          from 
+                                              menage as mena 
+                                              inner join fokontany as foko on mena.id_fokontany= foko.id 
+                                              inner join commune as com on com.id= foko.id_commune 
+                                              inner join district as dist on com.district_id= dist.id 
+                                              inner join region as reg on dist.region_id= reg.id 
+                                              inner join menage_beneficiaire as mb on mena.id = mb.id_menage 
+                                              inner join intervention as int on int.id = mb.id_intervention
+                                          where  
+                                              (SELECT DATE_PART('year', mb.date_inscription) - DATE_PART('year', mena.date_naissance)) >= 60
+                                              and mena.sexe = 'F'
+
+                                          group by 
+                                              reg.id,
+                                              dist.id,
+                                              com.id ,
+
+                                              int.id,
+                                              int.intitule
+                                      )
+                                      UNION
+                                      (
+                                          select 
+
+                                              int.id as id_intervention,
+                                              int.intitule as intitule_intervention,
+
+                                              reg.id as id_region,
+                                              reg.nom as nom_region,
+                                              dist.id as id_district,
+                                              dist.nom as nom_dist,
+                                              com.id as id_commune,
+                                              com.nom as nom_com,
+
+                                              0 as nbr_enfant_homme,
+                                              0 as nbr_enfant_fille,
+                                              0 as nbr_agescolaire_fille,
+                                              0 as nbr_agescolaire_homme,
+                                              0 as nbr_agetravaille_homme_menage,
+                                              0 as nbr_agetravaille_homme_individu,
+                                              0 as nbr_agetravaille_fille_menage,
+                                              0 as nbr_agetravaille_fille_individu,
+
+                                              0 as nbr_agee_homme_menage,
+                                              0 as nbr_agee_homme_individu,
+                                              0 as nbr_agee_fille_menage,
+                                              count(DISTINCT(indi.id)) as nbr_agee_fille_individu
+
+
+                                          from 
+                                              individu as indi 
+                                              inner join fokontany as foko on indi.id_fokontany= foko.id 
+                                              inner join commune as com on com.id= foko.id_commune 
+                                              inner join district as dist on com.district_id= dist.id 
+                                              inner join region as reg on dist.region_id= reg.id 
+                                              inner join individu_beneficiaire as mb on indi.id = mb.id_individu
+                                              inner join intervention as int on int.id = mb.id_intervention 
+                                          where  
+                                              (SELECT DATE_PART('year', mb.date_inscription) - DATE_PART('year', indi.date_naissance)) >= 60
+                                              and indi.sexe = 'F'
+
+                                          group by 
+                                              reg.id,
+                                              dist.id,
+                                              com.id ,
+
+                                              int.id,
+                                              int.intitule
+                                      )
+
+                                  ) niveau_1
+
+                                          group by 
+                                              nom_region,
+                                              nom_dist,
+                                              nom_com,
+                                              id_commune,
+                                              niveau_1.id_intervention,
+                                              niveau_1.intitule_intervention
+                          
+
+                  " ;
+
+          return $this->db->query($sql)->result();
+      }
+    //Fin Req38-theme 1
+
+    //req7_theme2 
+    public function repartition_financement_programme()
+    {
+      $now = date('Y-m-d');
+      $sql =  "
+                select
+                  niveau_1.id_program as id_program,
+                  niveau_1.intitule_programme as intitule_programme,
+                  niveau_1.id_intervention as id_intervention,
+                  niveau_1.intitule_intervention as intitule_intervention,
+
+                  niveau_1.id_devise as id_devise,
+                  niveau_1.description_devise as description_devise,
+
+
+                  sum(niveau_1.budget_initial_en_cours) as budget_initial_en_cours,
+                  sum(niveau_1.budget_modifie_en_cours) as budget_modifie_en_cours,
+
+                  sum(niveau_1.budget_initial_nouveau) as budget_initial_nouveau,
+                  sum(niveau_1.budget_modifie_nouveau) as budget_modifie_nouveau,
+
+                  (sum(niveau_1.budget_initial_en_cours) + sum(niveau_1.budget_modifie_en_cours)) as etat_en_cours,
+                  (sum(niveau_1.budget_initial_nouveau) + sum(niveau_1.budget_modifie_nouveau)) as etat_nouveau
+
+
+                from(
+
+                        (
+                        select 
+                          programme.id as id_program,
+                          programme.intitule as intitule_programme,
+                          intervention.id as id_intervention,
+                          intervention.intitule as intitule_intervention,
+
+                          devise.id as id_devise,
+                          devise.description as description_devise,
+
+                          sum(financement_intervention.budget_initial) as budget_initial_en_cours,
+                          sum(financement_intervention.budget_modifie) as budget_modifie_en_cours,
+
+                          0 as budget_initial_nouveau,
+                          0 as budget_modifie_nouveau
+
+                        from 
+                          intervention,
+                          programme,
+                          financement_intervention,
+                          devise
+
+                        where
+
+                          programme.id  = intervention.id_programme
+                          and intervention.id = financement_intervention.id_intervention
+                          and devise.id = financement_intervention.id_devise
+                          and '".$now."' > programme.date_debut
+                          and '".$now."' <= programme.date_fin
+
+                        group by 
+                          programme.id,
+                          intervention.id,
+                          devise.id
+                        )
+
+                        UNION
+
+                        (
+                        select 
+                          programme.id as id_program,
+                          programme.intitule as intitule_programme,
+                          intervention.id as id_intervention,
+                          intervention.intitule as intitule_intervention,
+
+                          devise.id as id_devise,
+                          devise.description as description_devise,
+
+                          0 as budget_initial_en_cours,
+                          0 as budget_modifie_en_cours,
+
+                          sum(financement_intervention.budget_initial) as budget_initial_nouveau,
+                          sum(financement_intervention.budget_modifie) as budget_modifie_nouveau
+
+                        from 
+                          intervention,
+                          programme,
+                          financement_intervention,
+                          devise
+
+                        where
+
+                          programme.id  = intervention.id_programme
+                          and intervention.id = financement_intervention.id_intervention
+                          and devise.id = financement_intervention.id_devise
+                          
+                          and '".$now."' <= programme.date_debut
+
+                        group by 
+                          programme.id,
+                          intervention.id,
+                          devise.id
+                        )
+                    )niveau_1
+
+                      group by
+                        niveau_1.id_program,
+                        niveau_1.id_intervention,
+                        niveau_1.intitule_programme,
+                        niveau_1.intitule_intervention,
+                        niveau_1.id_devise,
+                        niveau_1.description_devise 
+
+
+
+              " ;
+
+        return $this->db->query($sql)->result();
+    }
+    //fin req7_theme2  
+    //req8_theme2  
+    public function repartition_financement_source_financement()
+    {
+      $now = date('Y-m-d');
+      $sql =  "
+                select
+                  niveau_1.id_program as id_program,
+                  niveau_1.intitule_programme as intitule_programme,
+                  niveau_1.id_intervention as id_intervention,
+                  niveau_1.intitule_intervention as intitule_intervention,
+
+                  niveau_1.id_devise as id_devise,
+                  niveau_1.description_devise as description_devise,
+
+                  niveau_1.id_source_financement as id_source_financement,
+                  niveau_1.nom_source_financement as nom_source_financement,
+
+
+                  sum(niveau_1.budget_initial_en_cours) as budget_initial_en_cours,
+                  sum(niveau_1.budget_modifie_en_cours) as budget_modifie_en_cours,
+
+                  sum(niveau_1.budget_initial_nouveau) as budget_initial_nouveau,
+                  sum(niveau_1.budget_modifie_nouveau) as budget_modifie_nouveau,
+
+                  (sum(niveau_1.budget_initial_en_cours) + sum(niveau_1.budget_modifie_en_cours)) as etat_en_cours,
+                  (sum(niveau_1.budget_initial_nouveau) + sum(niveau_1.budget_modifie_nouveau)) as etat_nouveau
+
+
+                from(
+
+                        (
+                        select 
+                          programme.id as id_program,
+                          programme.intitule as intitule_programme,
+                          intervention.id as id_intervention,
+                          intervention.intitule as intitule_intervention,
+
+                          devise.id as id_devise,
+                          devise.description as description_devise,
+
+                          source_financement.id as id_source_financement,
+                          source_financement.nom as nom_source_financement,
+
+                          sum(financement_intervention.budget_initial) as budget_initial_en_cours,
+                          sum(financement_intervention.budget_modifie) as budget_modifie_en_cours,
+
+                          0 as budget_initial_nouveau,
+                          0 as budget_modifie_nouveau
+
+                        from 
+                          intervention,
+                          programme,
+                          financement_intervention,
+                          devise,
+                          source_financement
+
+                        where
+
+                          programme.id  = intervention.id_programme
+                          and intervention.id = financement_intervention.id_intervention
+                          and devise.id = financement_intervention.id_devise
+                          and source_financement.id = financement_intervention.id_source_financement
+                          and '".$now."' > programme.date_debut
+                          and '".$now."' <= programme.date_fin
+
+                        group by 
+                          programme.id,
+                          intervention.id,
+                          devise.id,
+                          source_financement.id
+                        )
+
+                        UNION
+
+                        (
+                        select 
+                          programme.id as id_program,
+                          programme.intitule as intitule_programme,
+                          intervention.id as id_intervention,
+                          intervention.intitule as intitule_intervention,
+
+                          devise.id as id_devise,
+                          devise.description as description_devise,
+
+                          source_financement.id as id_source_financement,
+                          source_financement.nom as nom_source_financement,
+
+                          0 as budget_initial_en_cours,
+                          0 as budget_modifie_en_cours,
+
+                          sum(financement_intervention.budget_initial) as budget_initial_nouveau,
+                          sum(financement_intervention.budget_modifie) as budget_modifie_nouveau
+
+                        from 
+                          intervention,
+                          programme,
+                          financement_intervention,
+                          devise,
+                          source_financement
+
+                        where
+
+                          programme.id  = intervention.id_programme
+                          and intervention.id = financement_intervention.id_intervention
+                          and devise.id = financement_intervention.id_devise
+                          and source_financement.id = financement_intervention.id_source_financement
+                          
+                          and '".$now."' <= programme.date_debut
+
+                        group by 
+                          programme.id,
+                          intervention.id,
+                          devise.id,
+                          source_financement.id
+                        )
+                    )niveau_1
+
+                      group by
+                        niveau_1.id_program,
+                        niveau_1.id_intervention,
+                        niveau_1.intitule_programme,
+                        niveau_1.intitule_intervention,
+                        niveau_1.id_devise,
+                        niveau_1.description_devise ,
+                        niveau_1.id_source_financement,
+                        niveau_1.nom_source_financement
+
+
+
+              " ;
+
+        return $this->db->query($sql)->result();
+    }
+    //fin req8_theme2  
+
+    //req9_theme2  
+    public function repartition_financement_tutelle()
+    {
+      $now = date('Y-m-d');
+      $sql =  "
+                select
+                  niveau_1.id_program as id_program,
+                  niveau_1.intitule_programme as intitule_programme,
+                  niveau_1.id_intervention as id_intervention,
+                  niveau_1.intitule_intervention as intitule_intervention,
+                  niveau_1.ministere_tutelle as ministere_tutelle,
+
+                  niveau_1.id_devise as id_devise,
+                  niveau_1.description_devise as description_devise,
+
+
+                  sum(niveau_1.budget_initial_en_cours) as budget_initial_en_cours,
+                  sum(niveau_1.budget_modifie_en_cours) as budget_modifie_en_cours,
+
+                  sum(niveau_1.budget_initial_nouveau) as budget_initial_nouveau,
+                  sum(niveau_1.budget_modifie_nouveau) as budget_modifie_nouveau,
+
+                  (sum(niveau_1.budget_initial_en_cours) + sum(niveau_1.budget_modifie_en_cours)) as etat_en_cours,
+                  (sum(niveau_1.budget_initial_nouveau) + sum(niveau_1.budget_modifie_nouveau)) as etat_nouveau
+
+
+                from(
+
+                        (
+                        select 
+                          programme.id as id_program,
+                          programme.intitule as intitule_programme,
+                          intervention.id as id_intervention,
+                          intervention.intitule as intitule_intervention,
+                          intervention.ministere_tutelle as ministere_tutelle,
+
+                          devise.id as id_devise,
+                          devise.description as description_devise,
+
+                          sum(financement_intervention.budget_initial) as budget_initial_en_cours,
+                          sum(financement_intervention.budget_modifie) as budget_modifie_en_cours,
+
+                          0 as budget_initial_nouveau,
+                          0 as budget_modifie_nouveau
+
+                        from 
+                          intervention,
+                          programme,
+                          financement_intervention,
+                          devise
+
+                        where
+
+                          programme.id  = intervention.id_programme
+                          and intervention.id = financement_intervention.id_intervention
+                          and devise.id = financement_intervention.id_devise
+                          and '".$now."' > programme.date_debut
+                          and '".$now."' <= programme.date_fin
+
+                        group by 
+                          programme.id,
+                          intervention.id,
+                          devise.id,
+                          intervention.ministere_tutelle
+                        )
+
+                        UNION
+
+                        (
+                        select 
+                          programme.id as id_program,
+                          programme.intitule as intitule_programme,
+                          intervention.id as id_intervention,
+                          intervention.intitule as intitule_intervention,
+                          intervention.ministere_tutelle as ministere_tutelle,
+
+                          devise.id as id_devise,
+                          devise.description as description_devise,
+
+                          0 as budget_initial_en_cours,
+                          0 as budget_modifie_en_cours,
+
+                          sum(financement_intervention.budget_initial) as budget_initial_nouveau,
+                          sum(financement_intervention.budget_modifie) as budget_modifie_nouveau
+
+                        from 
+                          intervention,
+                          programme,
+                          financement_intervention,
+                          devise
+
+                        where
+
+                          programme.id  = intervention.id_programme
+                          and intervention.id = financement_intervention.id_intervention
+                          and devise.id = financement_intervention.id_devise
+                          
+                          and '".$now."' <= programme.date_debut
+
+                        group by 
+                          programme.id,
+                          intervention.id,
+                          devise.id,
+                          intervention.ministere_tutelle
+                        )
+                    )niveau_1
+
+                      group by
+                        niveau_1.id_program,
+                        niveau_1.id_intervention,
+                        niveau_1.intitule_programme,
+                        niveau_1.intitule_intervention,
+                        niveau_1.id_devise,
+                        niveau_1.description_devise ,
+                        niveau_1.ministere_tutelle
+
+
+
+              " ;
+
+        return $this->db->query($sql)->result();
+    }
+    //fin req9_theme2  
     //FIN CODE HARIZO
 
    

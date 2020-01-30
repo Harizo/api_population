@@ -227,7 +227,7 @@ class Environment_demo_socio_model extends CI_Model
 
     //Fin Req1-theme 1 Si on veut une liste avec les commune qui n'ont pas de données
     //Début Req1-theme 1
-    public function effectif_par_age_sexe_population()
+    public function effectif_par_age_sexe_population($enfant,$scolaire_min,$scolaire_max,$travail_min,$travail_max,$agee)
     {
         $sql =  "
 
@@ -281,10 +281,9 @@ class Environment_demo_socio_model extends CI_Model
                                             inner join commune as com on com.id= foko.id_commune 
                                             inner join district as dist on com.district_id= dist.id 
                                             inner join region as reg on dist.region_id= reg.id 
-                                            inner join individu_beneficiaire as ib on indi.id = ib.id_individu
                                         where   
                                             
-                                             (SELECT DATE_PART('year', ib.date_inscription) - DATE_PART('year', indi.date_naissance)) < 7
+                                            indi.date_naissance >= '".$enfant."'
                                             and indi.sexe = 'H'
 
                                         group by 
@@ -323,10 +322,9 @@ class Environment_demo_socio_model extends CI_Model
                                             inner join commune as com on com.id= foko.id_commune 
                                             inner join district as dist on com.district_id= dist.id 
                                             inner join region as reg on dist.region_id= reg.id 
-                                            inner join individu_beneficiaire as ib on indi.id = ib.id_individu
                                         where   
                                             
-                                             (SELECT DATE_PART('year', ib.date_inscription) - DATE_PART('year', indi.date_naissance)) < 7
+                                            indi.date_naissance >= '".$enfant."'
                                             and indi.sexe = 'F'
 
                                         group by 
@@ -365,11 +363,9 @@ class Environment_demo_socio_model extends CI_Model
                                             inner join commune as com on com.id= foko.id_commune 
                                             inner join district as dist on com.district_id= dist.id 
                                             inner join region as reg on dist.region_id= reg.id 
-                                            inner join individu_beneficiaire as ib on indi.id = ib.id_individu
                                         where 
                                             
-                                             (SELECT DATE_PART('year', ib.date_inscription) - DATE_PART('year', indi.date_naissance)) >= 7
-                                            and (SELECT DATE_PART('year', ib.date_inscription) - DATE_PART('year', indi.date_naissance)) < 18
+                                            indi.date_naissance BETWEEN '".$scolaire_max."' AND '".$scolaire_min."'
                                             and indi.sexe = 'F'
 
                                         group by 
@@ -409,10 +405,8 @@ class Environment_demo_socio_model extends CI_Model
                                             inner join commune as com on com.id= foko.id_commune 
                                             inner join district as dist on com.district_id= dist.id
                                             inner join region as reg on dist.region_id= reg.id 
-                                            inner join individu_beneficiaire as ib on indi.id = ib.id_individu 
                                         where 
-                                            (SELECT DATE_PART('year', ib.date_inscription) - DATE_PART('year', indi.date_naissance)) >= 7
-                                            and (SELECT DATE_PART('year', ib.date_inscription) - DATE_PART('year', indi.date_naissance)) < 18
+                                            indi.date_naissance BETWEEN '".$scolaire_max."' AND '".$scolaire_min."'
                                             and indi.sexe = 'H'
 
                                         group by 
@@ -452,10 +446,8 @@ class Environment_demo_socio_model extends CI_Model
                                             inner join commune as com on com.id= foko.id_commune 
                                             inner join district as dist on com.district_id= dist.id 
                                             inner join region as reg on dist.region_id= reg.id 
-                                            inner join menage_beneficiaire as mb on mena.id = mb.id_menage 
                                         where  
-                                            (SELECT DATE_PART('year', mb.date_inscription) - DATE_PART('year', mena.date_naissance)) >= 18
-                                            and (SELECT DATE_PART('year', mb.date_inscription) - DATE_PART('year', mena.date_naissance)) < 60
+                                            mena.date_naissance BETWEEN '".$travail_max."' AND '".$travail_min."'
                                             and mena.sexe = 'H'
 
                                         group by 
@@ -495,10 +487,8 @@ class Environment_demo_socio_model extends CI_Model
                                             inner join commune as com on com.id= foko.id_commune 
                                             inner join district as dist on com.district_id= dist.id 
                                             inner join region as reg on dist.region_id= reg.id 
-                                            inner join individu_beneficiaire as mb on indi.id = mb.id_individu 
                                         where  
-                                            (SELECT DATE_PART('year', mb.date_inscription) - DATE_PART('year', indi.date_naissance)) >= 18
-                                            and (SELECT DATE_PART('year', mb.date_inscription) - DATE_PART('year', indi.date_naissance)) < 60
+                                            indi.date_naissance BETWEEN '".$travail_max."' AND '".$travail_min."'
                                             and indi.sexe = 'H'
 
                                         group by 
@@ -537,11 +527,9 @@ class Environment_demo_socio_model extends CI_Model
                                             inner join fokontany as foko on mena.id_fokontany= foko.id 
                                             inner join commune as com on com.id= foko.id_commune 
                                             inner join district as dist on com.district_id= dist.id 
-                                            inner join region as reg on dist.region_id= reg.id 
-                                            inner join menage_beneficiaire as mb on mena.id = mb.id_menage 
+                                            inner join region as reg on dist.region_id= reg.id  
                                         where  
-                                            (SELECT DATE_PART('year', mb.date_inscription) - DATE_PART('year', mena.date_naissance)) >= 18
-                                            and (SELECT DATE_PART('year', mb.date_inscription) - DATE_PART('year', mena.date_naissance)) < 60
+                                            mena.date_naissance BETWEEN '".$travail_max."' AND '".$travail_min."'
                                             and mena.sexe = 'F'
 
                                         group by 
@@ -581,10 +569,8 @@ class Environment_demo_socio_model extends CI_Model
                                             inner join commune as com on com.id= foko.id_commune 
                                             inner join district as dist on com.district_id= dist.id 
                                             inner join region as reg on dist.region_id= reg.id 
-                                            inner join individu_beneficiaire as mb on indi.id = mb.id_individu 
                                         where  
-                                            (SELECT DATE_PART('year', mb.date_inscription) - DATE_PART('year', indi.date_naissance)) >= 18
-                                            and (SELECT DATE_PART('year', mb.date_inscription) - DATE_PART('year', indi.date_naissance)) < 60
+                                            indi.date_naissance BETWEEN '".$travail_max."' AND '".$travail_min."'
                                             and indi.sexe = 'F'
 
                                         group by 
@@ -624,9 +610,8 @@ class Environment_demo_socio_model extends CI_Model
                                             inner join commune as com on com.id= foko.id_commune 
                                             inner join district as dist on com.district_id= dist.id 
                                             inner join region as reg on dist.region_id= reg.id 
-                                            inner join menage_beneficiaire as mb on mena.id = mb.id_menage 
                                         where  
-                                            (SELECT DATE_PART('year', mb.date_inscription) - DATE_PART('year', mena.date_naissance)) >= 60
+                                            mena.date_naissance <= '".$agee."'
                                             and mena.sexe = 'H'
 
                                         group by 
@@ -666,10 +651,8 @@ class Environment_demo_socio_model extends CI_Model
                                             inner join commune as com on com.id= foko.id_commune 
                                             inner join district as dist on com.district_id= dist.id 
                                             inner join region as reg on dist.region_id= reg.id 
-                                            inner join individu_beneficiaire as mb on indi.id = mb.id_individu 
                                         where  
-                                            (SELECT DATE_PART('year', mb.date_inscription) - DATE_PART('year', indi.date_naissance)) >= 18
-                                            and (SELECT DATE_PART('year', mb.date_inscription) - DATE_PART('year', indi.date_naissance)) < 60
+                                            indi.date_naissance <= '".$agee."'
                                             and indi.sexe = 'H'
 
                                         group by 
@@ -709,9 +692,8 @@ class Environment_demo_socio_model extends CI_Model
                                             inner join commune as com on com.id= foko.id_commune 
                                             inner join district as dist on com.district_id= dist.id 
                                             inner join region as reg on dist.region_id= reg.id 
-                                            inner join menage_beneficiaire as mb on mena.id = mb.id_menage 
                                         where  
-                                            (SELECT DATE_PART('year', mb.date_inscription) - DATE_PART('year', mena.date_naissance)) >= 60
+                                            mena.date_naissance <= '".$agee."'
                                             and mena.sexe = 'F'
 
                                         group by 
@@ -751,9 +733,8 @@ class Environment_demo_socio_model extends CI_Model
                                             inner join commune as com on com.id= foko.id_commune 
                                             inner join district as dist on com.district_id= dist.id 
                                             inner join region as reg on dist.region_id= reg.id 
-                                            inner join individu_beneficiaire as mb on indi.id = mb.id_individu 
                                         where  
-                                            (SELECT DATE_PART('year', mb.date_inscription) - DATE_PART('year', indi.date_naissance)) >= 60
+                                            indi.date_naissance <= '".$agee."'
                                             and indi.sexe = 'F'
 
                                         group by 
@@ -777,59 +758,105 @@ class Environment_demo_socio_model extends CI_Model
     }
     //Fin Req1-theme 1
 
-   /* public function findEffectif_menage_enfant($requete,$enfant,$scolaire_min,$scolaire_max)
+   
+    public function menage_ayant_efant($enfant, $scolaire_min, $scolaire_max)
     {
-       $this->db->select("region.id as id_reg,region.nom as nom_region,district.id as id_dist,commune.id as id_com ");
+        $sql = 
 
-       $this->db ->select("((select count(DISTINCT(menage.id)) from menage inner join individu on individu.id_menage = menage.id inner join fokontany on menage.id_fokontany= fokontany.id inner join commune on commune.id= fokontany.id_commune inner join district on commune.district_id= district.id where  ".$requete." and individu.date_naissance >= '".$enfant."')) as nombre_menage_enfant",false);
+                "
+                    select
+                        niveau_1.nom_reg as nom_reg,
+                        niveau_1.nom_dist as nom_dist,
+                        niveau_1.id_commune as id_commune,  niveau_1.nom_reg ,
+                        niveau_1.nom_com as nom_com,
 
-       $this->db ->select("((select count(DISTINCT(menage.id)) from menage inner join individu on individu.id_menage = menage.id inner join fokontany on menage.id_fokontany= fokontany.id inner join commune on commune.id= fokontany.id_commune inner join district on commune.district_id= district.id where  ".$requete." and individu.date_naissance BETWEEN '".$scolaire_max."' AND '".$scolaire_min."' )) as nombre_menage_agescollaire",false);
+                        sum(niveau_1.nbr_ayant_enfant) as nbr_ayant_enfant,
+                        sum(niveau_1.nbr_ayant_enfant_age_scolaire) as nbr_ayant_enfant_age_scolaire
 
-        $result =  $this->db->from('region,commune,district ,individu,fokontany')
-                    
-                    ->where('region.id = district.region_id')
-                    ->where('district.id = commune.district_id')
-                    ->where('commune.id = fokontany.id_commune')
-                    ->where('individu.id_fokontany = fokontany.id')
-                    ->where($requete)
-                    ->group_by('id_reg,id_dist,id_com')
-                                       
-                    ->get()
-                    ->result();                              
+                    from(
+                            (
+                            select
+                            
+                                region.id as id_reg,
+                                region.nom as nom_reg,
+                                district.id as id_dist,
+                                district.nom as nom_dist,
+                                commune.id as id_commune,
+                                commune.nom as nom_com,
 
-        if($result)
-        {
-            return $result;
-        }else{
-            return null;
-        }                 
-    }*/
-    public function findEffectif_menage_enfant($requete,$enfant,$scolaire_min,$scolaire_max)
-    {
-       $this->db->select("region.id as id_reg, region.nom as nom_region, district.id as id_dist, district.nom as nom_dist, commune.nom as nom_com, commune.id as id_com ");
 
-       $this->db ->select("((select count(DISTINCT(mena.id)) from menage as mena inner join individu as indi on indi.id_menage = mena.id inner join fokontany as foko on mena.id_fokontany= foko.id inner join commune as com on com.id= foko.id_commune inner join district as dist on com.district_id= dist.id where com.id=commune.id and ".$requete." and indi.date_naissance >= '".$enfant."')) as nbr_menage_enfant",false);
+                                0 as nbr_ayant_enfant,
+                                count(DISTINCT(menage.id)) as nbr_ayant_enfant_age_scolaire
+                            from 
+                                menage,
+                                individu,
+                                fokontany,
+                                commune,
+                                district,
+                                region
+                            where
+                                menage.id = individu.id_menage
+                                and fokontany.id = menage.id_fokontany
+                                and commune.id = fokontany.id_commune
+                                and district.id = commune.district_id
+                                and region.id = district.region_id
+                                and (select count(individu.id) from individu where id_liendeparente = 4 and id_menage = menage.id) > 0
+                                
 
-       $this->db ->select("((select count(DISTINCT(mena.id)) from menage as mena inner join individu as indi on indi.id_menage = mena.id inner join fokontany as foko on mena.id_fokontany= foko.id inner join commune as com on com.id= foko.id_commune inner join district as dist on com.district_id= dist.id where com.id=commune.id and ".$requete." and indi.date_naissance BETWEEN '".$scolaire_max."' AND '".$scolaire_min."' )) as nbr_menage_agescollaire",false);
+                                and individu.date_naissance BETWEEN '".$scolaire_max."' AND '".$scolaire_min."'
 
-        $result =  $this->db->from('region,commune,district ,individu,fokontany')
-                    
-                    ->where('region.id = district.region_id')
-                    ->where('district.id = commune.district_id')
-                    ->where('commune.id = fokontany.id_commune')
-                    ->where('individu.id_fokontany = fokontany.id')
-                    ->where($requete)
-                    ->group_by('id_reg,id_dist,id_com')
-                                       
-                    ->get()
-                    ->result();                              
+                            group by 
 
-        if($result)
-        {
-            return $result;
-        }else{
-            return null;
-        }                 
+                                region.id, district.id, commune.id
+                            )
+
+                            UNION
+                            (
+                            select
+                            
+                                region.id as id_reg,
+                                region.nom as nom_reg,
+                                district.id as id_dist,
+                                district.nom as nom_dist,
+                                commune.id as id_commune,
+                                commune.nom as nom_com,
+
+
+                                count(DISTINCT(menage.id)) as nbr_ayant_enfant,
+                                0 as nbr_ayant_enfant_age_scolaire
+                            from 
+                                menage,
+                                individu,
+                                fokontany,
+                                commune,
+                                district,
+                                region
+                            where
+                                menage.id = individu.id_menage
+                                and fokontany.id = menage.id_fokontany
+                                and commune.id = fokontany.id_commune
+                                and district.id = commune.district_id
+                                and region.id = district.region_id
+                                and (select count(individu.id) from individu where id_liendeparente = 4 and id_menage = menage.id) > 0
+                                
+
+                                and individu.date_naissance >= '".$enfant."'
+
+                            group by 
+
+                                region.id, district.id, commune.id
+                            )
+
+
+                        ) niveau_1
+                            group by 
+
+                                niveau_1.id_commune,  niveau_1.nom_reg ,niveau_1.nom_dist,niveau_1.nom_com
+
+
+                " ;
+        return $this->db->query($sql)->result();
+
     }
 
     public function findById($id)  {
@@ -842,7 +869,8 @@ class Environment_demo_socio_model extends CI_Model
     }
     public function findByIdArray($id)  {
         $result =  $this->db->select('*')
-                        ->from($this->table)
+                        ->from($
+                            $this->table)
                         ->where("id", $id)
                         ->order_by('id', 'asc')
                         ->get()
