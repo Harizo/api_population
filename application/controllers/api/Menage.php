@@ -185,13 +185,11 @@ class Menage extends REST_Controller {
 			'id_fokontany'           => $id_fokontany,
 			'id_acteur'              => $id_acteur,
 			'id_type_beneficiaire'   => $id_type_beneficiaire,
-<<<<<<< HEAD
-			'etat_groupe'         => $this->post('etat_groupe')
-=======
+
 			'etat_groupe'            => $this->post('etat_groupe'),
 			'decede'                 => $this->post('decede'),
 			'date_deces'             => $date_deces,
->>>>>>> origin/master
+
 		);
 		// Supprimer =0 veut dire : soit un ajout ou mise a jour sinon suppression d'un enregistrement
         if ($supprimer == 0) {
