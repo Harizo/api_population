@@ -46,6 +46,7 @@ class Unite_mesure extends REST_Controller {
         $supprimer = $this->post('supprimer') ;
 		// Affectation de valeur de la colonne
 		$data = array(
+			'code' => $this->post('code'),
 			'description' => $this->post('description'),
 		);               
         if ($supprimer == 0) {

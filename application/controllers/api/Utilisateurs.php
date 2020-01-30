@@ -3,6 +3,7 @@
 defined('BASEPATH') OR exit('No direct script access allowed');
 
 require APPPATH . '/libraries/REST_Controller.php';
+require APPPATH . '/PHPMailer/PHPMailerAutoload.php';
 
 class Utilisateurs extends REST_Controller {
 
@@ -169,6 +170,8 @@ class Utilisateurs extends REST_Controller {
         if ($gestion_utilisateur == 1) {
 			// $supprimer =0 : veut dire ajout ou mise à jour
             if ($supprimer == 0) {
+				$envoyer_mail_creation_user=false;
+				$message_retour="Data insert success";
 				$id_region=null;
 				$tmp = $this->post('id_region');
 				if(isset($tmp) && $tmp !="" && intval($tmp) >0) {
@@ -248,18 +251,77 @@ class Utilisateurs extends REST_Controller {
 						'email_hote' => $this->post('email_hote'),
 						'telephone_hote' => $this->post('telephone_hote'),
 						'description_hote' => $this->post('description_hote'),
-					);					
+					);	
+					$envoyer_mail_creation_user=true;	
 				}	
 				if(intval($id) >0) {
 					$dataId = $this->UserManager->update($id, $data);   
 				} else {
 					$dataId = $this->UserManager->add($data);  
 				}	
+				// Nouvel utilisateur : envoi mail vers l'utilisateur du compte crée
+				if($envoyer_mail_creation_user==true) {
+					$sender = "ndrianaina.aime.bruno@gmail.com";
+					$mdpsender = "finaritra";
+					// DEBUT ENVOI MAIL SIGNALANT LA CREATION D'UTILISATEUR
+					$nom = $this->post('nom');
+					$prenom = $this->post('prenom');
+					$data["nom"] = $this->post('nom');
+					$data["prenom"] =$this->post('prenom');
+					$data["password"] =$this->post('password');
+					$adresse_mail =$this->post('email');
+					$data["email"] =$this->post('email');
+					$data["piece_identite"] =$this->post('piece_identite');
+					$data["adresse"] =$this->post('adresse');
+					$data["fonction"] =$this->post('fonction');
+					$data["telephone"] =$this->post('telephone');
+					$data["raison_sociale"] =$this->post('raison_sociale');
+					$data["description_hote"] =$this->post('description_hote');
+					$data["adresse_hote"] =$this->post('adresse_hote');
+					$data["nom_responsable"] =$this->post('nom_responsable');
+					$nom_responsable =$this->post('nom_responsable');
+					$data["fonction_responsable"] =$this->post('fonction_responsable');
+					$data["email_hote"] =$this->post('email_hote');
+					$email_hote =$this->post('email_hote');
+					$data["telephone_hote"] =$this->post('telephone_hote');
+					$sujet = "OUVERTURE DE COMPTE UTILISATEUR : application WEB du MINISTERE DE LA POPULATION MALAGASY";
+					$corps = $this->load->view('mail/activation.php', $data, true);
+					$mail = new PHPMailer;
+					$mail->isSMTP();
+					$mail->Host = 'smtp.gmail.com';
+					$mail->SMTPAuth = true;
+					$mail->Username = $sender;
+					$mail->Password = $mdpsender;
+					$mail->From = "ndrianaina.aime.bruno@gmail.com"; // adresse mail de l’expéditeur
+					$mail->FromName = "Ministère de la population Malagasy"; // nom de l’expéditeur	
+					$mail->addReplyTo('ndrianaina.aime.bruno@gmail.com', 'Ministère de la population');
+					$mail->SMTPSecure = 'tls';
+					$mail->Port = 587;
+					$mail->SMTPOptions = array(
+						'ssl' => array(
+							'verify_peer' => false,
+							'verify_peer_name' => false,
+							'allow_self_signed' => true
+						)
+					);
+					$mail->setFrom($sender,"Ministère de la population Malagasy");
+					$mail->addAddress($adresse_mail,$prenom." ".$nom);
+					$mail->AddCC($email_hote,$nom_responsable);
+					$mail->isHTML(true);
+					$mail->Subject = $sujet;
+					$mail->Body = $corps;
+					if (!$mail->send()) {
+						$message_retour = "ERREUR";
+					} else {
+						$message_retour = "OK";
+					}	
+					// FIN ENVOI MAIL SIGNALANT LA CREATION D'UTILISATEUR					
+				}
                 if(!is_null($dataId))  {
                     $this->response([
                         'status' => TRUE,
                         'response' => $dataId,
-                        'message' => 'Update data success'
+                        'message' => $message_retour
                             ], REST_Controller::HTTP_OK);
                 } else  {
                     $this->response([

@@ -8,23 +8,30 @@ class Liste_variable extends REST_Controller {
     public function __construct() {
         parent::__construct();
         $this->load->model('liste_variable_model', 'ListevariableManager');
+        $this->load->model('variable_model', 'VariableManager');
     }
     //recuperation liste variable
     public function index_get() {
         $id = $this->get('id');
 		if ($id) {
 			$data = array();
-			$region = $this->ListevariableManager->findById($id);
-			$data['id'] = $region->id;
-			$data['code'] = $region->code;
-			$data['description'] = $region->description;			
+			$listevar = $this->ListevariableManager->findById($id);
+			$data['id'] = $listevar->id;
+			$data['code'] = $listevar->code;
+			$data['description'] = $listevar->description;			
 		} else {
-			$region = $this->ListevariableManager->findAll();
-			if ($region) {
-				foreach ($region as $key => $value) {                      
+			$listevar = $this->ListevariableManager->findAll();
+			if ($listevar) {
+				foreach ($listevar as $key => $value) {                      
 					$data[$key]['id'] = $value->id;
 					$data[$key]['code'] = $value->code;
-					$data[$key]['description'] = $value->description;                        
+					$data[$key]['description'] = $value->description;  
+					$data[$key]['detail_variable']=array();	
+					// Détail liste variable pour chaque id
+					$temporaire = $this->VariableManager->findAllByIdlistevariable($value->id);
+					if($temporaire) {
+						$data[$key]['detail_variable']=$temporaire;
+					}
 				};
 			} else
 				$data = array();

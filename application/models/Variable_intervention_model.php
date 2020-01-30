@@ -29,6 +29,7 @@ class Variable_intervention_model extends CI_Model {
             'id_liste_variable'                => $variable_intervention['id_liste_variable'],                      
             'id_variable'                      => $variable_intervention['id_variable'],
             'id_liste_validation_beneficiaire' => $variable_intervention['id_liste_validation_beneficiaire'],
+            'id_intervention'                  => $variable_intervention['id_intervention'],
         );
     }
 	// Suppression d'un enregistrement
@@ -39,6 +40,12 @@ class Variable_intervention_model extends CI_Model {
         }else{
             return null;
         }  
+    }
+	// Suppression des enregistrements par id_intervention
+    public function deleteByIntervention($id_intervention) {
+        $this->db->where('id_intervention', (int) $id_intervention)->delete($this->table);
+		// Valeur en retour = nombre d'enregistrement supprimé
+		return $this->db->affected_rows();
     }
 	// Récupération de tous les enregistrements de la table
     public function findAll() {
@@ -53,12 +60,12 @@ class Variable_intervention_model extends CI_Model {
             return null;
         }                 
     }
-	// Récupération pa id_liste_variable : clé étrangère
-    public function findAllByIdlistevariable($id_liste_variable) {
+	// Récupération par id_intervention : clé étrangère
+    public function findAllByIdIntervention($id_intervention) {
         $result =  $this->db->select('*')
                         ->from($this->table)
-                        ->order_by('id_variable')
-                        ->where("id_liste_variable", $id_liste_variable)
+                        ->where("id_intervention", $id_intervention)
+                        ->order_by('id_intervention')
                         ->get()
                         ->result();
         if($result) {

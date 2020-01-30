@@ -55,11 +55,6 @@ class Nomenclature_intervention4_model extends CI_Model {
 					." order by n1.code,n2.code,n3.code,n4.code";
  		$query = $this->db->query($requete);
         $result =   $query->result();			
-		/*$result =  $this->db->select('*')
-                        ->from($this->table)
-                        ->order_by('description')
-                        ->get()
-                        ->result();*/
         if($result)
         {
             return $result;
@@ -71,7 +66,7 @@ class Nomenclature_intervention4_model extends CI_Model {
 		// Selection nomenclature par id_nomenclature3
         $result =  $this->db->select('*')
                         ->from($this->table)
-                        ->order_by('description')
+                        ->order_by('code')
                         ->where("id_nomenclature3", $id_nomenclature3)
                         ->get()
                         ->result();
@@ -94,12 +89,6 @@ class Nomenclature_intervention4_model extends CI_Model {
 					." order by n1.code,n2.code,n3.code,n4.code";
  		$query = $this->db->query($requete);
         $result =   $query->result();			
-        /*$result =  $this->db->select('*')
-                        ->from($this->table)
-                        ->where("id", $id)
-                        ->order_by('id', 'asc')
-                        ->get()
-                        ->result();*/
         if($result) {
             return $result;
         }else{

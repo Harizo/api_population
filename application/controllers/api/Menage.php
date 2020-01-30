@@ -109,7 +109,9 @@ class Menage extends REST_Controller {
                     $data[$key]['id_type_beneficiaire'] = $value->id_type_beneficiaire;
                     $data[$key]['type_beneficiaire'] = $type_beneficiaire;
                     $data[$key]['etat_groupe'] = $value->etat_groupe;
-                }
+					$data[$key]['decede'] = $value->decede;
+                    $data[$key]['date_deces'] = $value->date_deces;
+          }
             }
             if (!$data)
                 $data = array();			
@@ -133,6 +135,7 @@ class Menage extends REST_Controller {
         $supprimer = $this->post('supprimer') ;
 		$date_naissance = $this->convertDateAngular($this->post('date_naissance'));
 		$date_inscription = $this->convertDateAngular($this->post('date_inscription'));
+		$date_deces = $this->convertDateAngular($this->post('date_deces'));
 		$id_fokontany=null;
 		$id_type_beneficiaire=null;
 		$id_acteur=null;
@@ -182,7 +185,13 @@ class Menage extends REST_Controller {
 			'id_fokontany'           => $id_fokontany,
 			'id_acteur'              => $id_acteur,
 			'id_type_beneficiaire'   => $id_type_beneficiaire,
+<<<<<<< HEAD
 			'etat_groupe'         => $this->post('etat_groupe')
+=======
+			'etat_groupe'            => $this->post('etat_groupe'),
+			'decede'                 => $this->post('decede'),
+			'date_deces'             => $date_deces,
+>>>>>>> origin/master
 		);
 		// Supprimer =0 veut dire : soit un ajout ou mise a jour sinon suppression d'un enregistrement
         if ($supprimer == 0) {

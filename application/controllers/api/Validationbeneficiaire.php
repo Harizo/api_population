@@ -724,13 +724,13 @@ class Validationbeneficiaire extends CI_Controller {
 						 } else if('S' == $cell->getColumn()) {
 							$depense = $cell->getValue(); 
 						 } else if('T' == $cell->getColumn()) {
-							$date_inscription = $cell->getValue();
-							if(isset($date_inscription) && $date_inscription>"") {
+							$date_inscription_detail_beneficiaire = $cell->getValue();
+							if(isset($date_inscription_detail_beneficiaire) && $date_inscription_detail_beneficiaire>"") {
 								if(PHPExcel_Shared_Date::isDateTime($cell)) {
-									 $date_inscription = date($format='Y-m-d', PHPExcel_Shared_Date::ExcelToPHP($date_inscription)); 
+									 $date_inscription_detail_beneficiaire = date($format='Y-m-d', PHPExcel_Shared_Date::ExcelToPHP($date_inscription_detail_beneficiaire)); 
 								}
 							} else {
-								$date_inscription=null;
+								$date_inscription_detail_beneficiaire=null;
 							}								 							 
 						 } else if('U' == $cell->getColumn()) {
 							$telephone = $cell->getValue();  
@@ -909,8 +909,8 @@ class Validationbeneficiaire extends CI_Controller {
 								 )
 						 );	
 						$nombre_erreur = $nombre_erreur + 1;						
-					}
-					if($date_inscription=='') {
+					}*/
+					if($date_inscription_detail_beneficiaire=='') {
 						$sheet->getStyle("T".$ligne)->getFill()->applyFromArray(
 								 array('type'       => PHPExcel_Style_Fill::FILL_SOLID,'rotation'   => 0,
 									 'startcolor' => array('rgb' => 'FF0000'),
@@ -919,7 +919,7 @@ class Validationbeneficiaire extends CI_Controller {
 						 );	
 						$nombre_erreur = $nombre_erreur + 1;						
 					}
-					if($telephone=='') {
+					/*if($telephone=='') {
 						$sheet->getStyle("U".$ligne)->getFill()->applyFromArray(
 								 array('type'       => PHPExcel_Style_Fill::FILL_SOLID,'rotation'   => 0,
 									 'startcolor' => array('rgb' => 'FF0000'),

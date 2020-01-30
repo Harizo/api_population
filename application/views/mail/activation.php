@@ -308,30 +308,30 @@
         </td>
     </tr>
     <tr>
-        <td align="center" valign="top" width="100%" style="background-color: #f7f7f7;" class="content-padding">
-            <center>
+        <td align="left" valign="top" width="100%" style="background-color: #f7f7f7;" class="content-padding">
+            <!--center-->
                 <table cellspacing="0" cellpadding="0" width="600" class="w320">
                     <tr>
-                        <td class="header-lg">
+                        <td class="header-lg" colspan="2">
                             Bonjour à vous,
                         </td>
                     </tr>
                     <tr>
-                        <td class="free-text">
+                        <td class="free-text" colspan="2">
                             Bienvenue dans l'application WEB du Ministère de la Population.
                         </td>
                     </tr>
                     <tr>
-                        <td class="free-text">
-                            Voici les informations necessaires pour la connexion à l'application :
+                        <td class="free-text" colspan="2">
+                            Voici les informations concernant votre compte pour l'application WEB :
                         </td>
                     </tr>
                     <tr>
                         <td class="free-text">
-                            Login :
+                            Login : 
                         </td>
                         <td class="free-text">
-                            <?php echo $login;?>
+                            <?php echo $email;?>
                         </td>
                     </tr>
                     <tr>
@@ -339,31 +339,154 @@
                             Mot de passe :
                         </td>
                         <td class="free-text">
-                            <?php echo $motdepasse;?>
+                            <?php echo $password;?>
                         </td>
                     </tr>
                     <tr>
                         <td class="free-text">
+                            Titulaire du compte :
+                        </td>
+                        <td class="free-text">
+                            <?php echo $prenom." ".$nom;?>
+                        </td>
+                    </tr>
+					<?php if($piece_identite && strlen($piece_identite ) >0) { ?>
+						<tr>
+							<td class="free-text">
+								Pièce d'identité :
+							</td>
+							<td class="free-text">
+								<?php echo $piece_identite;?>
+							</td>
+						</tr>
+					<?php }?>	
+					<?php if($adresse && strlen($adresse ) >0) { ?>
+						<tr>
+							<td class="free-text">
+								Adresse :
+							</td>
+							<td class="free-text">
+								<?php echo $adresse;?>
+							</td>
+						</tr>
+					<?php }?>	
+					<?php if($fonction && strlen($fonction ) >0) { ?>
+						<tr>
+							<td class="free-text">
+								Fonction :
+							</td>
+							<td class="free-text">
+								<?php echo $fonction;?>
+							</td>
+						</tr>
+					<?php }?>	
+					<?php if($telephone && strlen($telephone ) >0) { ?>
+						<tr>
+							<td class="free-text">
+								Téléphone :
+							</td>
+							<td class="free-text">
+								<?php echo $telephone;?>
+							</td>
+						</tr>
+					<?php }?>	
+						<tr>
+							<td class="free-text" colspan="2">
+								<b>DESCRIPTION DE L'ORGANISME </b>
+							</td>
+						</tr>
+					<?php if($raison_sociale && strlen($raison_sociale ) >0) { ?>
+						<tr>
+							<td class="free-text">
+								Nom de l'organisme :
+							</td>
+							<td class="free-text">
+								<?php echo $raison_sociale;?>
+							</td>
+						</tr>
+					<?php }?>	
+					<?php if($description_hote && strlen($description_hote ) >0) { ?>
+						<tr>
+							<td class="free-text">
+								Description :
+							</td>
+							<td class="free-text">
+								<?php echo $description_hote;?>
+							</td>
+						</tr>
+					<?php }?>	
+					<?php if($adresse_hote && strlen($adresse_hote ) >0) { ?>
+						<tr>
+							<td class="free-text">
+								Adresse :
+							</td>
+							<td class="free-text">
+								<?php echo $adresse_hote;?>
+							</td>
+						</tr>
+					<?php }?>	
+					<?php if($nom_responsable && strlen($nom_responsable ) >0) { ?>
+						<tr>
+							<td class="free-text">
+								Nom responsable :
+							</td>
+							<td class="free-text">
+								<?php echo $nom_responsable;?>
+							</td>
+						</tr>
+					<?php }?>	
+					<?php if($fonction_responsable && strlen($fonction_responsable ) >0) { ?>
+						<tr>
+							<td class="free-text">
+								Fonction responsable :
+							</td>
+							<td class="free-text">
+								<?php echo $fonction_responsable;?>
+							</td>
+						</tr>
+					<?php }?>	
+					<?php if($email_hote && strlen($email_hote ) >0) { ?>
+						<tr>
+							<td class="free-text">
+								adresse e-mail responsable :
+							</td>
+							<td class="free-text">
+								<?php echo $email_hote;?>
+							</td>
+						</tr>
+					<?php }?>	
+					<?php if($telephone_hote && strlen($telephone_hote ) >0) { ?>
+						<tr>
+							<td class="free-text">
+								Téléphone responsable :
+							</td>
+							<td class="free-text">
+								<?php echo $telephone_hote;?>
+							</td>
+						</tr>
+					<?php }?>	
+                    <tr>
+                        <td class="free-text" colspan="2">
                             Lors de votre première connexion, l'application vous redirigéra vers la modification du mot de passe par défaut que nous venons d'envoyer.
                         </td>
                     </tr>
                     <tr>
-                        <td class="free-text">
+                        <td class="free-text" colspan="2">
                             Et après changement du mot de passe, l'administrateur de l'application n'est plus en mesure de savoir votre mot de passe personnel.
                         </td>
                     </tr>
                     <tr>
-                        <td class="free-text">
+                        <td class="free-text" colspan="2">
 							Veuillez le conserver quelque part afin d'éviter un oubli.
                         </td>
                     </tr>
                     <tr>
-                        <td class="free-text">
+                        <td class="free-text" colspan="2">
                             Merci de votre collaboration
                         </td>
                     </tr>
                     <tr>
-                        <td class="mini-block-container">
+                        <td class="mini-block-container" colspan="2">
                             <table cellspacing="0" cellpadding="0" width="100%"  style="border-collapse:separate !important;">
                                 <tr>
                                     <td>
@@ -371,8 +494,8 @@
                                             <tr>
                                                 <td class="button">
                                                     <div><a class="button-mobile"
-                                                            href="<?php echo $connexion; ?>"
-                                                            style="background-color:#4a89dc;border-radius:5px;color:#ffffff;display:inline-block;font-family:'Cabin', Helvetica, Arial, sans-serif;font-size:14px;font-weight:regular;line-height:45px;text-align:center;text-decoration:none;width:155px;-webkit-text-size-adjust:none;mso-hide:all;">
+                                                            href="<?php /* echo $connexion;*/ ?>"
+                                                            style="background-color:#4a89dc;border-radius:5px;color:#ffffff;display:inline-block;font-family:'Cabin', Helvetica, Arial, sans-serif;font-size:14px;font-weight:regular;line-height:45px;text-align:center;text-decoration:none;width:200px;-webkit-text-size-adjust:none;mso-hide:all;">
                                                             Connexion à l'application</a>
                                                     </div>
                                                 </td>
@@ -384,7 +507,7 @@
                         </td>
                     </tr>
                 </table>
-            </center>
+            <!--/center-->
         </td>
     </tr>
 

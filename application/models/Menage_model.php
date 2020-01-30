@@ -69,7 +69,9 @@ class Menage_model extends CI_Model {
 			'depense_mensuel'        => $menage['depense_mensuel'],
 			'id_fokontany'           => $menage['id_fokontany'],
 			'id_acteur'              => $menage['id_acteur'],
-			'etat_groupe'              => $menage['etat_groupe'],
+			'etat_groupe'            => $menage['etat_groupe'],
+			'decede'                 => $menage['decede'],
+			'date_deces'             => $menage['date_deces'],
         );
     }
     public function _setbeneficiaire_acteur($menage) {
@@ -106,7 +108,9 @@ class Menage_model extends CI_Model {
 			'depense_mensuel'        => $menage['depense_mensuel'],
 			'id_fokontany'           => $menage['id_fokontany'],
 			'id_acteur'              => $menage['id_acteur'],
-			'etat_groupe'              => $menage['etat_groupe'],
+			'etat_groupe'            => $menage['etat_groupe'],
+			'decede'                 => $menage['decede'],
+			'date_deces'             => $menage['date_deces'],
         );
     }
     public function delete($id) {

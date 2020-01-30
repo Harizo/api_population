@@ -18,13 +18,9 @@ class Mail extends REST_Controller {
         $courriel = $to = $this->get('courriel');
         $token = $this->get('token');
         $actif = $this->get('actif');
-        $dest = $this->get('dest');
-        $assujettis = $this->get('assujettis');
-        $assujettis_id = $this->get('assujettis_id');
         $date = $this->get('date');
         $sender = "ndrianaina.aime.bruno@gmail.com";
         $mdpsender = "finaritra";
-
         if ($actif == 0) {
 			// Envoi mail code de confirmation
             $data['activer'] = base_url() . "/mail?actif=1&courriel=" . $courriel . "&token=" . $token;
@@ -147,6 +143,8 @@ class Mail extends REST_Controller {
         //status success + data
         $this->response($data, REST_Controller::HTTP_OK);
     }
+    public function index_post() {
+	}	
 
 }
 

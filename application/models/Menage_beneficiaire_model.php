@@ -29,9 +29,10 @@ class Menage_beneficiaire_model extends CI_Model {
     public function _set($menage_benef)  {
 		// Affectation des valeurs
         return array(
-            'id_menage'       => $menage_benef['id_menage'],
-            'id_intervention' => $menage_benef['id_intervention'],                      
-            'date_sortie' => $menage_benef['date_sortie'],                      
+            'id_menage'        => $menage_benef['id_menage'],
+            'id_intervention'  => $menage_benef['id_intervention'],                      
+            'date_sortie'      => $menage_benef['date_sortie'],                      
+            'date_inscription' => $menage_benef['date_inscription'],                      
         );
     }
     public function delete($id)  {

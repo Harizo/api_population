@@ -64,6 +64,8 @@ class Individu_model extends CI_Model {
 			'id_situation_matrimoniale' => $individu['id_situation_matrimoniale'],
 			'id_fokontany'              => $individu['id_fokontany'],
 			'id_acteur'                 => $individu['id_acteur'],
+			'decede'                    => $individu['decede'],
+			'date_deces'                => $individu['date_deces'],
         );
     }
     public function delete($id) {

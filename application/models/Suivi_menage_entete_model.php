@@ -40,6 +40,7 @@ class Suivi_menage_entete_model extends CI_Model
             'observation'                      => $suivi_menage_entete['observation'],                      
             'id_fokontany'                     => $suivi_menage_entete['id_fokontany'],                      
             'id_liste_validation_intervention' => $suivi_menage_entete['id_liste_validation_intervention'],                      
+            'montant_transfert' => $suivi_menage_entete['montant_transfert'],                      
         );
     }
 	// Cette fonction permet de supprimer un enregitrement dans la table

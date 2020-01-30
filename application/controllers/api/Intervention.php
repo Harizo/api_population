@@ -55,11 +55,11 @@ class Intervention extends REST_Controller {
 					if(count($ac) >0) {
 						$typeaction=$ac;
 					}	
-					$detail_type_transfert_intervention=null;
+					/*$detail_type_transfert_intervention=null;
 					$dettpintv= $this->DetailtypetransfertinterventionManager->findByIntervention($value->id);
 					if(count($dettpintv) >0) {
 						$detail_type_transfert_intervention=$dettpintv;
-					}	
+					}*/	
 					$frequencetransfert=null;
 					$freq= $this->FrequencetransfertManager->findById($value->id);
 					if(count($freq) >0) {
@@ -98,6 +98,7 @@ class Intervention extends REST_Controller {
                     $data[$key]['duree'] = $value->duree;
                     $data[$key]['unite_duree'] = $value->unite_duree;
                     $data[$key]['id_type_transfert'] = $value->id_type_transfert;
+                    $data[$key]['id_type_transfert_ancien'] = $value->id_type_transfert; // pour pouvoir comparer si retour vers ancienne valeur
                     $data[$key]['typetransfert'] = $typetransfert;
                     $data[$key]['id_frequence_transfert'] = $value->id_frequence_transfert;
                     $data[$key]['frequencetransfert'] = $frequencetransfert;
@@ -106,11 +107,11 @@ class Intervention extends REST_Controller {
                     $data[$key]['nouvelle_integration'] = $value->nouvelle_integration;
                     $data[$key]['commentaire'] = $value->commentaire;
                     $data[$key]['detail_transfert'] = $detail_transfert;
-                    $data[$key]['detail_type_transfert_intervention'] = $detail_type_transfert_intervention;
                     $data[$key]['id_nomenclature_intervention'] = $value->id_nomenclature_intervention;
                     $data[$key]['nomenclatureintervention'] = $nomenclatureintervention;
                     $data[$key]['detail_financement_intervention'] = array();
                     $data[$key]['detail_zone_intervention'] = array();
+                    $data[$key]['detail_type_transfert'] = array();
                     $data[$key]['detail_charge'] = 0;
 				}
 			}			

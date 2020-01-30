@@ -318,7 +318,7 @@
                     </tr>
                     <tr>
                         <td class="free-text">
-                            Bienvenue dans l'application de WEB du minist&eacute;re de la Population, pour r&eacute;initialiser votre mot de passe, veuillez cliquer sur le bouton R&eacute;initialiser,
+                            Bienvenue dans l'application WEB du minist&eacute;re de la Population, pour r&eacute;initialiser votre mot de passe, veuillez cliquer sur le bouton R&eacute;initialiser,
                         </td>
                     </tr>
                     <tr>
