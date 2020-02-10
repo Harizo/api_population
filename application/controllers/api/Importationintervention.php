@@ -10,6 +10,7 @@ class Importationintervention extends CI_Controller {
 		// Ouverture des modèles utilisées
         $this->load->model('importationintervention_model', 'ImportationinterventionManager');
         $this->load->model('validationintervention_model', 'ValidationinterventionManager');
+        $this->load->model('listevalidationintervention_model', 'ListevalidationinterventionManager');
         $this->load->model('region_model', 'RegionManager');
         $this->load->model('district_model', 'DistrictManager');
         $this->load->model('commune_model', 'CommuneManager');
@@ -25,6 +26,7 @@ class Importationintervention extends CI_Controller {
         $this->load->model('suivi_individu_entete_model', 'SuiviIndividuEnteteManager');        
         $this->load->model('suivi_individu_detail_transfert_model', 'SuiviIndividuDetailtransfertManager');        
         $this->load->model('detail_type_transfert_intervention_model', 'DetailTypeTransfertInterventionManager');        
+        $this->load->model('utilisateurs_model', 'UtilisateursManager');        
     }
 	// Copie fichier excel vers le serveur
 	public function upload_importationdonneesintervention() {	
@@ -123,6 +125,7 @@ class Importationintervention extends CI_Controller {
 							$nom_acteur =$cell->getValue();
 						} else if('D' == $cell->getColumn()) {
 							$intitule_intervention =$cell->getValue();	
+							$intervention =$cell->getValue();	
 						} else if('F' == $cell->getColumn()) {
 							$date_suivi = $cell->getValue();
 							if(isset($date_suivi) && $date_suivi>"") {
@@ -507,7 +510,7 @@ class Importationintervention extends CI_Controller {
 			$val_ret["district"] = $nom_district_original;
 			$val_ret["commune"] = $nom_commune_original;
 			$val_ret["fokontany"] = $nom_fokontany_original;
-			$val_ret["intervention"] = $intitule_intervention;
+			$val_ret["intervention"] = $intervention;
 			$val_ret["nombre_erreur"] = $nombre_erreur;
 			// Fermer fichier Excel
 		} else {
@@ -517,9 +520,91 @@ class Importationintervention extends CI_Controller {
 			$val_ret["district"] = $nom_district_original;
 			$val_ret["commune"] = $nom_commune_original;
 			$val_ret["fokontany"] = $nom_fokontany_original;
-			$val_ret["intervention"] = $intitule_intervention;
+			$val_ret["intervention"] = $intervention;
 			$val_ret["nombre_erreur"] = 0;			
 		}
 		echo json_encode($val_ret);
 	}	
+	// Envoi email vers acteur pour signaler que les données sont intégrées dans la BDD
+	public function envoyer_mail_integration_donnees() {
+		$id_utilisateur=$_POST['id_utilisateur'];
+		$adresse_mail=$_POST['adresse_mail'];
+		$region=$_POST['region'];
+		$district=$_POST['district'];
+		$commune=$_POST['commune'];
+		$fokontany=$_POST['fokontany'];
+		$intervention=$_POST['intervention'];
+		$date_inscription=$_POST['date_inscription'];
+		// $date_inscription = new DateTime($date_inscription); 
+		// $date_inscription =$date_inscription->format('d/m/Y');			
+		$id_liste_validation_intervention=$_POST['id_liste_validation_intervention'];
+		$retour=$this->ListevalidationinterventionManager->findById($id_liste_validation_intervention);
+		$date_reception="";
+		$id_utilisateur_proprietaire =null;
+		$adresse_mail_proprietaire=null;
+		$adresse_mail_proprietaire_hote=null;
+		if($retour) {
+			foreach($retour as $k=>$v) {
+				$date_reception=$v->date_reception;
+				$id_utilisateur_proprietaire =$v->id_utilisateur;
+			}
+			$date_reception = new DateTime($date_reception); 
+			$date_reception =$date_reception->format('d/m/Y H:m:s');	
+			$retour=$this->UtilisateursManager->findByIdtab($id_utilisateur_proprietaire);
+			// Récupération adresse mail utlisateur qui avait envoyé le fichier auparavant avec en copie l'organisma hote
+			if($retour) {
+				foreach($retour as $k=>$v) {
+					$adresse_mail_proprietaire=$v->email;
+					$adresse_mail_proprietaire_hote=$v->email_hote;
+				}	
+			}		
+		}
+		// DEBUT ENVOI MAIL SIGNALANT QUE TOUT EST INTEGRE DANS LA BDD
+		$data["type_fichier"] = " bénéficiaire intervention ".($retour !="" ? "(envoyé le ".$date_reception.")" : "");
+		$data["region"] =$region;
+		$data["district"] =$district;
+		$data["commune"] =$commune;
+		$data["fokontany"] =$fokontany;
+		$data["intervention"] =$intervention;
+		$data["date_inscription"] =$date_inscription;
+		$sender = "ndrianaina.aime.bruno@gmail.com";
+		$mdpsender = "finaritra";
+		$sujet = "Intégration des données : fichier excel bénéficiaire";
+		$corps = $this->load->view('mail/signaler_import_donnees.php', $data, true);
+		$mail = new PHPMailer;
+		$mail->isSMTP();
+		$mail->Host = 'smtp.gmail.com';
+		$mail->SMTPAuth = true;
+		$mail->Username = $sender;
+		$mail->Password = $mdpsender;
+		$mail->From = "ndrianaina.aime.bruno@gmail.com"; // adresse mail de l’expéditeur
+		$mail->FromName = "Ministère de la population Malagasy"; // nom de l’expéditeur	
+		$mail->addReplyTo('ndrianaina.aime.bruno@gmail.com', 'Ministère de la population');
+		$mail->SMTPSecure = 'tls';
+		$mail->Port = 587;
+		$mail->SMTPOptions = array(
+			'ssl' => array(
+				'verify_peer' => false,
+				'verify_peer_name' => false,
+				'allow_self_signed' => true
+			)
+		);
+		$mail->setFrom($sender);
+		$mail->addAddress($adresse_mail_proprietaire);
+		$mail->AddCC($adresse_mail_proprietaire_hote);
+		$mail->isHTML(true);
+		$mail->Subject = $sujet;
+		$mail->Body = $corps;
+		if (!$mail->send()) {
+			$data["reponse"] = 0;
+			$data["email"] = $adresse_mail_proprietaire;
+			$data["email_hote"] = $adresse_mail_proprietaire_hote;
+		} else {
+			$data["reponse"] = 1;
+			$data["email"] = $adresse_mail_proprietaire;
+			$data["email_hote"] = $adresse_mail_proprietaire_hote;
+		}	
+		echo json_encode($data);
+		// FIN ENVOI MAIL SIGNALANT QUE TOUT EST OK
+	}
 } ?>	
