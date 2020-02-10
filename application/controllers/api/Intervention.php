@@ -165,7 +165,7 @@ class Intervention extends REST_Controller {
 		}
 		$trouver= array("é","è","ê","à","ö","ç","'","ô"," ");
 		$remplacer=array("e","e","e","a","o","c","","o","");
-		$intitule2=$this->post('intitule');
+		$intitule2=$this->post('intitule2');
 		$intitule2=str_replace($trouver,$remplacer,$intitule2);
 		// Affectation des valeurs
  		$data = array(

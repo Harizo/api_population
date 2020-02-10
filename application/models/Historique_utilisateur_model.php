@@ -97,5 +97,12 @@ class Historique_utilisateur_model extends CI_Model
             return null;
         }                 
     }
+    public function Sauvegarde($date_debut,$date_fin)  {
+		$requete="insert into sauvegarde_historique(id_utilisateur,date_action,action) "
+				." select id_utilisateur,date_action,action from historique_utilisateur"
+				." where date_action>='".$date_debut."'"." and date_action <='".$date_fin."'";
+		$query = $this->db->query($requete);
+		return "ok";	
+    }
 
 }

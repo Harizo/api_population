@@ -97,40 +97,45 @@ class Historique_utilisateur extends REST_Controller {
  		$date_action = new DateTime;
 		$date_action->add(new DateInterval('PT1H'));
 		$date_action =$date_action->format('Y-m-d H:i:s');		
-   
-          
-        $data = array(
-            'action' => $this->post('action'),
-            'date_action' => $date_action,
-            'id_utilisateur' => $this->post('id_utilisateur')
-        );
-        if (!$data) {
-            $this->response([
-                'status' => FALSE,
-                'response' => 0,
-                'message' => 'No request found'
-                    ], REST_Controller::HTTP_BAD_REQUEST);
-        }
-		// Ajout d'un enregistrement
-        $dataId = $this->HistoriqueutilisateurManager->add($data);
+		$sauvegarde =$this->post('sauvegarde');
+         if($this->post('sauvegarde')) {
+			 // Sauvegarder les historiques entre 2 dates
+			 $date_debut = $this->post('date_debut');
+			 $date_fin = $this->post('date_fin');
+			 $dataId = $this->HistoriqueutilisateurManager->Sauvegarde($date_debut,$date_fin);
+		 } else {
+			$data = array(
+				'action' => $this->post('action'),
+				'date_action' => $date_action,
+				'id_utilisateur' => $this->post('id_utilisateur')
+			);
+			if (!$data) {
+				$this->response([
+					'status' => FALSE,
+					'response' => 0,
+					'message' => 'No request found'
+						], REST_Controller::HTTP_BAD_REQUEST);
+			}
+			// Ajout d'un enregistrement
+			$dataId = $this->HistoriqueutilisateurManager->add($data);
 
-        if (!is_null($dataId))
-        {
-            $this->response([
-                'status' => TRUE,
-                'response' => $dataId,
-                'message' => 'Data insert success'
-                    ], REST_Controller::HTTP_OK);
-        }
-        else
-        {
-            $this->response([
-                'status' => FALSE,
-                'response' => 0,
-                'message' => 'No request found'
-                    ], REST_Controller::HTTP_BAD_REQUEST);
-        }         
-
+			if (!is_null($dataId))
+			{
+				$this->response([
+					'status' => TRUE,
+					'response' => $dataId,
+					'message' => 'Data insert success'
+						], REST_Controller::HTTP_OK);
+			}
+			else
+			{
+				$this->response([
+					'status' => FALSE,
+					'response' => 0,
+					'message' => 'No request found'
+						], REST_Controller::HTTP_BAD_REQUEST);
+			}         
+		}
     }
 
     //requete du filtre 

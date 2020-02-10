@@ -21,6 +21,7 @@ class Importationbeneficiaire extends CI_Controller {
         $this->load->model('individu_model', 'IndividuManager');        
         $this->load->model('individu_beneficiaire_model', 'IndividubeneficiaireManager');        
         $this->load->model('variable_intervention_model', 'VariableinterventionManager');
+        $this->load->model('utilisateurs_model', 'UtilisateursManager');        
     }
 	// Fonction qui récupère le fichier envoyé par l'acteur pour l'neregistrer dans le repertoire dédié dans le serveur
 	// Structure repertoire donneesimportees/beneficiaire/'nom_acteur'/'nom de fichier.sxlsx'
@@ -301,20 +302,22 @@ class Importationbeneficiaire extends CI_Controller {
 											$code_commune = "????";
 										}	
 										if(intval($id_commune) >0) {
-											if($nom_fokontany >'') {
+											if($nom_fokontany >'' && intval($fokontany_id) >0) {
+												$fkt = $this->FokontanyManager->findById($fokontany_id);
+											} else {	
 												$fkt = $this->ImportationbeneficiaireManager->selectionfokontany($nom_fokontany,$id_commune);
-												if(count($fkt) >0) {
-													foreach($fkt as $indice=>$v) {
-														// A utliser ultérieurement lors de la deuxième vérification : id_fokontany
-														$id_fokontany = $v->id;
-														$code_fokontany = $v->code;
-													}
-												} else {													
-													// Pas de fokontany : marquer fokontany 
-													// $id_fokontany = null;
-													$code_fokontany = "????";
-												}												
 											}
+											if(count($fkt) >0) {
+												foreach($fkt as $indice=>$v) {
+													// A utliser ultérieurement lors de la deuxième vérification : id_fokontany
+													$id_fokontany = $v->id;
+													$code_fokontany = $v->code;
+												}
+											} else {													
+												// Pas de fokontany : marquer fokontany 
+												// $id_fokontany = null;
+												$code_fokontany = "????";
+											}												
 										} 
 									} else {										
 										// Pas de commune : marquer commune,fokontany 
@@ -1295,17 +1298,29 @@ class Importationbeneficiaire extends CI_Controller {
 		$fokontany=$_POST['fokontany'];
 		$intervention=$_POST['intervention'];
 		$date_inscription=$_POST['date_inscription'];
-		$date_inscription = new DateTime($date_inscription); 
-		$date_inscription =$date_inscription->format('d/m/Y');			
+		// $date_inscription = new DateTime($date_inscription); 
+		// $date_inscription =$date_inscription->format('d/m/Y');			
 		$id_liste_validation_beneficiaire=$_POST['id_liste_validation_beneficiaire'];
 		$retour=$this->ListevalidationbeneficiaireManager->findById($id_liste_validation_beneficiaire);
 		$date_reception="";
+		$id_utilisateur_proprietaire =null;
+		$adresse_mail_proprietaire=null;
+		$adresse_mail_proprietaire_hote=null;
 		if($retour) {
 			foreach($retour as $k=>$v) {
 				$date_reception=$v->date_reception;
+				$id_utilisateur_proprietaire =$v->id_utilisateur;
 			}
 			$date_reception = new DateTime($date_reception); 
-			$date_reception =$date_reception->format('d/m/Y H:m:s');			
+			$date_reception =$date_reception->format('d/m/Y H:m:s');	
+			$retour=$this->UtilisateursManager->findByIdtab($id_utilisateur_proprietaire);
+			// Récupération adresse mail utlisateur qui avait envoyé le fichier auparavant avec en copie l'organisma hote
+			if($retour) {
+				foreach($retour as $k=>$v) {
+					$adresse_mail_proprietaire=$v->email;
+					$adresse_mail_proprietaire_hote=$v->email_hote;
+				}	
+			}		
 		}
 		// DEBUT ENVOI MAIL SIGNALANT QUE TOUT EST INTEGRE DANS LA BDD
 		$data["type_fichier"] = " bénéficiaire intervention ".($retour !="" ? "(envoyé le ".$date_reception.")" : "");
@@ -1338,16 +1353,21 @@ class Importationbeneficiaire extends CI_Controller {
 			)
 		);
 		$mail->setFrom($sender);
-		$mail->addAddress($adresse_mail);
+		$mail->addAddress($adresse_mail_proprietaire);
+		$mail->AddCC($adresse_mail_proprietaire_hote);
 		$mail->isHTML(true);
 		$mail->Subject = $sujet;
 		$mail->Body = $corps;
 		if (!$mail->send()) {
-			$data = 0;
+			$data["reponse"] = 0;
+			$data["email"] = $adresse_mail_proprietaire;
+			$data["email_hote"] = $adresse_mail_proprietaire_hote;
 		} else {
-			$data = 1;
+			$data["reponse"] = 1;
+			$data["email"] = $adresse_mail_proprietaire;
+			$data["email_hote"] = $adresse_mail_proprietaire_hote;
 		}	
-		echo ($data);
+		echo json_encode($data);
 		// FIN ENVOI MAIL SIGNALANT QUE TOUT EST OK
 	}
 } ?>	
