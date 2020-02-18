@@ -995,7 +995,14 @@ class Systeme_protection_social_model extends CI_Model
             $sql = "
 
                     select int.intitule as intitule_intervention,
-                           (sum(smdt.valeur_quantite)/count(smdt.id)) as moyenne,
+
+                            CASE 
+                              WHEN count(smdt.id) = 0
+                                THEN '00'
+                              ELSE
+                                (sum(smdt.valeur_quantite)/count(smdt.id))
+
+                            END as moyenne,
                            um.description as unite_mesure,
                            dtt.description as detail_type_transfert
 
@@ -1174,7 +1181,14 @@ class Systeme_protection_social_model extends CI_Model
                                 sum(financement_intervention.budget_modifie) as sum_financement_par_intervention_par_programme,
                                 sum(decaissement.montant_revise) as sum_decaissement,
                                 devise.id as id_devise, devise.description as devise,
-                                ((sum(decaissement.montant_revise)*100)/sum(financement_intervention.budget_modifie)) as prop");
+                                CASE
+                                  WHEN sum(financement_intervention.budget_modifie) = 0
+                                    THEN 0
+                                  ELSE
+                                    ((sum(decaissement.montant_revise)*100)/sum(financement_intervention.budget_modifie))
+
+
+                                END as prop");
         
             
 
@@ -1207,15 +1221,42 @@ class Systeme_protection_social_model extends CI_Model
                     select 
                         pplee2.intitule_intervention as intitule_intervention,
 
-                        ROUND((((sum(pplee2.total_montant_menage)) * 100)/((sum(pplee2.total_montant_menage)) + (sum(pplee2.total_montant_groupe)) + (sum(pplee2.total_montant_individu)))),2) as stat_montant_menage,
+                        CASE WHEN (sum(pplee2.total_montant_menage) + sum(pplee2.total_montant_groupe) + sum(pplee2.total_montant_individu)) = 0
+                          THEN 0
+                        ELSE
+                          ROUND((((sum(pplee2.total_montant_menage)) * 100)/((sum(pplee2.total_montant_menage)) + (sum(pplee2.total_montant_groupe)) + (sum(pplee2.total_montant_individu)))),2) 
+                        END as stat_montant_menage,
 
-                        ROUND((((sum(pplee2.total_montant_groupe)) * 100)/((sum(pplee2.total_montant_menage)) + (sum(pplee2.total_montant_groupe)) + (sum(pplee2.total_montant_individu)))),2) as stat_montant_groupe,
+                        CASE WHEN (sum(pplee2.total_montant_menage) + sum(pplee2.total_montant_groupe) + sum(pplee2.total_montant_individu)) = 0
+                          THEN 0
+                        ELSE
+                          ROUND((((sum(pplee2.total_montant_groupe)) * 100)/((sum(pplee2.total_montant_menage)) + (sum(pplee2.total_montant_groupe)) + (sum(pplee2.total_montant_individu)))),2) 
+                        END as stat_montant_groupe,
 
-                        ROUND((((sum(pplee2.total_montant_individu)) * 100)/((sum(pplee2.total_montant_menage)) + (sum(pplee2.total_montant_groupe)) + (sum(pplee2.total_montant_individu)))),2) as stat_montant_individu,
 
-                        ROUND((((MAX(pplee2.nombre_menage)) * 100)/((MAX(pplee2.nombre_menage)) + (MAX(pplee2.nombre_groupe)) + (MAX(pplee2.nombre_individu)))),2) as stat_menage,
-                        ROUND((((MAX(pplee2.nombre_groupe)) * 100)/((MAX(pplee2.nombre_menage)) + (MAX(pplee2.nombre_groupe)) + (MAX(pplee2.nombre_individu)))),2) as stat_groupe,
-                        ROUND((((MAX(pplee2.nombre_individu)) * 100)/((MAX(pplee2.nombre_menage)) + (MAX(pplee2.nombre_groupe)) + (MAX(pplee2.nombre_individu)))),2) as stat_individu
+                        CASE WHEN (sum(pplee2.total_montant_menage) + sum(pplee2.total_montant_groupe) + sum(pplee2.total_montant_individu)) = 0
+                          THEN 0
+                        ELSE
+                          ROUND((((sum(pplee2.total_montant_individu)) * 100)/((sum(pplee2.total_montant_menage)) + (sum(pplee2.total_montant_groupe)) + (sum(pplee2.total_montant_individu)))),2) 
+                        END as stat_montant_individu,
+
+                        CASE WHEN (MAX(pplee2.nombre_menage) + MAX(pplee2.nombre_groupe) + MAX(pplee2.nombre_individu)) = 0
+                          THEN 0
+                        ELSE
+                          ROUND((((MAX(pplee2.nombre_menage)) * 100)/((MAX(pplee2.nombre_menage)) + (MAX(pplee2.nombre_groupe)) + (MAX(pplee2.nombre_individu)))),2) 
+                        END as stat_menage,
+
+                        CASE WHEN (MAX(pplee2.nombre_menage) + MAX(pplee2.nombre_groupe) + MAX(pplee2.nombre_individu)) = 0
+                          THEN 0
+                        ELSE
+                          ROUND((((MAX(pplee2.nombre_groupe)) * 100)/((MAX(pplee2.nombre_menage)) + (MAX(pplee2.nombre_groupe)) + (MAX(pplee2.nombre_individu)))),2) 
+                        END as stat_groupe,
+
+                        CASE WHEN (MAX(pplee2.nombre_menage) + MAX(pplee2.nombre_groupe) + MAX(pplee2.nombre_individu)) = 0
+                          THEN 0
+                        ELSE
+                          ROUND((((MAX(pplee2.nombre_individu)) * 100)/((MAX(pplee2.nombre_menage)) + (MAX(pplee2.nombre_groupe)) + (MAX(pplee2.nombre_individu)))),2) 
+                        END as stat_individu
 
 
                     from
