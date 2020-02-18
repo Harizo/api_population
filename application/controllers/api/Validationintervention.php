@@ -2,6 +2,7 @@
 
 defined('BASEPATH') OR exit('No direct script access allowed');
 require APPPATH . '/PHPMailer/PHPMailerAutoload.php';
+require APPPATH . '/libraries/chiffreenlettre.php';
 
 class Validationintervention extends CI_Controller {
     public function __construct() {
@@ -65,6 +66,8 @@ class Validationintervention extends CI_Controller {
 			$valeur_retour["intervention"] = $retour["intervention"];
 			$valeur_retour["date_inscription"] = $retour["date_inscription"];
 			$valeur_retour["nombre_erreur"] = $retour["nombre_erreur"];
+			$valeur_retour["id_fokontany"] =  $retour["id_fokontany"];
+			$valeur_retour["id_intervention"] =  $retour["id_intervention"];
 		} else {
 			$valeur_retour=array();
 			$valeur_retour["nom_fichier"] = "inexistant";
@@ -132,8 +135,10 @@ class Validationintervention extends CI_Controller {
 		$premier=0; 
 		$remplacer=array("'");
 		$trouver= array("’");
-		$trouver= array("é","è","ê","à","ö","ç","'","ô");
-		$remplacer=array("e","e","e","a","o","c","","o");
+		$trouver= array("é","è","ê","à","ö","ç","ô");
+		$remplacer=array("e","e","e","a","o","c","o");
+		$search=array("'");
+		$replace= array("’");
 		$nombre_erreur=0; // compter le nombre d'erreur afin de pouvoir renvoyer le fichier à l'envoyeur
 		foreach($rowIterator as $row) {
 			$ligne = $row->getRowIndex ();
@@ -299,11 +304,22 @@ class Validationintervention extends CI_Controller {
 					$code_fokontany = "";
 					$code_commune='';
 					$reg=array();
+					$place_espace = strpos($nom_region," ");
+					$place_apostrophe = strpos($nom_region,"'");
 					if($nom_region >'') {
 						if($amoron_mania==false) {
-							$reg = $this->ValidationinterventionManager->selectionregion($nom_region);
+							if($place_espace >0) {
+								$region_temporaire1 = substr ( $nom_region , 0 ,($place_espace - 1));
+								$region_temporaire2 = substr ( $nom_region , ($place_espace + 1));
+								$reg = $this->ValidationinterventionManager->selectionregion_avec_espace($region_temporaire1,$region_temporaire2);
+							} else if($place_apostrophe >0) {
+								$region_temporaire1 = substr ( $nom_region , 0 ,($place_apostrophe - 1));
+								$region_temporaire2 = substr ( $nom_region , ($place_apostrophe + 1));
+							} else {	
+								$reg = $this->ValidationinterventionManager->selectionregion($nom_region);
+							}	
 						} else {
-							$reg = $this->ValidationinterventionManager->selectionregionparid(5);
+							$reg = $this->ValidationinterventionManager->selectionregionparid(6);
 						}	
 						if(count($reg) >0) {
 							foreach($reg as $indice=>$v) {
@@ -341,7 +357,19 @@ class Validationintervention extends CI_Controller {
 						if(intval($id_region) >0) {
 							if($nom_district >'') {
 								$region_ok = true;
-								$dis = $this->ValidationinterventionManager->selectiondistrict($nom_district,$id_region);
+								$place_espace = strpos($nom_district," ");
+								$place_apostrophe = strpos($nom_district,"'");
+								if($place_espace >0) {
+									$district_temporaire1 = substr ( $nom_district , 0 ,($place_espace - 1));
+									$district_temporaire2 = substr ( $nom_district , ($place_espace + 1));
+									$dis = $this->ValidationinterventionManager->selectiondistrict_avec_espace($district_temporaire1,$district_temporaire2,$id_region);
+								} else if($place_apostrophe >0){
+									$district_temporaire1 = substr ( $nom_district , 0 ,($place_apostrophe - 1));
+									$district_temporaire2 = substr ( $nom_district , ($place_apostrophe + 1));
+									$dis = $this->ValidationinterventionManager->selectiondistrict_avec_espace($district_temporaire1,$district_temporaire2,$id_region);
+								} else {
+									$dis = $this->ValidationinterventionManager->selectiondistrict($nom_district,$id_region);
+								}	
 								if(count($dis) >0) {
 									foreach($dis as $indice=>$v) {
 										$id_district = $v->id;
@@ -372,7 +400,19 @@ class Validationintervention extends CI_Controller {
 								if(intval($id_district) >0) {
 									if($nom_commune >'') {
 										$district_ok = true;
-										$comm = $this->ValidationinterventionManager->selectioncommune($nom_commune,$id_district);
+										$place_espace = strpos($nom_commune," ");
+										$place_apostrophe = strpos($nom_commune,"'");
+										if($place_espace >0) {
+											$commune_temporaire1 = substr ( $nom_commune , 0 ,($place_espace - 1));
+											$commune_temporaire2 = substr ( $nom_commune , ($place_espace + 1));
+											$comm = $this->ValidationinterventionManager->selectioncommune_avec_espace($commune_temporaire1,$commune_temporaire2,$id_district);
+										} else if($place_apostrophe >0){
+											$commune_temporaire1 = substr ( $nom_commune , 0 ,($place_apostrophe - 1));
+											$commune_temporaire2 = substr ( $nom_commune , ($place_apostrophe + 1));
+											$comm = $this->ValidationinterventionManager->selectioncommune_avec_espace($commune_temporaire1,$commune_temporaire2,$id_district);
+										} else {
+											$comm = $this->ValidationinterventionManager->selectioncommune($nom_commune,$id_district);
+										}	
 										if(count($comm) >0) {
 											foreach($comm as $indice=>$v) {
 												$id_commune = $v->id;
@@ -396,7 +436,19 @@ class Validationintervention extends CI_Controller {
 										}	
 										if(intval($id_commune) >0) {
 											if($nom_fokontany >'') {
-												$fkt = $this->ValidationinterventionManager->selectionfokontany($nom_fokontany,$id_commune);
+												$place_espace = strpos($nom_fokontany," ");
+												$place_apostrophe = strpos($nom_fokontany,"'");
+												if($place_espace >0) {
+													$fokontany_temporaire1 = substr ( $nom_fokontany , 0 ,($place_espace - 1));
+													$fokontany_temporaire2 = substr ( $nom_fokontany , ($place_espace + 1));
+													$fkt = $this->ValidationinterventionManager->selectionfokontany_avec_espace($fokontany_temporaire1,$fokontany_temporaire2,$id_commune);
+												} else if($place_apostrophe >0){
+													$fokontany_temporaire1 = substr ( $nom_fokontany , 0 ,($place_apostrophe - 1));
+													$fokontany_temporaire2 = substr ( $nom_fokontany , ($place_apostrophe + 1));
+													$fkt = $this->ValidationinterventionManager->selectionfokontany_avec_espace($fokontany_temporaire1,$fokontany_temporaire2,$id_commune);
+												} else {
+													$fkt = $this->ValidationinterventionManager->selectionfokontany($nom_fokontany,$id_commune);
+												}	
 												if(count($fkt) >0) {
 													foreach($fkt as $indice=>$v) {
 														// A utliser ultérieurement lors de la deuxième vérification : id_fokontany
@@ -557,6 +609,8 @@ class Validationintervention extends CI_Controller {
 			$val_ret["intervention"] = $intitule_intervention;
 			$val_ret["nombre_erreur"] = $nombre_erreur;
 			$val_ret["date_inscription"] = $date_inscription;
+			$val_ret["id_fokontany"] = $id_fokontany;
+			$val_ret["id_intervention"] = $id_intervention;
 			$objWriter = PHPExcel_IOFactory::createWriter($excel, 'Excel2007');
 			$objWriter->save(dirname(__FILE__) . "/../../../../" .$repertoire. $nomfichier);
 			// DEBUT ENVOI MAIL SIGNALANT LES ERREURS
@@ -566,7 +620,11 @@ class Validationintervention extends CI_Controller {
 			$data["commune"] = $nom_commune_original;
 			$data["fokontany"] = $nom_fokontany_original;
 			$data["intervention"] = $intitule_intervention;
-			$val_ret["date_inscription"] = $date_inscription;
+			$data["date_inscription"] = $date_inscription;
+			$data["nombre_erreur"] = $nombre_erreur;
+			$newchiffrelettre = new chiffreEnLettre;
+			$nombre_erreur_en_lettre= $newchiffrelettre->ConvNumberLetter($nombre_erreur,0,0);
+			$data["nombre_erreur_en_lettre"] = $nombre_erreur_en_lettre;
 			$sujet = 'Erreur lors de la validation de la liste des interventions';
 			$corps = $this->load->view('mail/signaler_erreur_import.php', $data, true);
 			$mail = new PHPMailer;
@@ -672,37 +730,16 @@ class Validationintervention extends CI_Controller {
 						$nombre = $v->nombre;
 					}
 					if($nombre ==0) {
-						// Non trouvé continuer recherche
-						// 2- Recherche par nom , prenom , CIN, id_fokontany , id_acteur
-						// Recherche selon le cas : liste par ménage ou individu
-						// De plus si la liste est ménage; il faut chercher dans la table menage si chef_menage = "O"
-						// sinon recherche dans la table individu
-						if($menage_ou_individu=="individu") {
-							// Individu tout court
-							$parametre_table="individu";
-						} else if($menage_ou_individu=="menage") {
-							// Si chef ménage
-							$parametre_table="menage";
-						} else {
-							// Individu apprtenant à un ménage
-							$parametre_table="menage";
-						}
-						$retour=$this->ValidationinterventionManager->RechercheParNomPrenomCIN_Fokontany_Acteur($parametre_table,$identifiant_appariement,$id_acteur,$nom,$prenom,$cin,$id_fokontany);
-						$nombre=0;
-						foreach($retour as $k=>$v) {
-							$nombre = $v->nombre;
-						}
-						if($nombre ==0) {
-							 // Bénéficiaire introuvable : ERREUR Marquage colonne F par Bénéficiaire inexistant dans la BDD de couleur Jaune
-							$sheet->getStyle("F".$ligne)->getFill()->applyFromArray(
-									 array('type'       => PHPExcel_Style_Fill::FILL_SOLID,'rotation'   => 0,
-										 'startcolor' => array('rgb' => 'FFFF66'),
-										 'endcolor'   => array('argb' => 'FFFF66')
-									 )
-							 );	
-							 $sheet->setCellValue('F'.$ligne, 'Bénéficiaire inexistant dans la BDD');
-							$nombre_erreur = $nombre_erreur + 1;						
-						}
+						 // Bénéficiaire introuvable : ERREUR Marquage colonne F par Bénéficiaire inexistant dans la BDD de couleur Jaune
+						$sheet->getStyle("F".$ligne)->getFill()->applyFromArray(
+								 array('type'       => PHPExcel_Style_Fill::FILL_SOLID,'rotation'   => 0,
+									 'startcolor' => array('rgb' => 'FFFF66'),
+									 'endcolor'   => array('argb' => 'FFFF66')
+								 )
+						 );	
+						 $sheet->getStyle('F'.$ligne)->getAlignment()->setWrapText(true);
+						 $sheet->setCellValue('F'.$ligne, 'Bénéficiaire inexistant dans la BDD');
+						$nombre_erreur = $nombre_erreur + 1;						
 					}
 				}	
 				$ligne = $ligne + 1;
@@ -732,18 +769,24 @@ class Validationintervention extends CI_Controller {
 				$val_ret["intervention"] = $intitule_intervention;
 				$val_ret["date_inscription"] = $date_inscription;
 				$val_ret["nombre_erreur"] = $nombre_erreur;
+				$val_ret["id_fokontany"] = $id_fokontany;
+				$val_ret["id_intervention"] = $id_intervention;
 				$objWriter = PHPExcel_IOFactory::createWriter($excel, 'Excel2007');
 				$objWriter->save(dirname(__FILE__) . "/../../../../" .$repertoire. $nomfichier);
 				// Fermer fichier Excel
 				unset($objWriter);
 				// DEBUT ENVOI MAIL SIGNALANT LES ERREURS
-				$data["type_fichier"] = " bénéficiaire ";
+				$data["type_fichier"] = " interventions ";
 				$data["region"] = $nom_region_original;
 				$data["district"] = $nom_district_original;
 				$data["commune"] = $nom_commune_original;
 				$data["fokontany"] = $nom_fokontany_original;
 				$data["intervention"] = $intitule_intervention;
-				$val_ret["date_inscription"] = $date_inscription;
+				$data["date_inscription"] = $date_inscription;
+				$data["nombre_erreur"] = $nombre_erreur;
+				$newchiffrelettre = new chiffreEnLettre;
+				$nombre_erreur_en_lettre= $newchiffrelettre->ConvNumberLetter($nombre_erreur,0,0);
+				$data["nombre_erreur_en_lettre"] = $nombre_erreur_en_lettre;
 				$sujet = 'Erreur lors de la validation de la liste des interventions';
 				$corps = $this->load->view('mail/signaler_erreur_import.php', $data, true);
 				$mail = new PHPMailer;
@@ -785,6 +828,8 @@ class Validationintervention extends CI_Controller {
 				$val_ret["intervention"] = $intitule_intervention;
 				$val_ret["date_inscription"] = $date_inscription;
 				$val_ret["nombre_erreur"] = 0;				
+				$val_ret["id_fokontany"] = $id_fokontany;
+				$val_ret["id_intervention"] = $id_intervention;
 				$objWriter = PHPExcel_IOFactory::createWriter($excel, 'Excel2007');
 				$objWriter->save(dirname(__FILE__) . "/../../../../" .$repertoire. $nomfichier);
 			}

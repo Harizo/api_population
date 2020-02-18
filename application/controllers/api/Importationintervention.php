@@ -111,6 +111,8 @@ class Importationintervention extends CI_Controller {
 		$nombre_erreur=0;
 		$remplacer=array('&eacute;','e','e','a','o','c','_');
 		$trouver= array('é','è','ê','à','ö','ç',' ');
+		$search=array("'");
+		$replace= array("’");
 		$nombre_insertion_entete=0; // Utilisée une fois pour toute pendant la lecture du fichier et les détails à insérer par ligne excel
 		foreach($rowIterator as $row) {
 			$ligne = $row->getRowIndex ();
@@ -223,13 +225,22 @@ class Importationintervention extends CI_Controller {
 					$code_fokontany = "";
 					$code_commune='';
 					$reg=array();
+					$place_espace = strpos($nom_region," ");
+					$place_apostrophe = strpos($nom_region,"'");
 					if($nom_region >'') {
 						if($amoron_mania==false) {
-							// Selection region par nom
-							$reg = $this->ImportationinterventionManager->selectionregion($nom_region);
+							if($place_espace >0) {
+								$region_temporaire1 = substr ( $nom_region , 0 ,($place_espace - 1));
+								$region_temporaire2 = substr ( $nom_region , ($place_espace + 1));
+								$reg = $this->ImportationinterventionManager->selectionregion_avec_espace($region_temporaire1,$region_temporaire2);
+							} else if($place_apostrophe >0) {
+								$region_temporaire1 = substr ( $nom_region , 0 ,($place_apostrophe - 1));
+								$region_temporaire2 = substr ( $nom_region , ($place_apostrophe + 1));
+							} else {	
+								$reg = $this->ImportationinterventionManager->selectionregion($nom_region);
+							}	
 						} else {
-							// Selection region par id
-							$reg = $this->ImportationinterventionManager->selectionregionparid(5);
+							$reg = $this->ImportationinterventionManager->selectionregionparid(6);
 						}	
 						if(count($reg) >0) {
 							foreach($reg as $indice=>$v) {
@@ -244,7 +255,19 @@ class Importationintervention extends CI_Controller {
 							if($nom_district >'') {
 								$region_ok = true;
 								// Selection district par nom et id_region
-								$dis = $this->ImportationinterventionManager->selectiondistrict($nom_district,$id_region);
+								$place_espace = strpos($nom_district," ");
+								$place_apostrophe = strpos($nom_district,"'");
+								if($place_espace >0) {
+									$district_temporaire1 = substr ( $nom_district , 0 ,($place_espace - 1));
+									$district_temporaire2 = substr ( $nom_district , ($place_espace + 1));
+									$dis = $this->ImportationinterventionManager->selectiondistrict_avec_espace($district_temporaire1,$district_temporaire2,$id_region);
+								} else if($place_apostrophe >0){
+									$district_temporaire1 = substr ( $nom_district , 0 ,($place_apostrophe - 1));
+									$district_temporaire2 = substr ( $nom_district , ($place_apostrophe + 1));
+									$dis = $this->ImportationinterventionManager->selectiondistrict_avec_espace($district_temporaire1,$district_temporaire2,$id_region);
+								} else {
+									$dis = $this->ImportationinterventionManager->selectiondistrict($nom_district,$id_region);
+								}	
 								if(count($dis) >0) {
 									foreach($dis as $indice=>$v) {
 										$id_district = $v->id;
@@ -258,7 +281,19 @@ class Importationintervention extends CI_Controller {
 									if($nom_commune >'') {
 										$district_ok = true;
 										// Selection commune par nom et id_district
-										$comm = $this->ImportationinterventionManager->selectioncommune($nom_commune,$id_district);
+										$place_espace = strpos($nom_commune," ");
+										$place_apostrophe = strpos($nom_commune,"'");
+										if($place_espace >0) {
+											$commune_temporaire1 = substr ( $nom_commune , 0 ,($place_espace - 1));
+											$commune_temporaire2 = substr ( $nom_commune , ($place_espace + 1));
+											$comm = $this->ImportationinterventionManager->selectioncommune_avec_espace($commune_temporaire1,$commune_temporaire2,$id_district);
+										} else if($place_apostrophe >0){
+											$commune_temporaire1 = substr ( $nom_commune , 0 ,($place_apostrophe - 1));
+											$commune_temporaire2 = substr ( $nom_commune , ($place_apostrophe + 1));
+											$comm = $this->ImportationinterventionManager->selectioncommune_avec_espace($commune_temporaire1,$commune_temporaire2,$id_district);
+										} else {
+											$comm = $this->ImportationinterventionManager->selectioncommune($nom_commune,$id_district);
+										}	
 										if(count($comm) >0) {
 											foreach($comm as $indice=>$v) {
 												$id_commune = $v->id;
@@ -271,7 +306,19 @@ class Importationintervention extends CI_Controller {
 										}	
 										if(intval($id_commune) >0) {
 											if($nom_fokontany >'') {
-												$fkt = $this->ImportationinterventionManager->selectionfokontany($nom_fokontany,$id_commune);
+												$place_espace = strpos($nom_fokontany," ");
+												$place_apostrophe = strpos($nom_fokontany,"'");
+												if($place_espace >0) {
+													$commune_temporaire1 = substr ( $nom_fokontany , 0 ,($place_espace - 1));
+													$commune_temporaire2 = substr ( $nom_fokontany , ($place_espace + 1));
+													$fkt = $this->ImportationinterventionManager->selectionfokontany_avec_espace($commune_temporaire1,$commune_temporaire2,$id_commune);
+												} else if($place_apostrophe >0){
+													$commune_temporaire1 = substr ( $nom_fokontany , 0 ,($place_apostrophe - 1));
+													$commune_temporaire2 = substr ( $nom_fokontany , ($place_apostrophe + 1));
+													$fkt = $this->ImportationinterventionManager->selectionfokontany_avec_espace($commune_temporaire1,$commune_temporaire2,$id_commune);
+												} else {
+													$fkt = $this->ImportationinterventionManager->selectionfokontany($nom_fokontany,$id_commune);
+												}	
 												if(count($fkt) >0) {
 													foreach($fkt as $indice=>$v) {
 														// A utliser ultérieurement lors de la deuxième vérification : id_fokontany

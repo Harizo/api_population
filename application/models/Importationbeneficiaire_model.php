@@ -128,6 +128,46 @@ class Importationbeneficiaire_model extends CI_Model
         }else{
             return null;
         }                 
-    }			
+    }	
+	public function recuperer_code_region_district_commune_fokontany($id_fokontany) {
+		$requete ="select concat_ws('-',r.code,d.code,c.code,f.code) as code_precedent,r.nom as region,"
+				." d.nom as district,c.nom as commune,f.nom as fokontany"
+				." from fokontany as f"
+				." join commune as c on f.id_commune=c.id"
+				." join district as d on c.district_id=d.id"
+				." join region as r on d.region_id=r.id"
+				." where f.id=".$id_fokontany;
+		$query = $this->db->query($requete);
+        $result= $query->result();				
+        if($result) {
+            return $result;
+        }else{
+            return null;
+        }                 		
+	}	
+	public function recuperer_id_situation_matrimoniale($description) {
+		$requete ="select id as id_situation_matrimoniale from situation_matrimoniale"
+				." where lower(description) like '%".$description."%'";
+		$query = $this->db->query($requete);
+        $result= $query->result();				
+        if($result) {
+            return $result;
+        }else{
+            return null;
+        }                 		
+		
+	}
+	public function recuperer_id_niveau_de_classe($niveau_classe) {
+		$requete ="select id as id_niveau_de_classe from niveau_de_classe"
+				." where lower(description) like '%".$niveau_classe."%'";
+		$query = $this->db->query($requete);
+        $result= $query->result();				
+        if($result) {
+            return $result;
+        }else{
+            return null;
+        }                 		
+		
+	}
 }
 ?>

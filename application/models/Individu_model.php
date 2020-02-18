@@ -66,7 +66,13 @@ class Individu_model extends CI_Model {
 			'id_acteur'                 => $individu['id_acteur'],
 			'decede'                    => $individu['decede'],
 			'date_deces'                => $individu['date_deces'],
-        );
+			'chef_menage'               => $individu['chef_menage'],
+			'handicap_visuel'           => $individu['handicap_visuel'],
+			'handicap_parole'           => $individu['handicap_parole'],
+			'handicap_auditif'          => $individu['handicap_auditif'],
+			'handicap_moteur'           => $individu['handicap_moteur'],
+			'handicap_mental'           => $individu['handicap_mental'],
+		);
     }
     public function delete($id) {
 		// Suppression d'un enregitrement

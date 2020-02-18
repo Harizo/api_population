@@ -139,6 +139,8 @@ class Importationbeneficiaire extends CI_Controller {
 		$remplacer=array('&eacute;','e','e','a','o','c','_');
 		$trouver= array('é','è','ê','à','ö','ç',' ');
 		$id_fokontany = null;
+		$search=array("'");
+		$replace= array("’");		
 		foreach($rowIterator as $row) {
 			$ligne = $row->getRowIndex ();
 			if($ligne >=2) {
@@ -194,14 +196,14 @@ class Importationbeneficiaire extends CI_Controller {
 					// A utliser ultérieurement si tout est OK pour la deuxième vérification doublon :
 					// c'est-à-dire : recherche dans la table menage ou table individu
 					$menage_ou_individu = strtolower($menage_ou_individu);
-					$menage_ou_individu = substr($menage_ou_individu,3);
+					// $menage_ou_individu = substr($menage_ou_individu,3);
 					$menage_ou_groupe = strtolower($menage_ou_groupe);	
-					$menage_ou_groupe = substr($menage_ou_groupe,3);
+					// $menage_ou_groupe = substr($menage_ou_groupe,3);
 					$etat_groupe =0;					
-					if($menage_ou_individu=="ménage" || $menage_ou_individu=="menage" || $menage_ou_individu=="groupe") {
-						if($menage_ou_individu=="groupe") {
-							$etat_groupe =1;
-						}
+					if($menage_ou_groupe=="groupe") {
+						$etat_groupe =1;
+					}
+					if($menage_ou_groupe=="ménage" || $menage_ou_groupe=="menage" || $menage_ou_groupe=="groupe") {
 						$menage_ou_individu="menage";
 					} else {
 						$menage_ou_individu="individu";
@@ -259,346 +261,18 @@ class Importationbeneficiaire extends CI_Controller {
 					$code_fokontany = "";
 					$code_commune='';
 					$reg=array();
-					if($nom_region >'') {
-						if($amoron_mania==false) {
-							$reg = $this->ImportationbeneficiaireManager->selectionregion($nom_region);
-						} else {
-							$reg = $this->ImportationbeneficiaireManager->selectionregionparid(5);
-						}	
-						if(count($reg) >0) {
-							foreach($reg as $indice=>$v) {
-								$id_region = $v->id;
-								$code_region=$v->code;
-							} 						
-						} else {
-							$id_region=null;
-							$code_region="????";
-						}						
-						if(intval($id_region) >0) {
-							if($nom_district >'') {
-								$region_ok = true;
-								$dis = $this->ImportationbeneficiaireManager->selectiondistrict($nom_district,$id_region);
-								if(count($dis) >0) {
-									foreach($dis as $indice=>$v) {
-										$id_district = $v->id;
-										$code_district= $v->code;
-									}
-								} else {
-									$id_district =null;
-									$code_district="????";
-								}
-								if(intval($id_district) >0) {
-									if($nom_commune >'') {
-										$district_ok = true;
-										$comm = $this->ImportationbeneficiaireManager->selectioncommune($nom_commune,$id_district);
-										if(count($comm) >0) {
-											foreach($comm as $indice=>$v) {
-												$id_commune = $v->id;
-												$code_commune = $v->code;
-											}
-										} else {
-											// Pas de commune : marquer commune,fokontany 
-											$id_commune = null;
-											$code_commune = "????";
-										}	
-										if(intval($id_commune) >0) {
-											if($nom_fokontany >'' && intval($fokontany_id) >0) {
-												$fkt = $this->FokontanyManager->findById($fokontany_id);
-											} else {	
-												$fkt = $this->ImportationbeneficiaireManager->selectionfokontany($nom_fokontany,$id_commune);
-											}
-											if(count($fkt) >0) {
-												foreach($fkt as $indice=>$v) {
-													// A utliser ultérieurement lors de la deuxième vérification : id_fokontany
-													$id_fokontany = $v->id;
-													$code_fokontany = $v->code;
-												}
-											} else {													
-												// Pas de fokontany : marquer fokontany 
-												// $id_fokontany = null;
-												$code_fokontany = "????";
-											}												
-										} 
-									} else {										
-										// Pas de commune : marquer commune,fokontany 
-										$id_commune = null;
-										$code_commune = "????";
-									}		
-								}
-							} else {
-								// Pas de district : marquer district,commune,fokontany 
-								$id_district =null;
-								$code_district="????";
-							}		
+					$place_espace = strpos($nom_region," ");
+					$place_apostrophe = strpos($nom_region,"'");
+					/*---------affectation direct id_fokontany : pas de recherche carc'est déjà fait lors de la validation-------------*/
+					$id_fokontany=$fokontany_id;
+					$code_precedent="";
+					$retour=$this->ImportationbeneficiaireManager->recuperer_code_region_district_commune_fokontany($id_fokontany);
+					if($retour) {
+						foreach($retour as $k=>$v) {
+							$code_precedent=$v->code_precedent;
 						}
-					} else {
-						// Pas de région : marquer tous les découpages administratif 
-						$id_region=null;
-						$code_region="????";
 					}
-				}		
-			/*	if($ligne ==4) {
-					// Contrôle catégorie d'age, sexe, vulnérabilité, pauvreté, type ménage, avec enfant
-					 $cellIterator = $row->getCellIterator();
-					 $cellIterator->setIterateOnlyExistingCells(false);
-					 $rowIndex = $row->getRowIndex ();
-					foreach ($cellIterator as $cell) {
-						if('B' == $cell->getColumn()) {
-							$categorie_age =$cell->getValue();
-						} else if('D' == $cell->getColumn()) {
-							$sexe =$cell->getValue();	
-						} else if('F' == $cell->getColumn()) {
-							$vulnerabilite = $cell->getValue();
-						} else if('H' == $cell->getColumn()) {
-							$pauvrete = $cell->getValue();
-						} else if('J' == $cell->getColumn()) {
-							$type_menage = $cell->getValue();
-						} else if('L' == $cell->getColumn()) {
-							$avec_enfant = $cell->getValue();
-						}	 
-					}
-					// Lécture valeur à partir position 4
-					$categorie_age = strtolower($categorie_age);
-					$categorie_age = substr($categorie_age,3);
-					$sexe = strtolower($sexe);
-					$sexe = substr($sexe,3);
-					$vulnerabilite = strtolower($vulnerabilite);
-					$vulnerabilite = substr($vulnerabilite,3);
-					$pauvrete = strtolower($pauvrete);
-					$pauvrete = substr($pauvrete,3);
-					$type_menage = strtolower($type_menage);
-					$type_menage = substr($type_menage,3);
-					$avec_enfant = strtolower($avec_enfant);
-					$avec_enfant = substr($avec_enfant,3);
 				}	
-				if($ligne ==5) {
-					// Contrôle mecanisme de ciblage, ciblage communautaire,ciblage catégoriel,ciblage économique,autres methodes
-					 $cellIterator = $row->getCellIterator();
-					 $cellIterator->setIterateOnlyExistingCells(false);
-					 $rowIndex = $row->getRowIndex ();
-					foreach ($cellIterator as $cell) {
-						if('B' == $cell->getColumn()) {
-							$mecanisme_ciblage =$cell->getValue();
-						} else if('D' == $cell->getColumn()) {
-							$ciblage_communautaire =$cell->getValue();	
-						} else if('F' == $cell->getColumn()) {
-							$ciblage_categoriel = $cell->getValue();
-						} else if('H' == $cell->getColumn()) {
-							$ciblage_economique = $cell->getValue();
-						} else if('J' == $cell->getColumn()) {
-							$autres_methode = $cell->getValue();
-						}	 
-					}
-					// Lécture valeur à partir position 4
-					$mecanisme_ciblage = strtolower($mecanisme_ciblage);
-					$mecanisme_ciblage = substr($mecanisme_ciblage,3);
-					$ciblage_communautaire = strtolower($ciblage_communautaire);
-					$ciblage_communautaire = substr($ciblage_communautaire,3);
-					$ciblage_categoriel = strtolower($ciblage_categoriel);
-					$ciblage_categoriel = substr($ciblage_categoriel,3);
-					$ciblage_economique = strtolower($ciblage_economique);
-					$ciblage_economique = substr($ciblage_economique,3);
-					$autres_methode = strtolower($autres_methode);
-					$autres_methode = substr($autres_methode,3);
-				}
-				if($ligne==6) {
-					// Préparation insertion table variable_intervention : à la fin de tous les insertions
-					// ligne 6 = en-tete fichier excel => insertion liste des variables avant de passer à la lecture des détails du fichier
-					// Recherche des id de la liste des variable et id de la variable proprement dit
-					$description ="cible";
-					$retour = $this->ImportationbeneficiaireManager->selectionlistevariable($description);
-					$id_liste_variable_cible = null;
-					if($retour) {
-						foreach($retour as $k=>$v) {
-							$id_liste_variable_cible = $v->id;
-						}
-					}
-					$description ="catégories";
-					$retour = $this->ImportationbeneficiaireManager->selectionlistevariable($description);
-					$id_liste_variable_categorie_age = null;
-					if($retour) {
-						foreach($retour as $k=>$v) {
-							$id_liste_variable_categorie_age = $v->id;
-						}
-					}
-					$description ="sexe";
-					$retour = $this->ImportationbeneficiaireManager->selectionlistevariable($description);
-					$id_liste_variable_sexe = null;
-					if($retour) {
-						foreach($retour as $k=>$v) {
-							$id_liste_variable_sexe = $v->id;
-						}
-					}
-					$description ="vulnérabilité";
-					$retour = $this->ImportationbeneficiaireManager->selectionlistevariable($description);
-					$id_liste_variable_vulnerabilite = null;
-					if($retour) {
-						foreach($retour as $k=>$v) {
-							$id_liste_variable_vulnerabilite = $v->id;
-						}
-					}
-					$description ="pauvreté";
-					$retour = $this->ImportationbeneficiaireManager->selectionlistevariable($description);
-					$id_liste_variable_pauvrete = null;
-					if($retour) {
-						foreach($retour as $k=>$v) {
-							$id_liste_variable_pauvrete = $v->id;
-						}
-					}
-					$description ="type ménage";
-					$retour = $this->ImportationbeneficiaireManager->selectionlistevariable($description);
-					$id_liste_variable_type_menage = null;
-					if($retour) {
-						foreach($retour as $k=>$v) {
-							$id_liste_variable_type_menage = $v->id;
-						}
-					}
-					$description ="enfant";
-					$retour = $this->ImportationbeneficiaireManager->selectionlistevariable($description);
-					$id_liste_variable_avec_enfant = null;
-					if($retour) {
-						foreach($retour as $k=>$v) {
-							$id_liste_variable_avec_enfant = $v->id;
-						}
-					}
-					$description ="existence de mécanisme de ciblage";
-					$retour = $this->ImportationbeneficiaireManager->selectionlistevariable($description);
-					$id_liste_variable_mecanisme_ciblage = null;
-					if($retour) {
-						foreach($retour as $k=>$v) {
-							$id_liste_variable_mecanisme_ciblage = $v->id;
-						}
-					}
-					$description ="ciblage communautaire ";
-					$retour = $this->ImportationbeneficiaireManager->selectionlistevariable($description);
-					$id_liste_variable_ciblage_communautaire = null;
-					if($retour) {
-						foreach($retour as $k=>$v) {
-							$id_liste_variable_ciblage_communautaire = $v->id;
-						}
-					}
-					$description ="ciblage catégoriel";
-					$retour = $this->ImportationbeneficiaireManager->selectionlistevariable($description);
-					$id_liste_variable_ciblage_categoriel = null;
-					if($retour) {
-						foreach($retour as $k=>$v) {
-							$id_liste_variable_ciblage_categoriel = $v->id;
-						}
-					}
-					$description ="ciblage économique";
-					$retour = $this->ImportationbeneficiaireManager->selectionlistevariable($description);
-					$id_liste_variable_ciblage_economique = null;
-					if($retour) {
-						foreach($retour as $k=>$v) {
-							$id_liste_variable_ciblage_economique = $v->id;
-						}
-					}
-					$description ="autres méthodes";
-					$retour = $this->ImportationbeneficiaireManager->selectionlistevariable($description);
-					$id_liste_variable_autres_methodes = null;
-					if($retour) {
-						foreach($retour as $k=>$v) {
-							$id_liste_variable_autres_methodes = $v->id;
-						}
-					}
-					// Recherche id variable par rapport à l'id de la liste de variable
-					// 1 Cible : ménage,individu,groupe
-					$id_variable_cible=null;
-					$retour = $this->ImportationbeneficiaireManager->findByIdlistevariableAndDescription($id_liste_variable_cible,$menage_ou_groupe);
-					if($retour) {
-						foreach($retour as $k=>$v) {
-							$id_variable_cible=$v->id_variable;
-						}						
-					}
-					// 2 Catégorie d'age
-					$id_variable_categorie_age=null;
-					$retour = $this->ImportationbeneficiaireManager->findByIdlistevariableAndDescription($id_liste_variable_categorie_age,$categorie_age);
-					if($retour) {
-						foreach($retour as $k=>$v) {
-							$id_variable_categorie_age=$v->id_variable;
-						}						
-					}
-					// 3 Sexe
-					$id_variable_sexe=null;
-					$retour = $this->ImportationbeneficiaireManager->findByIdlistevariableAndDescription($id_liste_variable_sexe,$sexe);
-					if($retour) {
-						foreach($retour as $k=>$v) {
-							$id_variable_sexe=$v->id_variable;
-						}						
-					}
-					// 4 vulnérabilité
-					$id_variable_vulnerabilite=null;
-					$retour = $this->ImportationbeneficiaireManager->findByIdlistevariableAndDescription($id_liste_variable_vulnerabilite,$vulnerabilite);
-					if($retour) {
-						foreach($retour as $k=>$v) {
-							$id_variable_vulnerabilite=$v->id_variable;
-						}						
-					}
-					// 5 pauvreté
-					$id_variable_pauvrete=null;
-					$retour = $this->ImportationbeneficiaireManager->findByIdlistevariableAndDescription($id_liste_variable_pauvrete,$pauvrete);
-					if($retour) {
-						foreach($retour as $k=>$v) {
-							$id_variable_pauvrete=$v->id_variable;
-						}						
-					}
-					// 6 type de ménage
-					$id_variable_type_menage=null;
-					$retour = $this->ImportationbeneficiaireManager->findByIdlistevariableAndDescription($id_liste_variable_type_menage,$type_menage);
-					if($retour) {
-						foreach($retour as $k=>$v) {
-							$id_variable_type_menage=$v->id_variable;
-						}						
-					}
-					// 7 avec ou sans enfant
-					$id_variable_avec_enfant=null;
-					$retour = $this->ImportationbeneficiaireManager->findByIdlistevariableAndDescription($id_liste_variable_avec_enfant,$avec_enfant);
-					if($retour) {
-						foreach($retour as $k=>$v) {
-							$id_variable_avec_enfant=$v->id_variable;
-						}						
-					}
-					// 8 ? mécanisme de ciblage
-					$id_variable_mecanisme_ciblage=null;
-					$retour = $this->ImportationbeneficiaireManager->findByIdlistevariableAndDescription($id_liste_variable_mecanisme_ciblage,$mecanisme_ciblage);
-					if($retour) {
-						foreach($retour as $k=>$v) {
-							$id_variable_mecanisme_ciblage=$v->id_variable;
-						}						
-					}
-					// 9 ? ciblage communautaire
-					$id_variable_ciblage_communautaire=null;
-					$retour = $this->ImportationbeneficiaireManager->findByIdlistevariableAndDescription($id_liste_variable_ciblage_communautaire,$ciblage_communautaire);
-					if($retour) {
-						foreach($retour as $k=>$v) {
-							$id_variable_ciblage_communautaire=$v->id_variable;
-						}						
-					}
-					// 10 ? ciblage catégoriel
-					$id_variable_ciblage_categoriel=null;
-					$retour = $this->ImportationbeneficiaireManager->findByIdlistevariableAndDescription($id_liste_variable_ciblage_categoriel,$ciblage_categoriel);
-					if($retour) {
-						foreach($retour as $k=>$v) {
-							$id_variable_ciblage_categoriel=$v->id_variable;
-						}						
-					}
-					// 11 ? ciblage économique
-					$id_variable_ciblage_economique=null;
-					$retour = $this->ImportationbeneficiaireManager->findByIdlistevariableAndDescription($id_liste_variable_ciblage_economique,$ciblage_economique);
-					if($retour) {
-						foreach($retour as $k=>$v) {
-							$id_variable_ciblage_economique=$v->id_variable;
-						}						
-					}
-					// 12 autres methodes
-					$id_variable_ciblage_autres_methode=null;
-					$retour = $this->ImportationbeneficiaireManager->findByIdlistevariableAndDescription($id_liste_variable_autres_methodes,$autres_methode);
-					if($retour) {
-						foreach($retour as $k=>$v) {
-							$id_variable_ciblage_autres_methode=$v->id_variable;
-						}						
-					}
-				} */	
 				if($ligne >=5) {
 					// Contrôle de toutes les cellules à partir de la ligne 5
 					// Contrôle partenaire / intitulé intervention / Date 
@@ -608,6 +282,10 @@ class Importationbeneficiaire extends CI_Controller {
 					foreach ($cellIterator as $cell) {
 						 if('B' == $cell->getColumn()) {
 							$identifiant_appariement =$cell->getValue();
+						 } else if('C' == $cell->getColumn()) {
+							 $nom =$cell->getValue();
+						 } else if('A' == $cell->getColumn()) {
+							$numero_ordre =$cell->getValue();
 						 } else if('C' == $cell->getColumn()) {
 							$nom =$cell->getValue();	
 						 } else if('D' == $cell->getColumn()) {
@@ -673,16 +351,80 @@ class Importationbeneficiaire extends CI_Controller {
 						 } else if('AA' == $cell->getColumn()) {
 							$nom_enqueteur = $cell->getValue();  
 						 } else if('AB' == $cell->getColumn()) {
-							$date_enquete = $cell->getValue();
-							if(isset($date_enquete) && $date_enquete>"") {
+							$date_enquete_detail = $cell->getValue();
+							if(isset($date_enquete_detail) && $date_enquete_detail>"") {
 								if(PHPExcel_Shared_Date::isDateTime($cell)) {
-									 $date_enquete = date($format='Y-m-d', PHPExcel_Shared_Date::ExcelToPHP($date_enquete)); 
+									 $date_enquete_detail = date($format='Y-m-d', PHPExcel_Shared_Date::ExcelToPHP($date_enquete_detail)); 
 								}
 							} else {
-								$date_enquete=null;
+								$date_enquete_detail=null;
 							}								 							 
 						 }
 					}
+					// Début Formatage des données 
+					$nom=str_replace($search,$replace,$nom);
+					$prenom=str_replace($search,$replace,$prenom);					
+					$id_situation_matrimonale=null;
+					if($situation_matrimonale >"" && $situation_matrimonale!="-") {
+						$retour=$this->ImportationbeneficiaireManager->recuperer_id_situation_matrimoniale($situation_matrimonale);
+						if($retour) {
+							foreach($retour as $k=>$v) {
+								$id_situation_matrimonale=$v->id_situation_matrimoniale;
+							}
+						}
+					}
+					if($cin =="" || $cin=="-") {
+						$cin=null;
+					}
+					if($profession =="" || $profession=="-") {
+						$profession=null;
+					}
+					if($adresse =="" || $adresse=="-") {
+						$adresse=null;
+					}
+					if($surnom =="" || $surnom=="-") {
+						$surnom=null;
+					}
+					$id_niveau_de_classe=null;
+					if($niveau_classe >"" && $niveau_classe!="-") {
+						$retour=$this->ImportationbeneficiaireManager->recuperer_id_niveau_de_classe($niveau_classe);
+						if($retour) {
+							foreach($retour as $k=>$v) {
+								$id_niveau_de_classe=$v->id_niveau_de_classe;
+							}
+						}
+					}
+					if($langue =="" || $langue=="-") {
+						$langue=null;
+					}
+					if(intval($revenu) ==0) {
+						$revenu=null;
+					}
+					if(intval($depense) ==0) {
+						$depense=null;
+					}
+					if(intval($telephone) ==0) {
+						$telephone=null;
+					}
+					if($handicap_visuel =="" || $handicap_visuel=="-") {
+						$handicap_visuel="non";
+					}
+					if($handicap_auditif =="" || $handicap_auditif=="-") {
+						$handicap_auditif="non";
+					}
+					if($handicap_parole =="" || $handicap_parole=="-") {
+						$handicap_parole="non";
+					}
+					if($handicap_moteur =="" || $handicap_moteur=="-") {
+						$handicap_moteur="non";
+					}
+					if($handicap_mental =="" || $handicap_mental=="-") {
+						$handicap_mental="non";
+					}
+					if($nom_enqueteur =="" || $nom_enqueteur=="-") {
+						$nom_enqueteur=null;
+					}
+					// Fin Formatage des données
 					/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 					// Si bénéficiaire déjà existant das la table menage ou individu 
 					// Alors insertion seulement dans la table menage_beneficiaire ou individu_beneficiaire avec id_intervention
@@ -742,8 +484,8 @@ class Importationbeneficiaire extends CI_Controller {
 							}
 							$retour=$this->ValidationbeneficiaireManager->RechercheFokontanyParNomPrenomCIN_Fokontany_Acteur($parametre_table,$identifiant_appariement,$id_acteur,$nom,$prenom,$cin,$id_fokontany,$id_menage);
 							$nombre=0;
-							foreach($retour as $k=>$v) {
-								$nombre = $v->nombre;
+							if($retour) {
+								$nombre = 1; // déja existant
 							}							
 						}	
 					} else {
@@ -927,40 +669,115 @@ class Importationbeneficiaire extends CI_Controller {
 									'identifiant_appariement'=> $identifiant_appariement,
 									'numero_sequentiel'      => null,
 									'lieu_residence'         => null,
-									'surnom_chefmenage'      => null,
+									'surnom_chefmenage'      => $surnom,
 									'nom'                    => $nom,
 									'prenom'                 => $prenom,
 									'cin'                    => $cin,
 									'chef_menage'            => 'O',
-									'adresse'                => null,
+									'adresse'                => $adresse,
 									'date_naissance'         => $date_naissance,
 									'profession'             => $profession,
-									'id_situation_matrimoniale' => null,
+									'id_situation_matrimoniale' => $id_situation_matrimonale,
 									'sexe'                   => $sexe,
 									'date_inscription'       => $date_inscription_detail_beneficiaire,
 									'nom_prenom_pere'         => null,
 									'nom_prenom_mere'         => null,
-									'telephone'               => null,
+									'telephone'               => $telephone,
 									'statut'                  => null,
 									'date_sortie'            => null,
-									'nom_enqueteur'            => null,
-									'date_enquete'            => null,
+									'nom_enqueteur'            => $nom_enqueteur,
+									'date_enquete'            => $date_enquete_detail,
 									'nom_superviseur_enquete' => null,
 									'date_supervision' => null,
 									'flag_integration_donnees' => 1,
 									'nouvelle_integration' => true,
 									'commentaire' => null,
-									'revenu_mensuel'         => null,
-									'depense_mensuel'        => null,
+									'revenu_mensuel'         => $revenu,
+									'depense_mensuel'        => $depense,
 									'id_fokontany'           => $id_fokontany,
 									'id_acteur'              => $id_acteur,
 									'id_type_beneficiaire'   => 1,
-									'etat_groupe'   => $etat_groupe,
+									'etat_groupe'            => $etat_groupe,
 									'decede'                    => 0,
 									'date_deces'                => null,
 								);
 								$id_menage = $this->MenageManager->addchefmenage($data);
-								$sheet->setCellValue("AC".$ligne, $code_region."-".$code_district."-".$code_commune."-".$code_fokontany."-".$identifiant_unique);
+								$code_unique_chef_menage=$identifiant_unique;
+								// $sheet->setCellValue("AC".$ligne, $code_precedent."-".$identifiant_unique);
+								// Insértion chef ménage en tant qu'individu
+								// Attribution identifiant unique
+								$retour = $this->ImportationbeneficiaireManager->AttributionIdentifiantUniqueIndividu();
+								foreach($retour as $k=>$v) {
+									$valeur=$v->nombre;
+								}
+								// identifiant_unique : 8 caractères
+								if(strlen($valeur)==1) {
+									$identifiant_unique ="0000000".$valeur;
+								} else if(strlen($valeur)==2) {
+									$identifiant_unique ="000000".$valeur;							
+								} else if(strlen($valeur)==3) {
+									$identifiant_unique ="00000".$valeur;							
+								} else if(strlen($valeur)==4) {
+									$identifiant_unique ="0000".$valeur;							
+								} else if(strlen($valeur)==5) {
+									$identifiant_unique ="000".$valeur;							
+								} else if(strlen($valeur)==6) {
+									$identifiant_unique ="00".$valeur;							
+								} else if(strlen($valeur)==7) {
+									$identifiant_unique ="0".$valeur;							
+								} else {
+									$identifiant_unique =$valeur;
+								}
+								$code_unique_chef_menage=$code_unique_chef_menage." / ".$identifiant_unique;		
+								$data= array(
+									'id_menage'                => $id_menage,
+									'identifiant_unique'       => $identifiant_unique,
+									'identifiant_appariement'  => $identifiant_appariement,
+									'date_enregistrement'      => null,
+									'numero_ordre'             => $numero_ordre,
+									'numero_ordre_pere'        => null,
+									'numero_ordre_mere'        => null,
+									'inscription_etatcivil'    => null,
+									'numero_extrait_naissance' => null,
+									'id_groupe_appartenance'   => null,
+									'frequente_ecole'          => null,
+									'avait_frequente_ecole'    => null,
+									'nom_ecole'                => null,
+									'occupation'                => null,
+									'statut'                   => null,
+									'date_sortie'              => null,
+									'flag_integration_donnees' => 1,
+									'nouvelle_integration'     => true,
+									'commentaire'              => null,
+									'possede_cin'              => null,
+									'nom'                      => $nom,
+									'prenom'                   => $prenom,
+									'cin'                      => $cin,
+									'date_naissance'           => $date_naissance,
+									'sexe'                     => $sexe,
+									'id_liendeparente'         => null,
+									'id_handicap_visuel'       => null,
+									'id_handicap_parole'       => null,
+									'id_handicap_auditif'      => null,
+									'id_handicap_mental'       => null,
+									'id_handicap_moteur'       => null,
+									'id_type_ecole'            => null,
+									'id_niveau_de_classe'      => $id_niveau_de_classe,
+									'langue'                   => $langue,
+									'id_situation_matrimoniale' => $id_situation_matrimonale,
+									'id_fokontany'              => $id_fokontany,
+									'id_acteur'                 => $id_acteur,
+									'decede'                    => 0,
+									'date_deces'                => null,
+									'chef_menage'               => "O",
+									'handicap_visuel'           => $handicap_visuel,
+									'handicap_parole'           => $handicap_parole,
+									'handicap_auditif'          => $handicap_auditif,
+									'handicap_moteur'           => $handicap_moteur,
+									'handicap_mental'           => $handicap_mental,
+								);
+								$id_individu = $this->IndividuManager->add($data);
+								$sheet->setCellValue("AC".$ligne, $code_precedent."-".$code_unique_chef_menage);																
 							} else {
 								// Insértion Individu rattaché à un ménage
 								// Attribution identifiant unique
@@ -991,7 +808,7 @@ class Importationbeneficiaire extends CI_Controller {
 									'identifiant_unique'       => $identifiant_unique,
 									'identifiant_appariement'  => $identifiant_appariement,
 									'date_enregistrement'      => null,
-									'numero_ordre'             => null,
+									'numero_ordre'             => $numero_ordre,
 									'numero_ordre_pere'        => null,
 									'numero_ordre_mere'        => null,
 									'inscription_etatcivil'    => null,
@@ -1019,16 +836,22 @@ class Importationbeneficiaire extends CI_Controller {
 									'id_handicap_mental'       => null,
 									'id_handicap_moteur'       => null,
 									'id_type_ecole'            => null,
-									'id_niveau_de_classe'      => null,
-									'langue'                   => null,
-									'id_situation_matrimoniale' => null,
+									'id_niveau_de_classe'      => $id_niveau_de_classe,
+									'langue'                   => $langue,
+									'id_situation_matrimoniale' => $id_situation_matrimonale,
 									'id_fokontany'              => $id_fokontany,
 									'id_acteur'                 => $id_acteur,
 									'decede'                    => 0,
 									'date_deces'                => null,
+									'chef_menage'               => "N",
+									'handicap_visuel'           => $handicap_visuel,
+									'handicap_parole'           => $handicap_parole,
+									'handicap_auditif'          => $handicap_auditif,
+									'handicap_moteur'           => $handicap_moteur,
+									'handicap_mental'           => $handicap_mental,
 								);
 								$id_individu = $this->IndividuManager->add($data);
-								$sheet->setCellValue("AC".$ligne, $code_region."-".$code_district."-".$code_commune."-".$code_fokontany."-".$identifiant_unique);								
+								$sheet->setCellValue("AC".$ligne, $code_precedent."-".$identifiant_unique);								
 							}	
 						} else {
 							// Insértion Individu tout court sans ménage apparenté
@@ -1060,7 +883,7 @@ class Importationbeneficiaire extends CI_Controller {
 								'identifiant_unique'       => $identifiant_unique,
 								'identifiant_appariement'  => $identifiant_appariement,
 								'date_enregistrement'      => null,
-								'numero_ordre'             => null,
+								'numero_ordre'             => $numero_ordre,
 								'numero_ordre_pere'        => null,
 								'numero_ordre_mere'        => null,
 								'inscription_etatcivil'    => null,
@@ -1088,16 +911,22 @@ class Importationbeneficiaire extends CI_Controller {
 								'id_handicap_mental'       => null,
 								'id_handicap_moteur'       => null,
 								'id_type_ecole'            => null,
-								'id_niveau_de_classe'      => null,
-								'langue'                   => null,
-								'id_situation_matrimoniale' => null,
+								'id_niveau_de_classe'      => $id_niveau_de_classe,
+								'langue'                   => $langue,
+								'id_situation_matrimoniale' => $id_situation_matrimonale,
 								'id_fokontany'              => $id_fokontany,
 								'id_acteur'                 => $id_acteur,
 								'decede'                    => 0,
 								'date_deces'                => null,
+								'chef_menage'               => "N",
+								'handicap_visuel'           => $handicap_visuel,
+								'handicap_parole'           => $handicap_parole,
+								'handicap_auditif'          => $handicap_auditif,
+								'handicap_moteur'           => $handicap_moteur,
+								'handicap_mental'           => $handicap_mental,
 							);
 							$id_menage = $this->IndividuManager->add($data);
-							$sheet->setCellValue("AC".$ligne, $code_region."-".$code_district."-".$code_commune."-".$code_fokontany."-".$identifiant_unique);
+							$sheet->setCellValue("AC".$ligne, $code_precedent."-".$identifiant_unique);
 						}
 					}
 					// TOUJOURS : Insertion dans la table menage_beneficiaire ou individu_beneficiaire
@@ -1142,127 +971,6 @@ class Importationbeneficiaire extends CI_Controller {
 		$date_validation->add(new DateInterval('PT1H'));
 		$date_validation =$date_validation->format('Y-m-d H:i:s');		
 		$retour = $this->ImportationbeneficiaireManager->MiseAJourListeValidationBeneficiaire($id_liste_validation_beneficiaire,$date_validation,$id_utilisateur,$id_fokontany,$id_intervention);
-	/*	// Insertion table variable_intervention		
-		if($id_variable_cible!=null && $id_liste_variable_cible!=null) {
-			$data= array(
-				'id_variable'                      => $id_variable_cible,
-				'id_liste_variable'                => $id_liste_variable_cible,                     
-				'id_liste_validation_beneficiaire' => $id_liste_validation_beneficiaire,
-			);
-			// 1 Insertion dans la table variable_intervention
-			$id_variable_intervention = $this->VariableinterventionManager->add($data);
-			
-		}
-		if($id_variable_categorie_age!=null && $id_liste_variable_categorie_age!=null) {
-			$data= array(
-				'id_variable'                      => $id_variable_categorie_age,
-				'id_liste_variable'                => $id_liste_variable_categorie_age,                     
-				'id_liste_validation_beneficiaire' => $id_liste_validation_beneficiaire,
-			);
-			// 2 Insertion dans la table variable_intervention
-			$id_variable_intervention = $this->VariableinterventionManager->add($data);
-			
-		}
-		if($id_variable_sexe!=null && $id_liste_variable_sexe!=null) {
-			$data= array(
-				'id_variable'                      => $id_variable_sexe,
-				'id_liste_variable'                => $id_liste_variable_sexe,                     
-				'id_liste_validation_beneficiaire' => $id_liste_validation_beneficiaire,
-			);
-			// 3 Insertion dans la table variable_intervention
-			$id_variable_intervention = $this->VariableinterventionManager->add($data);
-			
-		}
-		if($id_variable_vulnerabilite!=null && $id_liste_variable_vulnerabilite!=null) {
-			$data= array(
-				'id_variable'                      => $id_variable_vulnerabilite,
-				'id_liste_variable'                => $id_liste_variable_vulnerabilite,                     
-				'id_liste_validation_beneficiaire' => $id_liste_validation_beneficiaire,
-			);
-			// 4 Insertion dans la table variable_intervention
-			$id_variable_intervention = $this->VariableinterventionManager->add($data);
-			
-		}
-		if($id_variable_pauvrete!=null && $id_liste_variable_pauvrete!=null) {
-			$data= array(
-				'id_variable'                      => $id_variable_pauvrete,
-				'id_liste_variable'                => $id_liste_variable_pauvrete,                     
-				'id_liste_validation_beneficiaire' => $id_liste_validation_beneficiaire,
-			);
-			// 5 Insertion dans la table variable_intervention
-			$id_variable_intervention = $this->VariableinterventionManager->add($data);
-			
-		}
-		if($id_variable_type_menage!=null && $id_liste_variable_type_menage!=null) {
-			$data= array(
-				'id_variable'                      => $id_variable_type_menage,
-				'id_liste_variable'                => $id_liste_variable_type_menage,                     
-				'id_liste_validation_beneficiaire' => $id_liste_validation_beneficiaire,
-			);
-			// 6 Insertion dans la table variable_intervention
-			$id_variable_intervention = $this->VariableinterventionManager->add($data);
-			
-		}
-		if($id_variable_avec_enfant!=null && $id_liste_variable_avec_enfant!=null) {
-			$data= array(
-				'id_variable'                      => $id_variable_avec_enfant,
-				'id_liste_variable'                => $id_liste_variable_avec_enfant,                     
-				'id_liste_validation_beneficiaire' => $id_liste_validation_beneficiaire,
-			);
-			// 7 Insertion dans la table variable_intervention
-			$id_variable_intervention = $this->VariableinterventionManager->add($data);
-			
-		}
-		if($id_variable_mecanisme_ciblage!=null && $id_liste_variable_mecanisme_ciblage!=null) {
-			$data= array(
-				'id_variable'                      => $id_variable_mecanisme_ciblage,
-				'id_liste_variable'                => $id_liste_variable_mecanisme_ciblage,                     
-				'id_liste_validation_beneficiaire' => $id_liste_validation_beneficiaire,
-			);
-			// 8 Insertion dans la table variable_intervention
-			$id_variable_intervention = $this->VariableinterventionManager->add($data);
-			
-		}
-		if($id_variable_ciblage_communautaire!=null && $id_liste_variable_ciblage_communautaire!=null) {
-			$data= array(
-				'id_variable'                      => $id_variable_ciblage_communautaire,
-				'id_liste_variable'                => $id_liste_variable_ciblage_communautaire,                     
-				'id_liste_validation_beneficiaire' => $id_liste_validation_beneficiaire,
-			);
-			// 9 Insertion dans la table variable_intervention
-			$id_variable_intervention = $this->VariableinterventionManager->add($data);
-			
-		}
-		if($id_variable_ciblage_categoriel!=null && $id_liste_variable_ciblage_categoriel!=null) {
-			$data= array(
-				'id_variable'                      => $id_variable_ciblage_categoriel,
-				'id_liste_variable'                => $id_liste_variable_ciblage_categoriel,                     
-				'id_liste_validation_beneficiaire' => $id_liste_validation_beneficiaire,
-			);
-			// 10 Insertion dans la table variable_intervention
-			$id_variable_intervention = $this->VariableinterventionManager->add($data);
-			
-		}
-		if($id_variable_ciblage_economique!=null && $id_liste_variable_ciblage_economique!=null) {
-			$data= array(
-				'id_variable'                      => $id_variable_ciblage_economique,
-				'id_liste_variable'                => $id_liste_variable_ciblage_economique,                     
-				'id_liste_validation_beneficiaire' => $id_liste_validation_beneficiaire,
-			);
-			// 11 Insertion dans la table variable_intervention
-			$id_variable_intervention = $this->VariableinterventionManager->add($data);
-			
-		}
-		if($id_variable_ciblage_autres_methode!=null && $id_liste_variable_autres_methodes!=null) {
-			$data= array(
-				'id_variable'                      => $id_variable_ciblage_autres_methode,
-				'id_liste_variable'                => $id_liste_variable_autres_methodes,                     
-				'id_liste_validation_beneficiaire' => $id_liste_validation_beneficiaire,
-			);
-			// 12 Insertion dans la table variable_intervention
-			$id_variable_intervention = $this->VariableinterventionManager->add($data);
-			
-		}	*/	
 		$date_inscription = new DateTime($date_inscription); 
 		$date_inscription =$date_inscription->format('d/m/Y');				
 		if($nombre_erreur > 0) {

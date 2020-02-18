@@ -15,6 +15,12 @@ class Validationintervention_model extends CI_Model
 		$query = $this->db->query($requete);
         return $query->result();				
 	}
+	// Selection région par nom
+	public function selectionregion_avec_espace($nom1,$nom2) {
+		$requete="select id,nom,code from region where lower(nom) like '%".$nom1."%' and lower(nom) like '%".$nom2."%' limit 1";
+		$query = $this->db->query($requete);
+        return $query->result();				
+	}
 	// Selection district par nom et id_region
 	public function selectiondistrict($nom,$id_region) {
 		$requete="select id,nom,code from district where lower(nom) like '%".$nom."%' and region_id ='".$id_region."' limit 1";
@@ -27,9 +33,15 @@ class Validationintervention_model extends CI_Model
 		$query = $this->db->query($requete);
         return $query->result();				
 	}
+	// Selection district par nom et id_region
+	public function selectiondistrict_avec_espace($nom1,$nom2,$id_region) {
+		$requete="select id,nom,code from district where lower(nom) like '%".$nom1."%' and lower(nom) like'%".$nom2."%' and region_id ='".$id_region."' limit 1";
+		$query = $this->db->query($requete);
+        return $query->result();				
+	}
 	// Selection commune par nom et id_district
 	public function selectioncommune($nom,$id_district) {
-		$requete="select id,nom,code from commune where lower(nom)='".$nom."' and district_id ='".$id_district."' limit 1";
+		$requete="select id,nom,code from commune where lower(nom) like '%".$nom."%' and district_id ='".$id_district."' limit 1";
 		$query = $this->db->query($requete);
         return $query->result();				
 	}
@@ -39,12 +51,24 @@ class Validationintervention_model extends CI_Model
 		$query = $this->db->query($requete);
         return $query->result();				
 	}
-	// Selection fokontany par nom et id_commune
-	public function selectionfokontany($nom,$id_commune) {
-		$requete="select id,nom,code from fokontany where lower(nom)='".$nom."' and id_commune ='".$id_commune."' limit 1";
+	// Selection commune par nom et id_district
+	public function selectioncommune_avec_espace($nom1,$nom2,$id_district) {
+		$requete="select id,nom,code from commune where lower(nom) like '%".$nom1."%' and lower(nom) like'%".$nom2."%' and district_id ='".$id_district."' limit 1";
 		$query = $this->db->query($requete);
         return $query->result();				
 	}
+	// Selection fokontany par nom et id_commune
+	public function selectionfokontany($nom,$id_commune) {
+		$requete="select id,nom,code from fokontany where lower(nom) ='".$nom."' and id_commune ='".$id_commune."' limit 1";
+		$query = $this->db->query($requete);
+        return $query->result();				
+	}
+	// Selection fokontany par nom et id_commune
+	public function selectionfokontany_avec_espace($nom1,$nom2,$id_commune) {
+		$requete="select id,nom,code from fokontany where lower(nom) like '%".$nom1."%' and lower(nom) like'%".$nom2."%' and id_commune ='".$id_commune."' limit 1";
+		$query = $this->db->query($requete);
+        return $query->result();
+	}	
 	// Comptage bénéficiaire par identifiant_appariement et id_acteur
     public function RechercheParIdentifiantActeur($identifiant_appariement,$id_acteur) {
 		$requete= "select count(*) as nombre from menage where identifiant_appariement='".$identifiant_appariement."' and id_acteur=".$id_acteur;

@@ -319,7 +319,7 @@
                     <tr>
                         <td class="free-text">
                             Lors de la vérification des données<?php echo $type_fichier?>à importer dans la base de données, nous vous signalons par la présente qu'il y avait 
-							des données erronées ou incompl&egrave;tes dans le fichier :
+							des données erronées ou incompl&egrave;tes au nombre de <?php echo $nombre_erreur;?> (<?php echo $nombre_erreur_en_lettre;?>) dans le fichier :
                         </td>
                     </tr>
                     <tr>
@@ -344,7 +344,7 @@
                     </tr>
                     <tr>
                         <td class="free-text">
-                            Date inscription : <?php echo $date_inscription;?>
+                            Date : <?php echo $date_inscription;?>
                         </td>
                     </tr>
                     <tr>

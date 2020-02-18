@@ -103,15 +103,15 @@ class Individu extends REST_Controller {
 					$situationmatrimoniale = $this->EnquetemenageManager->findById($value->id_situation_matrimoniale,"situation_matrimoniale");
                     $data[$key]['liendeparente'] = $lien;
                     $data[$key]['id_liendeparente'] = $value->id_liendeparente;
-                    $data[$key]['handicap_visuel'] = $hv;
+                    $data[$key]['handicap_visuel_tab'] = $hv;
                     $data[$key]['id_handicap_visuel'] = $value->id_handicap_visuel;
-                    $data[$key]['handicap_parole'] = $hp;
+                    $data[$key]['handicap_parole_tab'] = $hp;
                     $data[$key]['id_handicap_parole'] = $value->id_handicap_parole;
-                    $data[$key]['handicap_auditif'] = $ha;
+                    $data[$key]['handicap_auditif_tab'] = $ha;
                     $data[$key]['id_handicap_auditif'] = $value->id_handicap_auditif;
-                    $data[$key]['handicap_mental'] = $hm;
+                    $data[$key]['handicap_mental_tab'] = $hm;
                     $data[$key]['id_handicap_mental'] = $value->id_handicap_mental;
-                    $data[$key]['handicap_moteur'] = $hmot;
+                    $data[$key]['handicap_moteur_tab'] = $hmot;
                     $data[$key]['id_handicap_moteur'] = $value->id_handicap_moteur;
                     $data[$key]['type_ecole'] = $te;
                     $data[$key]['id_type_ecole'] = $value->id_type_ecole;
@@ -126,7 +126,13 @@ class Individu extends REST_Controller {
                     $data[$key]['acteur'] = $acteur;
                     $data[$key]['decede'] = $value->decede;
                     $data[$key]['date_deces'] = $value->date_deces;
-                }
+                    $data[$key]['chef_menage'] = $value->chef_menage;
+                    $data[$key]['handicap_visuel'] = $value->handicap_visuel;
+                    $data[$key]['handicap_parole'] = $value->handicap_parole;
+                    $data[$key]['handicap_auditif'] = $value->handicap_auditif;
+                    $data[$key]['handicap_moteur'] = $value->handicap_moteur;
+                    $data[$key]['handicap_mental'] = $value->handicap_mental;
+				}
             }
 		}
         if (count($data)>0) {
@@ -245,6 +251,12 @@ class Individu extends REST_Controller {
 			'id_acteur'                => $id_acteur,
 			'decede'                   => $this->post('decede'),
 			'date_deces'               => $date_deces,
+			'chef_menage'              => $this->post('chef_menage'),
+			'handicap_visuel'          => $this->post('handicap_visuel'),
+			'handicap_parole'          => $this->post('handicap_parole'),
+			'handicap_auditif'         => $this->post('handicap_auditif'),
+			'handicap_moteur'          => $this->post('handicap_moteur'),
+			'handicap_mental'          => $this->post('handicap_mental'),
 		);
         if ($supprimer == 0) {
             if ($id == 0) {
