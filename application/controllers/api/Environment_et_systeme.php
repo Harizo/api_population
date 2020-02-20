@@ -130,6 +130,12 @@ class Environment_et_systeme extends REST_Controller {
                 $data = $this->Systeme_protection_socialManager->req_multiple_21_to_30() ;
             }
 
+
+            if ($menu == 'req6_theme2') 
+            {
+                $data = $this->Systeme_protection_socialManager->req6_theme2() ;
+            }
+
             
 
 

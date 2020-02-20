@@ -128,6 +128,12 @@ class Export_excel extends REST_Controller {
                 $data = $this->Systeme_protection_socialManager->req_multiple_21_to_30() ;
             }
 
+
+            if ($menu == 'req6_theme2') 
+            {
+                $data = $this->Systeme_protection_socialManager->req6_theme2() ;
+            }
+
             
 
 
@@ -2013,6 +2019,76 @@ class Export_excel extends REST_Controller {
 
                     $objPHPExcel->getActiveSheet()->getStyle("A".$ligne.":Q".$ligne)->applyFromArray($stylecontenu);
                 $objPHPExcel->getActiveSheet()->getStyle("A".$ligne.":Q".$ligne)->getAlignment()->setWrapText(true);
+                $objPHPExcel->getActiveSheet()->getRowDimension($ligne)->setRowHeight(30);
+                    $ligne++;
+                }
+            }
+
+
+            if ($menu == 'req6_theme2') 
+            {
+                $objPHPExcel->getActiveSheet()->getColumnDimension('A')->setAutoSize(true);
+                $objPHPExcel->getActiveSheet()->getColumnDimension('B')->setAutoSize(true);
+                $objPHPExcel->getActiveSheet()->getColumnDimension('C')->setAutoSize(true);
+                $objPHPExcel->getActiveSheet()->getColumnDimension('D')->setAutoSize(true);
+                $objPHPExcel->getActiveSheet()->getColumnDimension('E')->setAutoSize(true);
+                $objPHPExcel->getActiveSheet()->getColumnDimension('F')->setAutoSize(true);
+                $objPHPExcel->getActiveSheet()->getColumnDimension('G')->setAutoSize(true);
+                $objPHPExcel->getActiveSheet()->getColumnDimension('H')->setAutoSize(true);
+                
+                $objPHPExcel->getActiveSheet()->setTitle("Tableau de bord");
+
+                $objPHPExcel->getActiveSheet()->getHeaderFooter()->setOddFooter('&R&11&B Page &P / &N');
+                $objPHPExcel->getActiveSheet()->getHeaderFooter()->setEvenFooter('&R&11&B Page &P / &N');
+
+                $objPHPExcel->getActiveSheet()->getRowDimension($ligne)->setRowHeight(30);
+                $objPHPExcel->getActiveSheet()->mergeCells("A".$ligne.":H".$ligne);
+                $objPHPExcel->getActiveSheet()->getStyle("A".$ligne.":H".$ligne)->applyFromArray($styleTitre);
+                $objPHPExcel->setActiveSheetIndex(0)->setCellValue('A'.$ligne, $nom_file);
+
+
+                $ligne = $ligne + 2 ;
+
+                
+
+
+                $objPHPExcel->setActiveSheetIndex(0)->setCellValue('A'.$ligne, "Région");
+                $objPHPExcel->getActiveSheet()->mergeCells("A".$ligne.":B".$ligne);
+
+                $objPHPExcel->setActiveSheetIndex(0)->setCellValue('C'.$ligne, 'District');
+                $objPHPExcel->getActiveSheet()->mergeCells("C".$ligne.":D".$ligne);
+
+                $objPHPExcel->setActiveSheetIndex(0)->setCellValue('E'.$ligne, 'Niveau de vulnérabilité');
+                $objPHPExcel->getActiveSheet()->mergeCells("E".$ligne.":F".$ligne);
+
+                $objPHPExcel->setActiveSheetIndex(0)->setCellValue('G'.$ligne, 'Nombre');
+                $objPHPExcel->getActiveSheet()->mergeCells("G".$ligne.":H".$ligne);
+
+                $objPHPExcel->getActiveSheet()->getStyle("A".$ligne.":H".$ligne)->applyFromArray($stylesousTitre);
+                $objPHPExcel->getActiveSheet()->getStyle("A".$ligne.":H".$ligne)->getAlignment()->setWrapText(true);
+                $objPHPExcel->getActiveSheet()->getRowDimension($ligne)->setRowHeight(30);
+
+                $ligne++;
+
+                foreach ($data as $key => $value) 
+                {
+                    $objPHPExcel->setActiveSheetIndex(0)->setCellValue('A'.$ligne, $value->nom_region);
+                    $objPHPExcel->getActiveSheet()->mergeCells("A".$ligne.":B".$ligne);
+
+                    $objPHPExcel->setActiveSheetIndex(0)->setCellValue('C'.$ligne, $value->nom_district);
+                    $objPHPExcel->getActiveSheet()->mergeCells("C".$ligne.":D".$ligne);
+
+                   
+
+                    $objPHPExcel->setActiveSheetIndex(0)->setCellValue('E'.$ligne, $value->description_vulnerabilite." (".$value->code_vulnerabilite.")");
+                    $objPHPExcel->getActiveSheet()->mergeCells("E".$ligne.":F".$ligne);
+
+                    $objPHPExcel->setActiveSheetIndex(0)->setCellValue('G'.$ligne, $value->nbr);
+                    $objPHPExcel->getActiveSheet()->mergeCells("G".$ligne.":H".$ligne);
+
+
+                    $objPHPExcel->getActiveSheet()->getStyle("A".$ligne.":H".$ligne)->applyFromArray($stylecontenu);
+                $objPHPExcel->getActiveSheet()->getStyle("A".$ligne.":H".$ligne)->getAlignment()->setWrapText(true);
                 $objPHPExcel->getActiveSheet()->getRowDimension($ligne)->setRowHeight(30);
                     $ligne++;
                 }

@@ -3169,7 +3169,9 @@ class Systeme_protection_social_model extends CI_Model
                   sum(niveau_1.budget_modifie_nouveau) as budget_modifie_nouveau,
 
                   (sum(niveau_1.budget_initial_en_cours) + sum(niveau_1.budget_modifie_en_cours)) as etat_en_cours,
-                  (sum(niveau_1.budget_initial_nouveau) + sum(niveau_1.budget_modifie_nouveau)) as etat_nouveau
+                  (sum(niveau_1.budget_initial_nouveau) + sum(niveau_1.budget_modifie_nouveau)) as etat_nouveau,
+
+                  (select description from nomenclature_intervention4 where id = niveau_1.id_nomenclature_intervention) as nomenclature
 
 
                 from(
@@ -3180,6 +3182,7 @@ class Systeme_protection_social_model extends CI_Model
                           programme.intitule as intitule_programme,
                           intervention.id as id_intervention,
                           intervention.intitule as intitule_intervention,
+                          intervention.id_nomenclature_intervention as id_nomenclature_intervention,
 
                           devise.id as id_devise,
                           devise.description as description_devise,
@@ -3218,6 +3221,7 @@ class Systeme_protection_social_model extends CI_Model
                           programme.intitule as intitule_programme,
                           intervention.id as id_intervention,
                           intervention.intitule as intitule_intervention,
+                          intervention.id_nomenclature_intervention as id_nomenclature_intervention,
 
                           devise.id as id_devise,
                           devise.description as description_devise,
@@ -3255,7 +3259,8 @@ class Systeme_protection_social_model extends CI_Model
                         niveau_1.intitule_programme,
                         niveau_1.intitule_intervention,
                         niveau_1.id_devise,
-                        niveau_1.description_devise 
+                        niveau_1.description_devise ,
+                        niveau_1.id_nomenclature_intervention
 
 
 
@@ -3522,6 +3527,10 @@ class Systeme_protection_social_model extends CI_Model
         return $this->db->query($sql)->result();
     }
     //fin req9_theme2  
+      
+
+    //req multiple
+
       public function req_multiple_21_to_30()
       {
         $sql =  "
@@ -3746,13 +3755,122 @@ class Systeme_protection_social_model extends CI_Model
                     var_int.id,
                     nmcl4.id
 
+                  order by 
+                    nomenclature_description
+
                 " ;
 
         return $this->db->query($sql)->result();
       }
-
-    //req multiple
     //fin req multiple
+
+
+    //req_6_theme2
+
+      public function req6_theme2()
+      {
+        $sql =  "
+                  select
+
+                  niveau_1.nom_region,
+                  niveau_1.nom_district,
+                  niveau_1.code_vulnerabilite,
+                  niveau_1.description_vulnerabilite,
+                  (sum(niveau_1.nbr_menage) + sum(niveau_1.nbr_individu)) as nbr 
+                  
+
+                  from
+
+                  (
+                    select
+
+                      region.id as id_region,
+                      region.nom as nom_region,
+                  
+                      district.id as id_district,
+                      district.nom as nom_district,
+                      indice_vulnerabilite.id as id_vulnerabilite,
+                      indice_vulnerabilite.code as code_vulnerabilite,
+                      indice_vulnerabilite.description as description_vulnerabilite,
+                      count(menage.id) as nbr_menage,
+                      0 as nbr_individu
+  
+                    from 
+                      menage,
+                      indice_vulnerabilite,
+                      fokontany,
+                      commune,
+                      district,
+                      region
+                    where 
+  
+                      fokontany.id = menage.id_fokontany
+                      and commune.id = fokontany.id_commune
+                      and district.id = commune.district_id
+                      and region.id = district.region_id
+                      and indice_vulnerabilite.id = menage.id_indice_vulnerabilite
+  
+                    group by 
+                      region.id,
+                      district.id,
+                      indice_vulnerabilite.id
+  
+  
+                    UNION
+  
+  
+                    select
+
+                      region.id as id_region,
+                      region.nom as nom_region,
+  
+                      district.id as id_district,
+                      district.nom as nom_district,
+                      indice_vulnerabilite.id as id_vulnerabilite,
+                      indice_vulnerabilite.code as code_vulnerabilite,
+                      indice_vulnerabilite.description as description_vulnerabilite,
+                      count(individu.id) as nbr_individu,
+                      0 as nbr_menage
+  
+                    from 
+                      individu,
+                      indice_vulnerabilite,
+                      fokontany,
+                      commune,
+                      district,
+                      region
+                    where 
+  
+                      fokontany.id = individu.id_fokontany
+                      and commune.id = fokontany.id_commune
+                      and district.id = commune.district_id
+                      and region.id = district.region_id
+                      and indice_vulnerabilite.id = individu.id_indice_vulnerabilite
+  
+                    group by 
+                      region.id,
+                      district.id,
+                      indice_vulnerabilite.id
+                  ) niveau_1
+
+
+                    group by 
+                      niveau_1.id_region,
+                      niveau_1.id_district,
+                      niveau_1.nom_region,
+                      niveau_1.nom_district,
+                      niveau_1.code_vulnerabilite,
+                      niveau_1.description_vulnerabilite,
+                      niveau_1.id_vulnerabilite
+
+                    order by
+                      niveau_1.nom_region
+                " ;
+
+
+          return $this->db->query($sql)->result();
+      }
+    //fin req_6_theme2
     //FIN CODE HARIZO
 
    
