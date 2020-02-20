@@ -218,4 +218,10 @@ class Validationbeneficiaire_model extends CI_Model
 		$query = $this->db->query($requete);
 		return $query->result();				
 	}
+	// Récupérationid de l'indice de vulnérabilité
+	public function recuperer_id_indice_vulnerabilite($description) {
+		$requete="select id as id_indice_vulnerabilite from indice_vulnerabilite where lower(description) like '%".$description."%'";
+		$query = $this->db->query($requete);
+		return $query->result();				
+	}
 }

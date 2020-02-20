@@ -668,6 +668,8 @@ class Validationbeneficiaire extends CI_Controller {
 							} else {
 								$date_inscription=null;
 							}								 							 
+						 } else if('AC' == $cell->getColumn()) {
+							$indice_vulnerabilite = $cell->getValue();  
 						 }
 					}
 					if($identifiant_appariement=='') {
@@ -930,6 +932,19 @@ class Validationbeneficiaire extends CI_Controller {
 						 );	
 						$nombre_erreur = $nombre_erreur + 1;						
 					} */
+					if($indice_vulnerabilite>'') {
+						$indice_vulnerabilite=strtolower($indice_vulnerabilite);
+						$retour=$this->ValidationbeneficiaireManager->recuperer_id_indice_vulnerabilite($indice_vulnerabilite);
+						if(!$retour) {
+							$sheet->getStyle("AC".$ligne)->getFill()->applyFromArray(
+									 array('type'       => PHPExcel_Style_Fill::FILL_SOLID,'rotation'   => 0,
+										 'startcolor' => array('rgb' => 'FF0000'),
+										 'endcolor'   => array('argb' => 'FF0000')
+									 )
+							 );		
+							$nombre_erreur = $nombre_erreur + 1; 
+						}
+					}	
 				}	
 				$ligne = $ligne + 1;
 			}		
@@ -1163,7 +1178,7 @@ class Validationbeneficiaire extends CI_Controller {
 										 $identifiant_unique=$v->identifiant_unique;
 										$id_menage=$v->id_menage; 
 									 }
-									$sheet->setCellValue("AC".$ligne, $code_region."-".$code_district."-".$code_commune."-".$code_fokontany."-".$identifiant_unique);
+									$sheet->setCellValue("AD".$ligne, $code_region."-".$code_district."-".$code_commune."-".$code_fokontany."-".$identifiant_unique);
 									$beneficiaire_existant=true;
 								}	 
 							}
@@ -1203,7 +1218,7 @@ class Validationbeneficiaire extends CI_Controller {
 										 $identifiant_unique=$v->identifiant_unique;
 										$id_menage=$v->id_menage; 
 									 }
-									$sheet->setCellValue("AC".$ligne, $code_region."-".$code_district."-".$code_commune."-".$code_fokontany."-".$identifiant_unique);
+									$sheet->setCellValue("AD".$ligne, $code_region."-".$code_district."-".$code_commune."-".$code_fokontany."-".$identifiant_unique);
 									$beneficiaire_existant=true;
 								}	 
 								// Vérification si déjà bénéficiaire de l'intervention
@@ -1214,14 +1229,14 @@ class Validationbeneficiaire extends CI_Controller {
 								}
 								// Bénéficiaire existant et bénéficie déjà de l'intervention =>ERREUR DOUBLON
 								if($nombre >0) {
-									// Doublon : ERREUR Marquage colonne AD par Doublon de couleur Jaune
-									$sheet->getStyle("AD".$ligne)->getFill()->applyFromArray(
+									// Doublon : ERREUR Marquage colonne AE par Doublon de couleur Jaune
+									$sheet->getStyle("AE".$ligne)->getFill()->applyFromArray(
 											 array('type'       => PHPExcel_Style_Fill::FILL_SOLID,'rotation'   => 0,
 												 'startcolor' => array('rgb' => 'FFFF66'),
 												 'endcolor'   => array('argb' => 'FFFF66')
 											 )
 									 );	
-									$sheet->setCellValue("AD".$ligne, "Doublon : Déjà bénéficiaire de l'intervention");
+									$sheet->setCellValue("AE".$ligne, "Doublon : Déjà bénéficiaire de l'intervention");
 									$nombre_erreur = $nombre_erreur + 1;	
 								}						
 							} else {
@@ -1241,7 +1256,7 @@ class Validationbeneficiaire extends CI_Controller {
 										$identifiant_unique=$v->identifiant_unique;
 										$id_individu=$v->id_individu; 
 									 }
-									$sheet->setCellValue("AC".$ligne, $code_region."-".$code_district."-".$code_commune."-".$code_fokontany."-".$identifiant_unique);
+									$sheet->setCellValue("AD".$ligne, $code_region."-".$code_district."-".$code_commune."-".$code_fokontany."-".$identifiant_unique);
 									$beneficiaire_existant=true;
 								}	 								
 							}	
@@ -1262,7 +1277,7 @@ class Validationbeneficiaire extends CI_Controller {
 									$identifiant_unique=$v->identifiant_unique;
 									$id_individu=$v->id_individu; 
 								 }
-								$sheet->setCellValue("AC".$ligne, $code_region."-".$code_district."-".$code_commune."-".$code_fokontany."-".$identifiant_unique);
+								$sheet->setCellValue("AD".$ligne, $code_region."-".$code_district."-".$code_commune."-".$code_fokontany."-".$identifiant_unique);
 								$beneficiaire_existant=true;
 							}	 
 							// Vérification si déjà bénéficiaire de l'intervention
@@ -1273,14 +1288,14 @@ class Validationbeneficiaire extends CI_Controller {
 							}
 							// Bénéficiaire existant et bénéficie déjà de l'intervention =>ERREUR DOUBLON
 							if($nombre >0) {
-								// Doublon : ERREUR Marquage colonne AD par Doublon de couleur Jaune
-								$sheet->getStyle("AD".$ligne)->getFill()->applyFromArray(
+								// Doublon : ERREUR Marquage colonne AE par Doublon de couleur Jaune
+								$sheet->getStyle("AE".$ligne)->getFill()->applyFromArray(
 										 array('type'       => PHPExcel_Style_Fill::FILL_SOLID,'rotation'   => 0,
 											 'startcolor' => array('rgb' => 'FFFF66'),
 											 'endcolor'   => array('argb' => 'FFFF66')
 										 )
 								 );	
-								$sheet->setCellValue("AD".$ligne, "Doublon : Déjà bénéficiaire de l'intervention");
+								$sheet->setCellValue("AE".$ligne, "Doublon : Déjà bénéficiaire de l'intervention");
 								$nombre_erreur = $nombre_erreur + 1;	
 							}						
 						}	
@@ -1307,7 +1322,7 @@ class Validationbeneficiaire extends CI_Controller {
 										$identifiant_unique=$v->identifiant_unique;
 										$id_menage=$v->id_menage; 
 									 }
-									$sheet->setCellValue("AC".$ligne, $code_region."-".$code_district."-".$code_commune."-".$code_fokontany."-".$identifiant_unique);
+									$sheet->setCellValue("AD".$ligne, $code_region."-".$code_district."-".$code_commune."-".$code_fokontany."-".$identifiant_unique);
 									$beneficiaire_existant=true;
 									// Vérification si déjà bénéficiaire de l'intervention
 									$nombre=0;
@@ -1317,14 +1332,14 @@ class Validationbeneficiaire extends CI_Controller {
 									}
 									// Bénéficiaire existant et bénéficie déjà de l'intervention =>ERREUR DOUBLON
 									if($nombre >0) {
-										// Doublon : ERREUR Marquage colonne AD par Doublon de couleur Jaune
-										$sheet->getStyle("AD".$ligne)->getFill()->applyFromArray(
+										// Doublon : ERREUR Marquage colonne AE par Doublon de couleur Jaune
+										$sheet->getStyle("AE".$ligne)->getFill()->applyFromArray(
 												 array('type'       => PHPExcel_Style_Fill::FILL_SOLID,'rotation'   => 0,
 													 'startcolor' => array('rgb' => 'FFFF66'),
 													 'endcolor'   => array('argb' => 'FFFF66')
 												 )
 										 );	
-										$sheet->setCellValue("AD".$ligne, "Doublon : Déjà bénéficiaire de l'intervention");
+										$sheet->setCellValue("AE".$ligne, "Doublon : Déjà bénéficiaire de l'intervention");
 										$nombre_erreur = $nombre_erreur + 1;	
 									}						
 								}	 
@@ -1347,7 +1362,7 @@ class Validationbeneficiaire extends CI_Controller {
 										$id_menage=$v->id_menage; 
 										$id_individu=$v->id_individu; 
 									 }
-									$sheet->setCellValue("AC".$ligne, $code_region."-".$code_district."-".$code_commune."-".$code_fokontany."-".$identifiant_unique);
+									$sheet->setCellValue("AD".$ligne, $code_region."-".$code_district."-".$code_commune."-".$code_fokontany."-".$identifiant_unique);
 									$beneficiaire_existant=true;
 								}	 
 							}	
@@ -1368,7 +1383,7 @@ class Validationbeneficiaire extends CI_Controller {
 									$identifiant_unique=$v->identifiant_unique;
 									$id_individu=$v->id_individu; 
 								 }
-								$sheet->setCellValue("AC".$ligne, $code_region."-".$code_district."-".$code_commune."-".$code_fokontany."-".$identifiant_unique);
+								$sheet->setCellValue("AD".$ligne, $code_region."-".$code_district."-".$code_commune."-".$code_fokontany."-".$identifiant_unique);
 								$beneficiaire_existant=true;
 								// Vérification si déjà bénéficiaire de l'intervention
 								$nombre=0;
@@ -1378,14 +1393,14 @@ class Validationbeneficiaire extends CI_Controller {
 								}
 								// Bénéficiaire existant et bénéficie déjà de l'intervention =>ERREUR DOUBLON
 								if($nombre >0) {
-									// Doublon : ERREUR Marquage colonne AD par Doublon de couleur Jaune
-									$sheet->getStyle("AD".$ligne)->getFill()->applyFromArray(
+									// Doublon : ERREUR Marquage colonne AE par Doublon de couleur Jaune
+									$sheet->getStyle("AE".$ligne)->getFill()->applyFromArray(
 											 array('type'       => PHPExcel_Style_Fill::FILL_SOLID,'rotation'   => 0,
 												 'startcolor' => array('rgb' => 'FFFF66'),
 												 'endcolor'   => array('argb' => 'FFFF66')
 											 )
 									 );	
-									$sheet->setCellValue("AD".$ligne, "Doublon : Déjà bénéficiaire de l'intervention");
+									$sheet->setCellValue("AE".$ligne, "Doublon : Déjà bénéficiaire de l'intervention");
 									$nombre_erreur = $nombre_erreur + 1;	
 								}						
 							}	 

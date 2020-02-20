@@ -72,6 +72,7 @@ class Menage_model extends CI_Model {
 			'etat_groupe'            => $menage['etat_groupe'],
 			'decede'                 => $menage['decede'],
 			'date_deces'             => $menage['date_deces'],
+			'id_indice_vulnerabilite' => $menage['id_indice_vulnerabilite'],
         );
     }
     public function _setbeneficiaire_acteur($menage) {
@@ -111,7 +112,8 @@ class Menage_model extends CI_Model {
 			'etat_groupe'            => $menage['etat_groupe'],
 			'decede'                 => $menage['decede'],
 			'date_deces'             => $menage['date_deces'],
-        );
+ 			'id_indice_vulnerabilite' => $menage['id_indice_vulnerabilite'],
+       );
     }
     public function delete($id) {
 		// Suppression d'un enregitrement
