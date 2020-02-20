@@ -359,6 +359,8 @@ class Importationbeneficiaire extends CI_Controller {
 							} else {
 								$date_enquete_detail=null;
 							}								 							 
+						 } else if('AC' == $cell->getColumn()) {
+							$indice_vulnerabilite = $cell->getValue();  
 						 }
 					}
 					// Début Formatage des données 
@@ -423,6 +425,15 @@ class Importationbeneficiaire extends CI_Controller {
 					}
 					if($nom_enqueteur =="" || $nom_enqueteur=="-") {
 						$nom_enqueteur=null;
+					}
+					$id_indice_vulnerabilite=null;
+					if($indice_vulnerabilite >"" && $indice_vulnerabilite!="-") {
+						$retour=$this->ImportationbeneficiaireManager->recuperer_id_indice_vulnerabilite($indice_vulnerabilite);
+						if($retour) {
+							foreach($retour as $k=>$v) {
+								$id_indice_vulnerabilite=$v->id_indice_vulnerabilite;
+							}
+						}
 					}
 					// Fin Formatage des données
 					/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -700,6 +711,7 @@ class Importationbeneficiaire extends CI_Controller {
 									'etat_groupe'            => $etat_groupe,
 									'decede'                    => 0,
 									'date_deces'                => null,
+									'id_indice_vulnerabilite'  => $id_indice_vulnerabilite,
 								);
 								$id_menage = $this->MenageManager->addchefmenage($data);
 								$code_unique_chef_menage=$identifiant_unique;
@@ -775,6 +787,7 @@ class Importationbeneficiaire extends CI_Controller {
 									'handicap_auditif'          => $handicap_auditif,
 									'handicap_moteur'           => $handicap_moteur,
 									'handicap_mental'           => $handicap_mental,
+									'id_indice_vulnerabilite'  => $id_indice_vulnerabilite,
 								);
 								$id_individu = $this->IndividuManager->add($data);
 								$sheet->setCellValue("AC".$ligne, $code_precedent."-".$code_unique_chef_menage);																
@@ -849,6 +862,7 @@ class Importationbeneficiaire extends CI_Controller {
 									'handicap_auditif'          => $handicap_auditif,
 									'handicap_moteur'           => $handicap_moteur,
 									'handicap_mental'           => $handicap_mental,
+									'id_indice_vulnerabilite'  => $id_indice_vulnerabilite,
 								);
 								$id_individu = $this->IndividuManager->add($data);
 								$sheet->setCellValue("AC".$ligne, $code_precedent."-".$identifiant_unique);								
@@ -924,6 +938,7 @@ class Importationbeneficiaire extends CI_Controller {
 								'handicap_auditif'          => $handicap_auditif,
 								'handicap_moteur'           => $handicap_moteur,
 								'handicap_mental'           => $handicap_mental,
+								'id_indice_vulnerabilite'  => $id_indice_vulnerabilite,
 							);
 							$id_menage = $this->IndividuManager->add($data);
 							$sheet->setCellValue("AC".$ligne, $code_precedent."-".$identifiant_unique);

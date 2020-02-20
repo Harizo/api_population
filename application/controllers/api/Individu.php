@@ -57,6 +57,8 @@ class Individu extends REST_Controller {
                 foreach ($menu as $key => $value) {
 					// Selection groupe appartenance
 					$ga = $this->EnquetemenageManager->findById($value->id_groupe_appartenance,"groupe_appartenance");
+					// Selection indice de vulnérabilité
+					$indicevulnerable = $this->EnquetemenageManager->findById($value->id_indice_vulnerabilite,"indice_vulnerabilite");
                     $acteur = array();
                     $fokontany = array();
 					// Selection description fokontany
@@ -132,6 +134,12 @@ class Individu extends REST_Controller {
                     $data[$key]['handicap_auditif'] = $value->handicap_auditif;
                     $data[$key]['handicap_moteur'] = $value->handicap_moteur;
                     $data[$key]['handicap_mental'] = $value->handicap_mental;
+                    $data[$key]['id_indice_vulnerabilite'] = $value->id_indice_vulnerabilite;
+					if($indicevulnerable) {
+						$data[$key]['indicevulnerabilite'] =$indicevulnerable;
+					} else {	
+						$data[$key]['indicevulnerabilite'] = array();
+					}	
 				}
             }
 		}
@@ -210,6 +218,10 @@ class Individu extends REST_Controller {
 		if(isset($temporaire) && $temporaire !="" && intval($temporaire) >0) {
 			$id_fokontany=$temporaire;
 		}
+		$temporaire=$this->post('id_indice_vulnerabilite');
+		if(isset($temporaire) && $temporaire !="" && intval($temporaire) >0) {
+			$id_indice_vulnerabilite=$temporaire;
+		}
 		// Affectation des valeurs de chaque colonne de la table
 		$data = array(
 			'id_menage'                => $this->post('id_menage'),
@@ -257,6 +269,7 @@ class Individu extends REST_Controller {
 			'handicap_auditif'         => $this->post('handicap_auditif'),
 			'handicap_moteur'          => $this->post('handicap_moteur'),
 			'handicap_mental'          => $this->post('handicap_mental'),
+			'id_indice_vulnerabilite'  => $id_indice_vulnerabilite,
 		);
         if ($supprimer == 0) {
             if ($id == 0) {

@@ -72,6 +72,7 @@ class Individu_model extends CI_Model {
 			'handicap_auditif'          => $individu['handicap_auditif'],
 			'handicap_moteur'           => $individu['handicap_moteur'],
 			'handicap_mental'           => $individu['handicap_mental'],
+			'id_indice_vulnerabilite'   => $individu['id_indice_vulnerabilite'],
 		);
     }
     public function delete($id) {

@@ -13,6 +13,7 @@ class Menage extends REST_Controller {
         $this->load->model('fokontany_model', 'FokontanyManager');
         $this->load->model('acteur_model', 'ActeurManager');
         $this->load->model('type_beneficiaire_model', 'TypebeneficiaireManager');
+        $this->load->model('enquete_menage_model', 'EnquetemenageManager');
     }
 	// Conversion date angular date longue en  format y-m-d
 	public function convertDateAngular($daty){
@@ -71,6 +72,13 @@ class Menage extends REST_Controller {
 					if(count($acteur_temp) >0) {
 						$acteur=$acteur_temp;
 					}
+					if($indicevulnerable) {
+						$data[$key]['indicevulnerabilite'] =$indicevulnerable;
+					} else {	
+						$data[$key]['indicevulnerabilite'] = array();
+					}	
+					// Selection indice de vulnérabilité
+					$indicevulnerable = $this->EnquetemenageManager->findById($value->id_indice_vulnerabilite,"indice_vulnerabilite");
 					// Valeur retourné en tableau	
                     $data[$key]['id'] = $value->id;
                     $data[$key]['identifiant_unique'] = $value->identifiant_unique;
@@ -111,6 +119,12 @@ class Menage extends REST_Controller {
                     $data[$key]['etat_groupe'] = $value->etat_groupe;
 					$data[$key]['decede'] = $value->decede;
                     $data[$key]['date_deces'] = $value->date_deces;
+                    $data[$key]['id_indice_vulnerabilite'] = $value->id_indice_vulnerabilite;
+					if($indicevulnerable) {
+						$data[$key]['indicevulnerabilite'] =$indicevulnerable;
+					} else {	
+						$data[$key]['indicevulnerabilite'] = array();
+					}	
           }
             }
             if (!$data)
@@ -151,6 +165,10 @@ class Menage extends REST_Controller {
 		if(isset($temporaire) && $temporaire !="" && intval($temporaire) >0) {
 			$id_acteur=$temporaire;
 		}
+		$temporaire=$this->post('id_indice_vulnerabilite');
+		if(isset($temporaire) && $temporaire !="" && intval($temporaire) >0) {
+			$id_indice_vulnerabilite=$temporaire;
+		}
 		// Affectation valeur colonne
 		$data = array(
 			'identifiant_unique'     => $this->post('identifiant_unique'),
@@ -185,11 +203,10 @@ class Menage extends REST_Controller {
 			'id_fokontany'           => $id_fokontany,
 			'id_acteur'              => $id_acteur,
 			'id_type_beneficiaire'   => $id_type_beneficiaire,
-
 			'etat_groupe'            => $this->post('etat_groupe'),
 			'decede'                 => $this->post('decede'),
 			'date_deces'             => $date_deces,
-
+			'id_indice_vulnerabilite'  => $id_indice_vulnerabilite,
 		);
 		// Supprimer =0 veut dire : soit un ajout ou mise a jour sinon suppression d'un enregistrement
         if ($supprimer == 0) {
