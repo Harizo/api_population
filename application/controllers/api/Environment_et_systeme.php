@@ -124,6 +124,12 @@ class Environment_et_systeme extends REST_Controller {
                 $data = $this->Systeme_protection_socialManager->nbr_nouveau_beneficiaire($date_debut, $date_fin) ;
             }
 
+
+            if ($menu == 'req_multiple_21_to_30_theme2') 
+            {
+                $data = $this->Systeme_protection_socialManager->req_multiple_21_to_30() ;
+            }
+
             
 
 

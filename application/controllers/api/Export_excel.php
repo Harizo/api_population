@@ -122,6 +122,12 @@ class Export_excel extends REST_Controller {
                 $data = $this->Systeme_protection_socialManager->nbr_nouveau_beneficiaire($date_debut, $date_fin) ;
             }
 
+
+            if ($menu == 'req_multiple_21_to_30_theme2') 
+            {
+                $data = $this->Systeme_protection_socialManager->req_multiple_21_to_30() ;
+            }
+
             
 
 
@@ -1919,6 +1925,94 @@ class Export_excel extends REST_Controller {
 
                     $objPHPExcel->getActiveSheet()->getStyle("A".$ligne.":F".$ligne)->applyFromArray($stylecontenu);
                 $objPHPExcel->getActiveSheet()->getStyle("A".$ligne.":F".$ligne)->getAlignment()->setWrapText(true);
+                $objPHPExcel->getActiveSheet()->getRowDimension($ligne)->setRowHeight(30);
+                    $ligne++;
+                }
+            }
+
+            if ($menu == 'req_multiple_21_to_30_theme2') 
+            {
+                $objPHPExcel->getActiveSheet()->getColumnDimension('A')->setAutoSize(true);
+                $objPHPExcel->getActiveSheet()->getColumnDimension('B')->setAutoSize(true);
+                $objPHPExcel->getActiveSheet()->getColumnDimension('C')->setAutoSize(true);
+                $objPHPExcel->getActiveSheet()->getColumnDimension('D')->setAutoSize(true);
+                $objPHPExcel->getActiveSheet()->getColumnDimension('E')->setAutoSize(true);
+                $objPHPExcel->getActiveSheet()->getColumnDimension('F')->setAutoSize(true);
+                $objPHPExcel->getActiveSheet()->getColumnDimension('G')->setAutoSize(true);
+                $objPHPExcel->getActiveSheet()->getColumnDimension('H')->setAutoSize(true);
+                $objPHPExcel->getActiveSheet()->getColumnDimension('I')->setAutoSize(true);
+                $objPHPExcel->getActiveSheet()->getColumnDimension('J')->setAutoSize(true);
+                $objPHPExcel->getActiveSheet()->getColumnDimension('K')->setAutoSize(true);
+                $objPHPExcel->getActiveSheet()->getColumnDimension('L')->setAutoSize(true);
+                $objPHPExcel->getActiveSheet()->getColumnDimension('M')->setAutoSize(true);
+                $objPHPExcel->getActiveSheet()->getColumnDimension('N')->setAutoSize(true);
+                $objPHPExcel->getActiveSheet()->getColumnDimension('O')->setAutoSize(true);
+                $objPHPExcel->getActiveSheet()->getColumnDimension('P')->setAutoSize(true);
+                $objPHPExcel->getActiveSheet()->getColumnDimension('Q')->setAutoSize(true);
+                
+                $objPHPExcel->getActiveSheet()->setTitle("Tableau de bord");
+
+                $objPHPExcel->getActiveSheet()->getHeaderFooter()->setOddFooter('&R&11&B Page &P / &N');
+                $objPHPExcel->getActiveSheet()->getHeaderFooter()->setEvenFooter('&R&11&B Page &P / &N');
+
+                $objPHPExcel->getActiveSheet()->getRowDimension($ligne)->setRowHeight(30);
+                $objPHPExcel->getActiveSheet()->mergeCells("A".$ligne.":Q".$ligne);
+                $objPHPExcel->getActiveSheet()->getStyle("A".$ligne.":Q".$ligne)->applyFromArray($styleTitre);
+                $objPHPExcel->setActiveSheetIndex(0)->setCellValue('A'.$ligne, $nom_file);
+
+
+                $ligne = $ligne + 2 ;
+
+          
+
+                $objPHPExcel->setActiveSheetIndex(0)->setCellValue('A'.$ligne, "Nomenclature");
+                $objPHPExcel->getActiveSheet()->mergeCells("A".$ligne.":C".$ligne);
+
+                $objPHPExcel->setActiveSheetIndex(0)->setCellValue('D'.$ligne, 'Intervention');
+                $objPHPExcel->getActiveSheet()->mergeCells("D".$ligne.":F".$ligne);
+
+                $objPHPExcel->setActiveSheetIndex(0)->setCellValue('G'.$ligne, 'Variable');
+                $objPHPExcel->getActiveSheet()->mergeCells("G".$ligne.":J".$ligne);
+
+                $objPHPExcel->setActiveSheetIndex(0)->setCellValue('K'.$ligne, 'Détails');
+                $objPHPExcel->getActiveSheet()->mergeCells("K".$ligne.":M".$ligne);
+
+                $objPHPExcel->setActiveSheetIndex(0)->setCellValue('N'.$ligne, 'Effectif');
+                $objPHPExcel->getActiveSheet()->mergeCells("N".$ligne.":O".$ligne);
+
+                $objPHPExcel->setActiveSheetIndex(0)->setCellValue('P'.$ligne, 'Coût');
+                $objPHPExcel->getActiveSheet()->mergeCells("P".$ligne.":Q".$ligne);
+
+                $objPHPExcel->getActiveSheet()->getStyle("A".$ligne.":Q".$ligne)->applyFromArray($stylesousTitre);
+                $objPHPExcel->getActiveSheet()->getStyle("A".$ligne.":Q".$ligne)->getAlignment()->setWrapText(true);
+                $objPHPExcel->getActiveSheet()->getRowDimension($ligne)->setRowHeight(30);
+
+                $ligne++;
+
+                foreach ($data as $key => $value) 
+                {
+                    $objPHPExcel->setActiveSheetIndex(0)->setCellValue('A'.$ligne, $value->nomenclature_description);
+                    $objPHPExcel->getActiveSheet()->mergeCells("A".$ligne.":C".$ligne);
+
+                    $objPHPExcel->setActiveSheetIndex(0)->setCellValue('D'.$ligne, $value->intitule_intervention);
+                    $objPHPExcel->getActiveSheet()->mergeCells("D".$ligne.":F".$ligne);
+
+                    $objPHPExcel->setActiveSheetIndex(0)->setCellValue('G'.$ligne, $value->liste_variable);
+                    $objPHPExcel->getActiveSheet()->mergeCells("G".$ligne.":J".$ligne);
+
+                    $objPHPExcel->setActiveSheetIndex(0)->setCellValue('K'.$ligne, $value->variable);
+                    $objPHPExcel->getActiveSheet()->mergeCells("K".$ligne.":M".$ligne);
+
+                    $objPHPExcel->setActiveSheetIndex(0)->setCellValue('N'.$ligne, number_format($value->effectif,2,","," ")." %");
+                    $objPHPExcel->getActiveSheet()->mergeCells("N".$ligne.":O".$ligne);
+
+                    $objPHPExcel->setActiveSheetIndex(0)->setCellValue('P'.$ligne, number_format($value->stat_cout,2,","," ")." %");
+                    $objPHPExcel->getActiveSheet()->mergeCells("P".$ligne.":Q".$ligne);
+
+
+
+                    $objPHPExcel->getActiveSheet()->getStyle("A".$ligne.":Q".$ligne)->applyFromArray($stylecontenu);
+                $objPHPExcel->getActiveSheet()->getStyle("A".$ligne.":Q".$ligne)->getAlignment()->setWrapText(true);
                 $objPHPExcel->getActiveSheet()->getRowDimension($ligne)->setRowHeight(30);
                     $ligne++;
                 }

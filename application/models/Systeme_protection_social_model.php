@@ -3522,6 +3522,237 @@ class Systeme_protection_social_model extends CI_Model
         return $this->db->query($sql)->result();
     }
     //fin req9_theme2  
+      public function req_multiple_21_to_30()
+      {
+        $sql =  "
+
+                  select 
+
+                    int.id as id_intervention,
+                    int.intitule as intitule_intervention,
+
+                    nmcl4.description as nomenclature_description,
+
+                    (select count(id) from intervention) as nbr_intervention_total,
+
+                    (((select count(DISTINCT(id_intervention)) from variable_intervention where id_variable = (select id from variable where id = var_int.id_variable)) * 100) / (select count(id) from intervention)) as effectif ,
+
+                   
+
+                    (select description from variable where id = var_int.id_variable) as variable,
+                    (select description from liste_variable where id = var_int.id_liste_variable) as liste_variable,
+
+
+                    (select count(DISTINCT(id_intervention)) from variable_intervention where id_variable = (select id from variable where id = var_int.id_variable)) as nbr_intervention,
+
+
+                    (select
+
+                      sum(niveau_1.cout_menage_par_entete) + sum(niveau_1.cout_individu_par_entete)
+
+                    from
+
+                      ( 
+                        select 
+
+                            (count(suivi_menage.id_menage) * suivi_menage_entete.montant_transfert) as cout_menage_par_entete,
+                            0 as cout_individu_par_entete
+
+                          from 
+                            suivi_menage_entete,
+                            suivi_menage
+
+                          where 
+                            suivi_menage_entete.id = suivi_menage.id_suivi_menage_entete
+                            and suivi_menage_entete.id_intervention = int.id
+
+                          
+                          group by 
+                            suivi_menage_entete.id
+
+                        UNION
+
+                        select 
+
+                            0 as cout_menage_par_entete,
+                            (count(suivi_individu.id_individu) * suivi_individu_entete.montant_transfert) as cout_individu_par_entete
+
+                          from 
+                            suivi_individu_entete,
+                            suivi_individu
+
+                          where 
+                            suivi_individu_entete.id = suivi_individu.id_suivi_individu_entete
+                            and suivi_individu_entete.id_intervention = int.id
+                          group by 
+                            suivi_individu_entete.id
+
+                      ) niveau_1
+
+                    ) as cout_par_intervention ,
+
+                    (select
+
+                      sum(niveau_1.cout_menage_par_entete) + sum(niveau_1.cout_individu_par_entete)
+
+                    from
+
+                      ( 
+                        select 
+
+                            (count(suivi_menage.id_menage) * suivi_menage_entete.montant_transfert) as cout_menage_par_entete,
+                            0 as cout_individu_par_entete
+
+                          from 
+                            suivi_menage_entete,
+                            suivi_menage
+
+                          where 
+                            suivi_menage_entete.id = suivi_menage.id_suivi_menage_entete
+
+                          
+                          group by 
+                            suivi_menage_entete.id
+
+                        UNION
+
+                        select 
+
+                            0 as cout_menage_par_entete,
+                            (count(suivi_individu.id_individu) * suivi_individu_entete.montant_transfert) as cout_individu_par_entete
+
+                          from 
+                            suivi_individu_entete,
+                            suivi_individu
+
+                          where 
+                            suivi_individu_entete.id = suivi_individu.id_suivi_individu_entete
+                          group by 
+                            suivi_individu_entete.id
+
+                      ) niveau_1
+
+                    ) as cout_total_intervention ,
+
+
+                    (((select
+                                        
+                        sum(niveau_1.cout_menage_par_entete) + sum(niveau_1.cout_individu_par_entete)
+  
+                      from
+  
+                        ( 
+                          select 
+  
+                              (count(suivi_menage.id_menage) * suivi_menage_entete.montant_transfert) as cout_menage_par_entete,
+                              0 as cout_individu_par_entete
+  
+                            from 
+                              suivi_menage_entete,
+                              suivi_menage
+  
+                            where 
+                              suivi_menage_entete.id = suivi_menage.id_suivi_menage_entete
+                              and suivi_menage_entete.id_intervention = int.id
+  
+                            
+                            group by 
+                              suivi_menage_entete.id
+  
+                          UNION
+  
+                          select 
+  
+                              0 as cout_menage_par_entete,
+                              (count(suivi_individu.id_individu) * suivi_individu_entete.montant_transfert) as cout_individu_par_entete
+  
+                            from 
+                              suivi_individu_entete,
+                              suivi_individu
+  
+                            where 
+                              suivi_individu_entete.id = suivi_individu.id_suivi_individu_entete
+                              and suivi_individu_entete.id_intervention = int.id
+                            group by 
+                              suivi_individu_entete.id
+  
+                        ) niveau_1
+  
+                      ) * 100) 
+
+                      / 
+
+                      (select
+
+                        sum(niveau_1.cout_menage_par_entete) + sum(niveau_1.cout_individu_par_entete)
+
+                      from
+
+                        ( 
+                          select 
+
+                              (count(suivi_menage.id_menage) * suivi_menage_entete.montant_transfert) as cout_menage_par_entete,
+                              0 as cout_individu_par_entete
+
+                            from 
+                              suivi_menage_entete,
+                              suivi_menage
+
+                            where 
+                              suivi_menage_entete.id = suivi_menage.id_suivi_menage_entete
+
+                            
+                            group by 
+                              suivi_menage_entete.id
+
+                          UNION
+
+                          select 
+
+                              0 as cout_menage_par_entete,
+                              (count(suivi_individu.id_individu) * suivi_individu_entete.montant_transfert) as cout_individu_par_entete
+
+                            from 
+                              suivi_individu_entete,
+                              suivi_individu
+
+                            where 
+                              suivi_individu_entete.id = suivi_individu.id_suivi_individu_entete
+                            group by 
+                              suivi_individu_entete.id
+
+                        ) niveau_1
+
+                      )) as stat_cout
+
+                     
+
+                  from
+
+                    intervention as int,
+                    variable_intervention as var_int,
+                    nomenclature_intervention4 as nmcl4
+
+                  where
+                    nmcl4.id = int.id_nomenclature_intervention
+                    and int.id = var_int.id_intervention
+
+
+                 
+
+                  group by 
+                    
+                    int.id,
+                    var_int.id,
+                    nmcl4.id
+
+                " ;
+
+        return $this->db->query($sql)->result();
+      }
+
+    //req multiple
+    //fin req multiple
     //FIN CODE HARIZO
 
    
