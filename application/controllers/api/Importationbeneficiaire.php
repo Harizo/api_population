@@ -427,7 +427,8 @@ class Importationbeneficiaire extends CI_Controller {
 						$nom_enqueteur=null;
 					}
 					$id_indice_vulnerabilite=null;
-					if($indice_vulnerabilite >"" && $indice_vulnerabilite!="-") {
+					$indice_vulnerabilite=strtolower($indice_vulnerabilite);					
+					if($indice_vulnerabilite >"") {
 						$retour=$this->ImportationbeneficiaireManager->recuperer_id_indice_vulnerabilite($indice_vulnerabilite);
 						if($retour) {
 							foreach($retour as $k=>$v) {
@@ -484,7 +485,7 @@ class Importationbeneficiaire extends CI_Controller {
 										 $identifiant_unique=$v->identifiant_unique;
 										$id_menage=$v->id_menage; 
 									 }
-									$sheet->setCellValue("AC".$ligne, $code_region."-".$code_district."-".$code_commune."-".$code_fokontany."-".$identifiant_unique);
+									$sheet->setCellValue("AD".$ligne, $code_region."-".$code_district."-".$code_commune."-".$code_fokontany."-".$identifiant_unique);
 									$beneficiaire_existant=true;
 								}	 
 							}
@@ -526,7 +527,7 @@ class Importationbeneficiaire extends CI_Controller {
 										 $identifiant_unique=$v->identifiant_unique;
 										$id_menage=$v->id_menage; 
 									 }
-									$sheet->setCellValue("AC".$ligne, $code_region."-".$code_district."-".$code_commune."-".$code_fokontany."-".$identifiant_unique);
+									$sheet->setCellValue("AD".$ligne, $code_region."-".$code_district."-".$code_commune."-".$code_fokontany."-".$identifiant_unique);
 									$beneficiaire_existant=true;
 								}	 
 							} else {
@@ -546,7 +547,7 @@ class Importationbeneficiaire extends CI_Controller {
 										$identifiant_unique=$v->identifiant_unique;
 										$id_individu=$v->id_individu; 
 									 }
-									$sheet->setCellValue("AC".$ligne, $code_region."-".$code_district."-".$code_commune."-".$code_fokontany."-".$identifiant_unique);
+									$sheet->setCellValue("AD".$ligne, $code_region."-".$code_district."-".$code_commune."-".$code_fokontany."-".$identifiant_unique);
 									$beneficiaire_existant=true;
 								}	 								
 							}	
@@ -566,7 +567,7 @@ class Importationbeneficiaire extends CI_Controller {
 									$identifiant_unique=$v->identifiant_unique;
 									$id_individu=$v->id_individu; 
 								 }
-								$sheet->setCellValue("AC".$ligne, $code_region."-".$code_district."-".$code_commune."-".$code_fokontany."-".$identifiant_unique);
+								$sheet->setCellValue("AD".$ligne, $code_region."-".$code_district."-".$code_commune."-".$code_fokontany."-".$identifiant_unique);
 								$beneficiaire_existant=true;
 							}	 
 						}	
@@ -596,7 +597,7 @@ class Importationbeneficiaire extends CI_Controller {
 										$identifiant_unique=$v->identifiant_unique;
 										$id_menage=$v->id_menage; 
 									 }
-									$sheet->setCellValue("AC".$ligne, $code_region."-".$code_district."-".$code_commune."-".$code_fokontany."-".$identifiant_unique);
+									$sheet->setCellValue("AD".$ligne, $code_region."-".$code_district."-".$code_commune."-".$code_fokontany."-".$identifiant_unique);
 									$beneficiaire_existant=true;
 								}	 
 							} else {
@@ -618,7 +619,7 @@ class Importationbeneficiaire extends CI_Controller {
 										$id_menage=$v->id_menage; 
 										$id_individu=$v->id_individu; 
 									 }
-									$sheet->setCellValue("AC".$ligne, $code_region."-".$code_district."-".$code_commune."-".$code_fokontany."-".$identifiant_unique);
+									$sheet->setCellValue("AD".$ligne, $code_region."-".$code_district."-".$code_commune."-".$code_fokontany."-".$identifiant_unique);
 									$beneficiaire_existant=true;
 								}	 
 							}	
@@ -639,7 +640,7 @@ class Importationbeneficiaire extends CI_Controller {
 									$identifiant_unique=$v->identifiant_unique;
 									$id_individu=$v->id_individu; 
 								 }
-								$sheet->setCellValue("AC".$ligne, $code_region."-".$code_district."-".$code_commune."-".$code_fokontany."-".$identifiant_unique);
+								$sheet->setCellValue("AD".$ligne, $code_region."-".$code_district."-".$code_commune."-".$code_fokontany."-".$identifiant_unique);
 								$beneficiaire_existant=true;
 							}	 
 						}							
@@ -715,7 +716,7 @@ class Importationbeneficiaire extends CI_Controller {
 								);
 								$id_menage = $this->MenageManager->addchefmenage($data);
 								$code_unique_chef_menage=$identifiant_unique;
-								// $sheet->setCellValue("AC".$ligne, $code_precedent."-".$identifiant_unique);
+								// $sheet->setCellValue("AD".$ligne, $code_precedent."-".$identifiant_unique);
 								// Insértion chef ménage en tant qu'individu
 								// Attribution identifiant unique
 								$retour = $this->ImportationbeneficiaireManager->AttributionIdentifiantUniqueIndividu();
@@ -790,7 +791,7 @@ class Importationbeneficiaire extends CI_Controller {
 									'id_indice_vulnerabilite'  => $id_indice_vulnerabilite,
 								);
 								$id_individu = $this->IndividuManager->add($data);
-								$sheet->setCellValue("AC".$ligne, $code_precedent."-".$code_unique_chef_menage);																
+								$sheet->setCellValue("AD".$ligne, $code_precedent."-".$code_unique_chef_menage);																
 							} else {
 								// Insértion Individu rattaché à un ménage
 								// Attribution identifiant unique
@@ -865,7 +866,7 @@ class Importationbeneficiaire extends CI_Controller {
 									'id_indice_vulnerabilite'  => $id_indice_vulnerabilite,
 								);
 								$id_individu = $this->IndividuManager->add($data);
-								$sheet->setCellValue("AC".$ligne, $code_precedent."-".$identifiant_unique);								
+								$sheet->setCellValue("AD".$ligne, $code_precedent."-".$identifiant_unique);								
 							}	
 						} else {
 							// Insértion Individu tout court sans ménage apparenté
@@ -941,7 +942,7 @@ class Importationbeneficiaire extends CI_Controller {
 								'id_indice_vulnerabilite'  => $id_indice_vulnerabilite,
 							);
 							$id_menage = $this->IndividuManager->add($data);
-							$sheet->setCellValue("AC".$ligne, $code_precedent."-".$identifiant_unique);
+							$sheet->setCellValue("AD".$ligne, $code_precedent."-".$identifiant_unique);
 						}
 					}
 					// TOUJOURS : Insertion dans la table menage_beneficiaire ou individu_beneficiaire
