@@ -810,32 +810,44 @@ class Systeme_protection_social_model extends CI_Model
                 $sql = "select sum(principale.nombre_menage)  as nombre_menage, 
                          sum(principale.nombre_individu) as nombre_individu,
                          principale.intervention,
-                         principale.sexe
+                         principale.sexe,
+                         (select description from nomenclature_intervention4 where id = principale.id_nomenclature_intervention) as nomenclature
 
 
-                    FROM (select count(mb.id) as nombre_menage, 0 as nombre_individu, m.sexe as sexe ,
-                            it.intitule as intervention
+                    FROM (
+                            select 
+                              count(mb.id) as nombre_menage, 
+                              0 as nombre_individu, 
+                              m.sexe as sexe ,
+                              it.intitule as intervention,
+                              it.id_nomenclature_intervention as id_nomenclature_intervention
                             from menage as m
-                            join menage_beneficiaire as mb on mb.id_menage = m.id
-                            join intervention as it on it.id = mb.id_intervention  
-                        where mb.date_sortie is not null
-                        group by it.id, m.sexe 
+                                join menage_beneficiaire as mb on mb.id_menage = m.id
+                                join intervention as it on it.id = mb.id_intervention  
+                            where 
+                              mb.date_sortie is not null
+                            group by it.id, m.sexe 
 
-                        UNION 
+                            UNION 
 
-                        select 0 as nombre_menage, count(ib.id) as nombre_individu, i.sexe as sexe ,
-                                it.intitule as intervention
+                            select 
+                              0 as nombre_menage, 
+                              count(ib.id) as nombre_individu, 
+                              i.sexe as sexe ,
+                              it.intitule as intervention,
+                              it.id_nomenclature_intervention as id_nomenclature_intervention
 
                             from individu as i
-                            join individu_beneficiaire as ib on ib.id_individu=i.id
-                            join intervention as it on it.id=ib.id_intervention
-                        where ib.date_sortie is not null
-                        group by it.id, i.sexe 
+                                join individu_beneficiaire as ib on ib.id_individu=i.id
+                                join intervention as it on it.id=ib.id_intervention
+                            where 
+                              ib.date_sortie is not null
+                            group by it.id, i.sexe 
 
                          ) principale
 
                 group by 
-                        principale.intervention, principale.sexe" ;
+                        principale.intervention, principale.sexe, principale.id_nomenclature_intervention" ;
 
 
             return $this->db->query($sql)->result();
@@ -846,12 +858,13 @@ class Systeme_protection_social_model extends CI_Model
 
         public function nombre_beneficiaire_handicap()//Effectif beneficiaire handicapés(40)
         {
-             $sql = "select sum(principale.nbr_hand_visu) as nbr_hand_visu,
+             /*$sql = "select sum(principale.nbr_hand_visu) as nbr_hand_visu,
                             sum(principale.nbr_hand_paro) as nbr_hand_paro,
                             sum(principale.nbr_hand_audi) as nbr_hand_audi,
                             sum(principale.nbr_hand_ment) as nbr_hand_ment,
                             sum(principale.nbr_hand_mote) as nbr_hand_mote,
-                            principale.intervention
+                            principale.intervention,
+                            (select description from nomenclature_intervention4 where id = principale.id_nomenclature_intervention) as nomenclature
 
 
                     FROM (
@@ -861,7 +874,8 @@ class Systeme_protection_social_model extends CI_Model
                                    0 as nbr_hand_audi,
                                    0 as nbr_hand_ment,
                                    0 as nbr_hand_mote,
-                                   int.intitule as intervention
+                                   int.intitule as intervention,
+                                   int.id_nomenclature_intervention as id_nomenclature_intervention
 
                             from enquete_individu as enq_ind
 
@@ -881,7 +895,8 @@ class Systeme_protection_social_model extends CI_Model
                                    0 as nbr_hand_audi,
                                    0 as nbr_hand_ment,
                                    0 as nbr_hand_mote,
-                                   int.intitule as intervention
+                                   int.intitule as intervention,
+                                   int.id_nomenclature_intervention as id_nomenclature_intervention
 
                             from enquete_individu as enq_ind
 
@@ -900,7 +915,8 @@ class Systeme_protection_social_model extends CI_Model
                                    count(enq_ind.id) as nbr_hand_audi,
                                    0 as nbr_hand_ment,
                                    0 as nbr_hand_mote,
-                                   int.intitule as intervention
+                                   int.intitule as intervention,
+                                   int.id_nomenclature_intervention as id_nomenclature_intervention
 
                             from enquete_individu as enq_ind
 
@@ -919,7 +935,8 @@ class Systeme_protection_social_model extends CI_Model
                                    0 as nbr_hand_audi,
                                    count(enq_ind.id) as nbr_hand_ment,
                                    0 as nbr_hand_mote,
-                                   int.intitule as intervention
+                                   int.intitule as intervention,
+                                   int.id_nomenclature_intervention as id_nomenclature_intervention
 
                             from enquete_individu as enq_ind
 
@@ -939,7 +956,8 @@ class Systeme_protection_social_model extends CI_Model
                                    0 as nbr_hand_audi,
                                    0 as nbr_hand_ment,
                                    count(enq_ind.id) as nbr_hand_mote,
-                                   int.intitule as intervention
+                                   int.intitule as intervention,
+                                   int.id_nomenclature_intervention as id_nomenclature_intervention
 
                             from enquete_individu as enq_ind
 
@@ -954,9 +972,134 @@ class Systeme_protection_social_model extends CI_Model
 
                          ) principale
 
-                    group by principale.intervention
+                    group by principale.intervention, principale.id_nomenclature_intervention
 
-                " ;
+                " ;*/
+
+                $sql =  "
+
+                              select
+                                sum(principale.nbr_hand_visu) as nbr_hand_visu,
+                                sum(principale.nbr_hand_paro) as nbr_hand_paro,
+                                sum(principale.nbr_hand_audi) as nbr_hand_audi,
+                                sum(principale.nbr_hand_ment) as nbr_hand_ment,
+                                sum(principale.nbr_hand_mote) as nbr_hand_mote,
+                                principale.intervention,
+                                (select description from nomenclature_intervention4 where id = principale.id_nomenclature_intervention) as nomenclature
+                              from
+                              (
+                                select
+                                  count(individu.id) as nbr_hand_visu, 
+                                  0 as nbr_hand_paro,
+                                  0 as nbr_hand_audi,
+                                  0 as nbr_hand_ment,
+                                  0 as nbr_hand_mote,
+                                  intervention.intitule as intervention,
+                                  intervention.id_nomenclature_intervention as id_nomenclature_intervention
+                                from
+                                  individu,
+                                  individu_beneficiaire,
+                                  intervention,
+                                  nomenclature_intervention4
+                                where 
+                                  individu.id = individu_beneficiaire.id_individu
+                                  and intervention.id = individu_beneficiaire.id_intervention
+                                  and lower(handicap_visuel) = 'oui'
+                                group by 
+                                  intervention.id
+
+                                UNION
+
+                                select
+                                  0 as nbr_hand_visu, 
+                                  count(individu.id) as nbr_hand_paro,
+                                  0 as nbr_hand_audi,
+                                  0 as nbr_hand_ment,
+                                  0 as nbr_hand_mote,
+                                  intervention.intitule as intervention,
+                                  intervention.id_nomenclature_intervention as id_nomenclature_intervention
+                                from
+                                  individu,
+                                  individu_beneficiaire,
+                                  intervention,
+                                  nomenclature_intervention4
+                                where 
+                                  individu.id = individu_beneficiaire.id_individu
+                                  and intervention.id = individu_beneficiaire.id_intervention
+                                  and lower(handicap_parole) = 'oui'
+                                group by 
+                                  intervention.id
+
+                                UNION
+
+                                select
+                                  0 as nbr_hand_visu, 
+                                  0 as nbr_hand_paro,
+                                  count(individu.id) as nbr_hand_audi,
+                                  0 as nbr_hand_ment,
+                                  0 as nbr_hand_mote,
+                                  intervention.intitule as intervention,
+                                  intervention.id_nomenclature_intervention as id_nomenclature_intervention
+                                from
+                                  individu,
+                                  individu_beneficiaire,
+                                  intervention,
+                                  nomenclature_intervention4
+                                where 
+                                  individu.id = individu_beneficiaire.id_individu
+                                  and intervention.id = individu_beneficiaire.id_intervention
+                                  and lower(handicap_auditif) = 'oui'
+                                group by 
+                                  intervention.id
+
+                                UNION
+
+                                select
+                                  0 as nbr_hand_visu, 
+                                  0 as nbr_hand_paro,
+                                  0 as nbr_hand_audi,
+                                  count(individu.id) as nbr_hand_ment,
+                                  0 as nbr_hand_mote,
+                                  intervention.intitule as intervention,
+                                  intervention.id_nomenclature_intervention as id_nomenclature_intervention
+                                from
+                                  individu,
+                                  individu_beneficiaire,
+                                  intervention,
+                                  nomenclature_intervention4
+                                where 
+                                  individu.id = individu_beneficiaire.id_individu
+                                  and intervention.id = individu_beneficiaire.id_intervention
+                                  and lower(handicap_mental) = 'oui'
+                                group by 
+                                  intervention.id
+
+                                UNION
+
+                                select
+                                  0 as nbr_hand_visu, 
+                                  0 as nbr_hand_paro,
+                                  0 as nbr_hand_audi,
+                                  0 as nbr_hand_ment,
+                                  count(individu.id) as nbr_hand_mote,
+                                  intervention.intitule as intervention,
+                                  intervention.id_nomenclature_intervention as id_nomenclature_intervention
+                                from
+                                  individu,
+                                  individu_beneficiaire,
+                                  intervention,
+                                  nomenclature_intervention4
+                                where 
+                                  individu.id = individu_beneficiaire.id_individu
+                                  and intervention.id = individu_beneficiaire.id_intervention
+                                  and lower(handicap_moteur) = 'oui'
+                                group by 
+                                  intervention.id
+                              ) principale
+
+                                group by principale.intervention, principale.id_nomenclature_intervention
+
+                        " ;
 
                 return $this->db->query($sql)->result();
         }
@@ -966,6 +1109,7 @@ class Systeme_protection_social_model extends CI_Model
             $sql = "
 
                     select int.intitule as intitule_intervention,
+                          (select description from nomenclature_intervention4 where id = int.id_nomenclature_intervention) as nomenclature,
                            sum(smdt.valeur_quantite) as quantite,
                            um.description as unite_mesure,
                            dtt.description as detail_type_transfert
@@ -995,6 +1139,8 @@ class Systeme_protection_social_model extends CI_Model
             $sql = "
 
                     select int.intitule as intitule_intervention,
+
+                            (select description from nomenclature_intervention4 where id = int.id_nomenclature_intervention) as nomenclature,
 
                             CASE 
                               WHEN count(smdt.id) = 0
@@ -1028,10 +1174,19 @@ class Systeme_protection_social_model extends CI_Model
 
         public function decaissement_par_programme()
         {
-            $this->db->select(" programme.id as id_prog, programme.intitule as intitule_programme,
-                                intervention.id as id_interv, intervention.intitule as intitule_intervention,
-                                sum(decaissement.montant_initial) as montant_init, sum(decaissement.montant_revise) as montant_revise,
-                                devise.id as id_devise, devise.description as devise");
+            $this->db->select(" programme.id as id_prog,
+                                programme.intitule as intitule_programme,
+
+                                intervention.id as id_interv, 
+                                intervention.intitule as intitule_intervention,
+
+                                (select description from nomenclature_intervention4 where id = intervention.id_nomenclature_intervention) as nomenclature,
+
+                                sum(decaissement.montant_initial) as montant_init, 
+                                sum(decaissement.montant_revise) as montant_revise,
+
+                                devise.id as id_devise, 
+                                devise.description as devise");
         
             
 
@@ -1063,9 +1218,16 @@ class Systeme_protection_social_model extends CI_Model
                                 intervention.id as id_interv, intervention.intitule as intitule_intervention,
                                 sum(decaissement.montant_initial) as montant_init, sum(decaissement.montant_revise) as montant_revise,
                                 devise.id as id_devise, devise.description as devise");*/
-            $this->db->select(" programme.id as id_prog, programme.intitule as intitule_programme,
+            $this->db->select(" programme.id as id_prog, 
+                                programme.intitule as intitule_programme,
                                 acteur.id as id_act, acteur.nom as nom_acteur,
-                                intervention.id as id_interv, intervention.intitule as intitule_intervention");
+                                intervention.id as id_interv, 
+                                intervention.intitule as intitule_intervention,
+
+
+                                (select description from nomenclature_intervention4 where id = intervention.id_nomenclature_intervention) as nomenclature
+
+                                ");
         
             
 
@@ -1093,9 +1255,18 @@ class Systeme_protection_social_model extends CI_Model
 
         public function decaissement_par_tutelle()
         {
-            $this->db->select(" intervention.id as id_interv, intervention.intitule as intitule_intervention,intervention.ministere_tutelle as tutelle,
-                                sum(decaissement.montant_initial) as montant_init, sum(decaissement.montant_revise) as montant_revise,
-                                devise.id as id_devise, devise.description as devise");
+            $this->db->select(" intervention.id as id_interv, 
+                                intervention.intitule as intitule_intervention,
+
+                                (select description from nomenclature_intervention4 where id = intervention.id_nomenclature_intervention) as nomenclature,
+
+                                intervention.ministere_tutelle as tutelle,
+
+                                sum(decaissement.montant_initial) as montant_init, 
+                                sum(decaissement.montant_revise) as montant_revise,
+
+                                devise.id as id_devise, 
+                                devise.description as devise");
         
             
 
@@ -1176,8 +1347,11 @@ class Systeme_protection_social_model extends CI_Model
 
         public function taux_de_decaissement_par_programme()
         {
-            $this->db->select(" programme.id as id_prog, programme.intitule as intitule_programme,
-                                intervention.id as id_interv, intervention.intitule as intitule_intervention,
+            $this->db->select(" programme.id as id_prog, 
+                                programme.intitule as intitule_programme,
+                                intervention.id as id_interv, 
+                                intervention.intitule as intitule_intervention,
+                                (select description from nomenclature_intervention4 where id = intervention.id_nomenclature_intervention) as nomenclature,
                                 sum(financement_intervention.budget_modifie) as sum_financement_par_intervention_par_programme,
                                 sum(decaissement.montant_revise) as sum_decaissement,
                                 devise.id as id_devise, devise.description as devise,
@@ -1220,6 +1394,8 @@ class Systeme_protection_social_model extends CI_Model
 
                     select 
                         pplee2.intitule_intervention as intitule_intervention,
+
+                        (select description from nomenclature_intervention4 where id = pplee2.id_nomenclature_intervention) as nomenclature,
 
                         CASE WHEN (sum(pplee2.total_montant_menage) + sum(pplee2.total_montant_groupe) + sum(pplee2.total_montant_individu)) = 0
                           THEN 0
@@ -1271,7 +1447,9 @@ class Systeme_protection_social_model extends CI_Model
                             (principale.montant_transfert_menage * principale.nombre_menage) as total_montant_menage,
                             (principale.montant_transfert_groupe * principale.nombre_groupe) as total_montant_groupe,
                             (principale.montant_transfert_individu * principale.nombre_individu) as total_montant_individu,
-                            principale.intitule_intervention as intitule_intervention
+                            principale.intitule_intervention as intitule_intervention,
+                            principale.id_nomenclature_intervention as id_nomenclature_intervention
+
 
 
                         FROM (
@@ -1279,6 +1457,7 @@ class Systeme_protection_social_model extends CI_Model
                                 0 as nombre_groupe ,
                                 0 as nombre_individu ,
                                 int.intitule as intitule_intervention,
+                                int.id_nomenclature_intervention as id_nomenclature_intervention,
                                 sme.montant_transfert as montant_transfert_menage,
                                 0 as montant_transfert_groupe,
                                 0 as montant_transfert_individu
@@ -1295,6 +1474,7 @@ class Systeme_protection_social_model extends CI_Model
                                 count(DISTINCT(sm.id_menage)) as nombre_groupe ,
                                 0 as nombre_individu ,
                                 int.intitule as intitule_intervention,
+                                int.id_nomenclature_intervention as id_nomenclature_intervention,
                                 0 as montant_transfert_menage,
                                 sme.montant_transfert as montant_transfert_groupe,
                                 0 as montant_transfert_individu
@@ -1311,6 +1491,7 @@ class Systeme_protection_social_model extends CI_Model
                                 0 as nombre_groupe ,
                                 count(DISTINCT(si.id_individu)) as nombre_individu ,
                                 int.intitule as intitule_intervention,
+                                int.id_nomenclature_intervention as id_nomenclature_intervention,
                                 0 as montant_transfert_menage,
                                 0 as montant_transfert_groupe,
                                 sie.montant_transfert as montant_transfert_individu
@@ -1328,8 +1509,9 @@ class Systeme_protection_social_model extends CI_Model
                         principale.montant_transfert_individu,
                         principale.nombre_menage,
                         principale.nombre_groupe,
-                        principale.nombre_individu
-                    ) pplee2 group by  pplee2.intitule_intervention
+                        principale.nombre_individu,
+                        principale.id_nomenclature_intervention
+                    ) pplee2 group by  pplee2.intitule_intervention,pplee2.id_nomenclature_intervention
               
                   " ;
 
@@ -1349,6 +1531,7 @@ class Systeme_protection_social_model extends CI_Model
                     select
                       niveau_1.intitule_intervention as intitule_inter,
                       niveau_1.id_interv as id_inter,
+                      (select description from nomenclature_intervention4 where id = niveau_1.id_nomenclature_intervention) as nomenclature,
                       niveau_1.id_region as id_reg,
                       niveau_1.nom_region as nom_reg,
                       niveau_1.id_district as id_dist,
@@ -1415,6 +1598,9 @@ class Systeme_protection_social_model extends CI_Model
                               
                               intervention.intitule as intitule_intervention,
                               intervention.id as id_interv,
+
+                              intervention.id_nomenclature_intervention as id_nomenclature_intervention,
+
                               district.id as id_district,
                               district.nom as nom_district,
                               region.id as id_region,
@@ -1458,6 +1644,9 @@ class Systeme_protection_social_model extends CI_Model
                               
                               intervention.intitule as intitule_intervention,
                               intervention.id as id_interv,
+
+                              intervention.id_nomenclature_intervention as id_nomenclature_intervention,
+
                               district.id as id_district,
                               district.nom as nom_district,
                               region.id as id_region,
@@ -1505,7 +1694,8 @@ class Systeme_protection_social_model extends CI_Model
                                   niveau_1.id_region ,
                                   niveau_1.nom_region ,
                                   niveau_1.id_district,
-                                  niveau_1.nom_district 
+                                  niveau_1.nom_district ,
+                                  niveau_1.id_nomenclature_intervention
 
                           
 
@@ -1527,6 +1717,8 @@ class Systeme_protection_social_model extends CI_Model
                       select
                         niveau_1.intitule_intervention as intitule_interv,
                         niveau_1.id_intervention id_interv,
+
+                        (select description from nomenclature_intervention4 where id = niveau_1.id_nomenclature_intervention) as nomenclature,
                
                         (sum(niveau_1.cout_par_entete_menage_h) + sum(niveau_1.cout_par_entete_individu_h)) cout_total_intervention_h,
                         (sum(niveau_1.cout_par_entete_menage_f) + sum(niveau_1.cout_par_entete_individu_f)) cout_total_intervention_f,
@@ -1620,7 +1812,7 @@ class Systeme_protection_social_model extends CI_Model
 
                           sum(srq_niveau_1.cout_menage_par_entete) + sum(srq_niveau_1.cout_individu_par_entete) as total_cout_menage
 
-                        from ( select 
+                          from ( select 
 
                                   (count(suivi_menage.id_menage) * suivi_menage_entete.montant_transfert) as cout_menage_par_entete,
                                   0 as cout_individu_par_entete,
@@ -1711,6 +1903,8 @@ class Systeme_protection_social_model extends CI_Model
                             intervention.intitule as intitule_intervention,
                             intervention.id as id_intervention,
 
+                            intervention.id_nomenclature_intervention as id_nomenclature_intervention,
+
                             (count(suivi_menage.id_menage) * suivi_menage_entete.montant_transfert) as cout_par_entete_menage_h,
                             0 as cout_par_entete_menage_f,
 
@@ -1737,6 +1931,8 @@ class Systeme_protection_social_model extends CI_Model
                           select 
                             intervention.intitule as intitule_intervention,
                             intervention.id as id_intervention,
+
+                            intervention.id_nomenclature_intervention as id_nomenclature_intervention,
 
                             0 as cout_par_entete_menage_h,
                             (count(suivi_menage.id_menage) * suivi_menage_entete.montant_transfert) as cout_par_entete_menage_f,
@@ -1765,6 +1961,8 @@ class Systeme_protection_social_model extends CI_Model
                             intervention.intitule as intitule_intervention,
                             intervention.id as id_intervention,
 
+                            intervention.id_nomenclature_intervention as id_nomenclature_intervention,
+
                             (count(suivi_individu.id_individu) * suivi_individu_entete.montant_transfert) as cout_par_entete_individu_h,
                             0 as cout_par_entete_individu_f,
 
@@ -1792,6 +1990,8 @@ class Systeme_protection_social_model extends CI_Model
                             intervention.intitule as intitule_intervention,
                             intervention.id as id_intervention,
 
+                            intervention.id_nomenclature_intervention as id_nomenclature_intervention,
+
                             0 as cout_par_entete_individu_h,
                             (count(suivi_individu.id_individu) * suivi_individu_entete.montant_transfert) as cout_par_entete_individu_f,
 
@@ -1816,7 +2016,8 @@ class Systeme_protection_social_model extends CI_Model
 
                       group by 
                         niveau_1.id_intervention,
-                        niveau_1.intitule_intervention
+                        niveau_1.intitule_intervention,
+                        niveau_1.id_nomenclature_intervention
 
                     " ;
 
@@ -1836,6 +2037,8 @@ class Systeme_protection_social_model extends CI_Model
                         select
                           intitule_intervention,
                           id_intervention,
+
+                          (select description from nomenclature_intervention4 where id = niveau_1.id_nomenclature_intervention) as nomenclature,
 
                           (sum(cout_par_entete_enfant_menage)) + (sum(cout_par_entete_enfant_individu)) as cout_enfant,
                           (sum(cout_par_entete_age_scolaire_menage)) + (sum(cout_par_entete_age_scolaire_individu)) as cout_age_scolaire,
@@ -1909,6 +2112,8 @@ class Systeme_protection_social_model extends CI_Model
                                   intervention.intitule as intitule_intervention,
                                   intervention.id as id_intervention,
 
+                                  intervention.id_nomenclature_intervention as id_nomenclature_intervention,
+
                                   
                                   (count(suivi_menage.id_menage) * suivi_menage_entete.montant_transfert) as cout_par_entete_enfant_menage,
                                   0 as cout_par_entete_age_scolaire_menage,
@@ -1956,6 +2161,8 @@ class Systeme_protection_social_model extends CI_Model
                               select 
                                   intervention.intitule as intitule_intervention,
                                   intervention.id as id_intervention,
+
+                                  intervention.id_nomenclature_intervention as id_nomenclature_intervention,
 
                                   
                                   0 as cout_par_entete_enfant_menage,
@@ -2005,6 +2212,8 @@ class Systeme_protection_social_model extends CI_Model
                                   intervention.intitule as intitule_intervention,
                                   intervention.id as id_intervention,
 
+                                  intervention.id_nomenclature_intervention as id_nomenclature_intervention,
+
                                   
                                   0 as cout_par_entete_enfant_menage,
                                   0 as cout_par_entete_age_scolaire_menage,
@@ -2051,6 +2260,8 @@ class Systeme_protection_social_model extends CI_Model
                               select 
                                   intervention.intitule as intitule_intervention,
                                   intervention.id as id_intervention,
+
+                                  intervention.id_nomenclature_intervention as id_nomenclature_intervention,
 
                                   
                                   0 as cout_par_entete_enfant_menage,
@@ -2099,6 +2310,8 @@ class Systeme_protection_social_model extends CI_Model
                                   intervention.intitule as intitule_intervention,
                                   intervention.id as id_intervention,
 
+                                  intervention.id_nomenclature_intervention as id_nomenclature_intervention,
+
                                   0 as cout_par_entete_enfant_menage,
                                   0 as cout_par_entete_age_scolaire_menage,
                                   0 as cout_par_entete_age_travail_menage,
@@ -2146,6 +2359,8 @@ class Systeme_protection_social_model extends CI_Model
                                   intervention.intitule as intitule_intervention,
                                   intervention.id as id_intervention,
 
+                                  intervention.id_nomenclature_intervention as id_nomenclature_intervention,
+
                                   0 as cout_par_entete_enfant_menage,
                                   0 as cout_par_entete_age_scolaire_menage,
                                   0 as cout_par_entete_age_travail_menage,
@@ -2191,6 +2406,8 @@ class Systeme_protection_social_model extends CI_Model
                               select 
                                   intervention.intitule as intitule_intervention,
                                   intervention.id as id_intervention,
+
+                                  intervention.id_nomenclature_intervention as id_nomenclature_intervention,
 
                                   0 as cout_par_entete_enfant_menage,
                                   0 as cout_par_entete_age_scolaire_menage,
@@ -2238,6 +2455,8 @@ class Systeme_protection_social_model extends CI_Model
                                   intervention.intitule as intitule_intervention,
                                   intervention.id as id_intervention,
 
+                                  intervention.id_nomenclature_intervention as id_nomenclature_intervention,
+
                                   0 as cout_par_entete_enfant_menage,
                                   0 as cout_par_entete_age_scolaire_menage,
                                   0 as cout_par_entete_age_travail_menage,
@@ -2281,7 +2500,8 @@ class Systeme_protection_social_model extends CI_Model
                             ) niveau_1
 
                                 group by  intitule_intervention,
-                                          id_intervention
+                                          id_intervention,
+                                          niveau_1.id_nomenclature_intervention
 
 
                       " ;
@@ -2297,6 +2517,7 @@ class Systeme_protection_social_model extends CI_Model
                       select
                         niveau_1.id_intervention as id_interv,
                         niveau_1.intitule_intervention as intitule_interv,
+                        (select description from nomenclature_intervention4 where id = niveau_1.id_nomenclature_intervention) as nomenclature,
                         (sum(niveau_1.nbr_menage) + sum(niveau_1.nbr_individu)) as nbr_total_benaficiaire,
                         niveau_1.nom_region as nom_reg,
                         niveau_1.id_region as id_reg
@@ -2305,6 +2526,8 @@ class Systeme_protection_social_model extends CI_Model
                           select
                               intervention.id as id_intervention,
                               intervention.intitule as intitule_intervention,
+
+                              intervention.id_nomenclature_intervention as id_nomenclature_intervention,
                               count(menage_beneficiaire.id_menage) as nbr_menage,
                               0 as nbr_individu,
                               region.nom as nom_region,
@@ -2339,6 +2562,8 @@ class Systeme_protection_social_model extends CI_Model
                           select
                               intervention.id as id_intervention,
                               intervention.intitule as intitule_intervention,
+
+                              intervention.id_nomenclature_intervention as id_nomenclature_intervention,
                               0 as nbr_menage,
                               count(individu_beneficiaire.id_individu) as nbr_individu,
                               region.nom as nom_region,
@@ -2372,7 +2597,8 @@ class Systeme_protection_social_model extends CI_Model
                             niveau_1.id_intervention,
                             niveau_1.intitule_intervention,
                             niveau_1.id_region,
-                            niveau_1.nom_region
+                            niveau_1.nom_region,
+                            niveau_1.id_nomenclature_intervention
 
 
                   " ;
@@ -2392,6 +2618,7 @@ class Systeme_protection_social_model extends CI_Model
                         niveau_1.intitule_programme,
                         niveau_1.id_intervention as id_interv,
                         niveau_1.intitule_intervention,
+                        (select description from nomenclature_intervention4 where id = niveau_1.id_nomenclature_intervention) as nomenclature,
                         niveau_1.id_region as id_regi,
                         niveau_1.nom_region,
                         sum(niveau_1.nbr_menage) as nbr_menage_beneficiaire,
@@ -2425,6 +2652,7 @@ class Systeme_protection_social_model extends CI_Model
                                 programme.intitule as intitule_programme,
                                 intervention.id as id_intervention,
                                 intervention.intitule as intitule_intervention,
+                                intervention.id_nomenclature_intervention as id_nomenclature_intervention,
                                 region.id as id_region,
                                 region.nom as nom_region,
 
@@ -2461,6 +2689,7 @@ class Systeme_protection_social_model extends CI_Model
                                 programme.intitule as intitule_programme,
                                 intervention.id as id_intervention,
                                 intervention.intitule as intitule_intervention,
+                                intervention.id_nomenclature_intervention as id_nomenclature_intervention,
                                 region.id as id_region,
                                 region.nom as nom_region,
 
@@ -2497,7 +2726,8 @@ class Systeme_protection_social_model extends CI_Model
                                 id_regi,
                                 niveau_1.intitule_programme,
                                 niveau_1.intitule_intervention,
-                                niveau_1.nom_region
+                                niveau_1.nom_region,
+                                niveau_1.id_nomenclature_intervention
 
                   " ;
           return $this->db->query($sql)->result(); 
@@ -2514,6 +2744,8 @@ class Systeme_protection_social_model extends CI_Model
 
                                       niveau_1.id_intervention as id_intervention,
                                       niveau_1.intitule_intervention as intitule_intervention,
+
+                                      (select description from nomenclature_intervention4 where id = niveau_1.id_nomenclature_intervention) as nomenclature,
 
                                       niveau_1.nom_region as nom_region,
                                       niveau_1.nom_dist as nom_dist,
@@ -2538,6 +2770,8 @@ class Systeme_protection_social_model extends CI_Model
 
                                               int.id as id_intervention,
                                               int.intitule as intitule_intervention,
+
+                                              int.id_nomenclature_intervention as id_nomenclature_intervention,
 
                                               reg.id as id_region,
                                               reg.nom as nom_region,
@@ -2589,6 +2823,8 @@ class Systeme_protection_social_model extends CI_Model
                                               int.id as id_intervention,
                                               int.intitule as intitule_intervention,
 
+                                              int.id_nomenclature_intervention as id_nomenclature_intervention,
+
                                               reg.id as id_region,
                                               reg.nom as nom_region,
                                               dist.id as id_district,
@@ -2639,6 +2875,8 @@ class Systeme_protection_social_model extends CI_Model
                                               int.id as id_intervention,
                                               int.intitule as intitule_intervention,
 
+                                              int.id_nomenclature_intervention as id_nomenclature_intervention,
+
                                               reg.id as id_region,
                                               reg.nom as nom_region,
                                               dist.id as id_district,
@@ -2688,6 +2926,8 @@ class Systeme_protection_social_model extends CI_Model
                                           select 
                                               int.id as id_intervention,
                                               int.intitule as intitule_intervention,
+
+                                              int.id_nomenclature_intervention as id_nomenclature_intervention,
 
 
                                               reg.id as id_region,
@@ -2740,6 +2980,8 @@ class Systeme_protection_social_model extends CI_Model
                                               int.id as id_intervention,
                                               int.intitule as intitule_intervention,
 
+                                              int.id_nomenclature_intervention as id_nomenclature_intervention,
+
                                               reg.id as id_region,
                                               reg.nom as nom_region,
                                               dist.id as id_district,
@@ -2789,6 +3031,8 @@ class Systeme_protection_social_model extends CI_Model
 
                                               int.id as id_intervention,
                                               int.intitule as intitule_intervention,
+
+                                              int.id_nomenclature_intervention as id_nomenclature_intervention,
 
 
                                               reg.id as id_region,
@@ -2841,6 +3085,8 @@ class Systeme_protection_social_model extends CI_Model
                                               int.id as id_intervention,
                                               int.intitule as intitule_intervention,
 
+                                              int.id_nomenclature_intervention as id_nomenclature_intervention,
+
                                               reg.id as id_region,
                                               reg.nom as nom_region,
                                               dist.id as id_district,
@@ -2891,6 +3137,8 @@ class Systeme_protection_social_model extends CI_Model
                                               int.id as id_intervention,
                                               int.intitule as intitule_intervention,
 
+                                              int.id_nomenclature_intervention as id_nomenclature_intervention,
+
                                               reg.id as id_region,
                                               reg.nom as nom_region,
                                               dist.id as id_district,
@@ -2939,6 +3187,8 @@ class Systeme_protection_social_model extends CI_Model
                                           select 
                                               int.id as id_intervention,
                                               int.intitule as intitule_intervention,
+
+                                              int.id_nomenclature_intervention as id_nomenclature_intervention,
 
 
                                               reg.id as id_region,
@@ -2990,6 +3240,8 @@ class Systeme_protection_social_model extends CI_Model
                                               int.id as id_intervention,
                                               int.intitule as intitule_intervention,
 
+                                              int.id_nomenclature_intervention as id_nomenclature_intervention,
+
                                               reg.id as id_region,
                                               reg.nom as nom_region,
                                               dist.id as id_district,
@@ -3037,6 +3289,8 @@ class Systeme_protection_social_model extends CI_Model
                                           select 
                                               int.id as id_intervention,
                                               int.intitule as intitule_intervention,
+
+                                              int.id_nomenclature_intervention as id_nomenclature_intervention,
 
                                               reg.id as id_region,
                                               reg.nom as nom_region,
@@ -3086,6 +3340,8 @@ class Systeme_protection_social_model extends CI_Model
 
                                               int.id as id_intervention,
                                               int.intitule as intitule_intervention,
+
+                                              int.id_nomenclature_intervention as id_nomenclature_intervention,
 
                                               reg.id as id_region,
                                               reg.nom as nom_region,
@@ -3138,7 +3394,8 @@ class Systeme_protection_social_model extends CI_Model
                                               nom_com,
                                               id_commune,
                                               niveau_1.id_intervention,
-                                              niveau_1.intitule_intervention
+                                              niveau_1.intitule_intervention,
+                                              niveau_1.id_nomenclature_intervention
                           
 
                   " ;
@@ -3280,6 +3537,8 @@ class Systeme_protection_social_model extends CI_Model
                   niveau_1.id_intervention as id_intervention,
                   niveau_1.intitule_intervention as intitule_intervention,
 
+                  (select description from nomenclature_intervention4 where id = niveau_1.id_nomenclature_intervention) as nomenclature,
+
                   niveau_1.id_devise as id_devise,
                   niveau_1.description_devise as description_devise,
 
@@ -3305,6 +3564,8 @@ class Systeme_protection_social_model extends CI_Model
                           programme.intitule as intitule_programme,
                           intervention.id as id_intervention,
                           intervention.intitule as intitule_intervention,
+
+                          intervention.id_nomenclature_intervention as id_nomenclature_intervention,
 
                           devise.id as id_devise,
                           devise.description as description_devise,
@@ -3349,6 +3610,8 @@ class Systeme_protection_social_model extends CI_Model
                           programme.intitule as intitule_programme,
                           intervention.id as id_intervention,
                           intervention.intitule as intitule_intervention,
+
+                          intervention.id_nomenclature_intervention as id_nomenclature_intervention,
 
                           devise.id as id_devise,
                           devise.description as description_devise,
@@ -3394,7 +3657,8 @@ class Systeme_protection_social_model extends CI_Model
                         niveau_1.id_devise,
                         niveau_1.description_devise ,
                         niveau_1.id_source_financement,
-                        niveau_1.nom_source_financement
+                        niveau_1.nom_source_financement,
+                        niveau_1.id_nomenclature_intervention
 
 
 
@@ -3414,6 +3678,9 @@ class Systeme_protection_social_model extends CI_Model
                   niveau_1.intitule_programme as intitule_programme,
                   niveau_1.id_intervention as id_intervention,
                   niveau_1.intitule_intervention as intitule_intervention,
+
+                  (select description from nomenclature_intervention4 where id = niveau_1.id_nomenclature_intervention) as nomenclature,
+
                   niveau_1.ministere_tutelle as ministere_tutelle,
 
                   niveau_1.id_devise as id_devise,
@@ -3438,6 +3705,11 @@ class Systeme_protection_social_model extends CI_Model
                           programme.intitule as intitule_programme,
                           intervention.id as id_intervention,
                           intervention.intitule as intitule_intervention,
+
+
+
+                          intervention.id_nomenclature_intervention as id_nomenclature_intervention,
+
                           intervention.ministere_tutelle as ministere_tutelle,
 
                           devise.id as id_devise,
@@ -3478,6 +3750,11 @@ class Systeme_protection_social_model extends CI_Model
                           programme.intitule as intitule_programme,
                           intervention.id as id_intervention,
                           intervention.intitule as intitule_intervention,
+
+
+
+                          intervention.id_nomenclature_intervention as id_nomenclature_intervention,
+
                           intervention.ministere_tutelle as ministere_tutelle,
 
                           devise.id as id_devise,
@@ -3518,7 +3795,8 @@ class Systeme_protection_social_model extends CI_Model
                         niveau_1.intitule_intervention,
                         niveau_1.id_devise,
                         niveau_1.description_devise ,
-                        niveau_1.ministere_tutelle
+                        niveau_1.ministere_tutelle,
+                        niveau_1.id_nomenclature_intervention
 
 
 
