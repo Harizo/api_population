@@ -1,0 +1,30 @@
+delete from suivi_individu_detail_transfert;
+delete from suivi_individu;
+delete from suivi_individu_entete;
+delete from suivi_menage_detail_transfert;
+delete from suivi_menage;
+delete from suivi_menage_entete;
+
+ALTER SEQUENCE suivi_individu_detail_transfert_id_seq RESTART WITH 1;
+ALTER SEQUENCE suivi_individu_id_seq RESTART WITH 1;
+ALTER SEQUENCE suivi_individu_entete_id_seq RESTART WITH 1;
+ALTER SEQUENCE suivi_menage_detail_transfert_id_seq RESTART WITH 1;
+ALTER SEQUENCE suivi_menage_id_seq RESTART WITH 1;
+ALTER SEQUENCE suivi_menage_entete_id_seq RESTART WITH 1;
+
+delete from individu_beneficiaire;
+delete from menage_beneficiaire;
+delete from individu;
+delete from menage;
+delete from liste_validation_beneficiaire;
+delete from liste_validation_intervention;
+
+ALTER SEQUENCE individu_beneficiaire_id_seq RESTART WITH 1;
+ALTER SEQUENCE menage_beneficiaire_id_seq RESTART WITH 1;
+ALTER SEQUENCE individu_id_seq RESTART WITH 1;
+ALTER SEQUENCE menage_id_seq RESTART WITH 1;
+ALTER SEQUENCE liste_validation_beneficiaire_id_seq RESTART WITH 1;
+ALTER SEQUENCE liste_validation_intervention_id_seq RESTART WITH 1;
+
+delete from historique_utilisateur;
+ALTER SEQUENCE historique_utilisateur_id_seq RESTART WITH 1;
