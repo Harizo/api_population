@@ -185,7 +185,8 @@ class Validationintervention extends CI_Controller {
 							// $id_acteur : à utiliser ultérieurement si tout est OK pour Deuxième vérification
 							foreach($retour as $k=>$v) {
 								$id_acteur = $v->id;
-							}	
+							}
+							$sheet->setCellValue("J3", $id_acteur);
 						} else {
 							$sheet->getStyle("B2")->getFill()->applyFromArray(
 									 array('type'       => PHPExcel_Style_Fill::FILL_SOLID,'rotation'   => 0,
@@ -194,6 +195,7 @@ class Validationintervention extends CI_Controller {
 									 )
 							 );		
 							$nombre_erreur = $nombre_erreur + 1; 
+							$sheet->setCellValue("J3", "tsy tao");
 						}
 					} 
 					if($intitule_intervention=="") {
@@ -218,6 +220,7 @@ class Validationintervention extends CI_Controller {
 									 )
 							 );		
 							$nombre_erreur = $nombre_erreur + 1; 
+							$sheet->setCellValue("K3", "tsy hita");
 						} else {
 							// id_intervention : à utliser plus tard pour vérifier si l'intervention se déroule dans le fokontany en question
 							// sinon : paramétrage DDB à modifier et insérer le fokontany 
@@ -225,6 +228,7 @@ class Validationintervention extends CI_Controller {
 							foreach($retour as $k=>$v) {
 								$id_intervention=$v->id;
 							}
+							$sheet->setCellValue("K3", $id_intervention);
 						}
 					}
 					if(!$date_intervention) {
@@ -248,8 +252,10 @@ class Validationintervention extends CI_Controller {
 						// A utliser ultérieurement si tout est OK pour la deuxième vérification doublon :
 						// c'est-à-dire : recherche dans la table menage ou table individu
 						$menage_ou_individu = strtolower($menage_ou_individu);
-						if($menage_ou_individu=="ménage" || $menage_ou_individu=="menage") {
+						if($menage_ou_individu=="ménage" || $menage_ou_individu=="menage" || $menage_ou_individu=="groupe") {
 							$menage_ou_individu="menage";
+						} else {
+							$menage_ou_individu="individu";
 						}
 					}						
 				}	
@@ -455,6 +461,7 @@ class Validationintervention extends CI_Controller {
 														$id_fokontany = $v->id;
 														$code_fokontany = $v->code;
 													}
+													$sheet->setCellValue("I3", $id_fokontany);
 												} else {													
 													// Pas de fokontany : marquer fokontany 
 													$sheet->getStyle("H3")->getFill()->applyFromArray(
@@ -463,7 +470,8 @@ class Validationintervention extends CI_Controller {
 																 'endcolor'   => array('argb' => 'FF0000')
 															 )
 													 );	
-													$nombre_erreur = $nombre_erreur + 1;												
+													$nombre_erreur = $nombre_erreur + 1;	
+													$sheet->setCellValue("I3", "perdu");
 												}												
 											} else {
 												// Pas de fokontany : marquer fokontany 
@@ -663,19 +671,6 @@ class Validationintervention extends CI_Controller {
 			$chemin=dirname(__FILE__) . "/../../../../".$repertoire;
 			$lien_vers_mon_document_excel = $chemin . $nomfichier;
 			$array_data = array();
-			if(strpos($lien_vers_mon_document_excel,"xlsx") >0) {
-				$objet_read_write = PHPExcel_IOFactory::createReader('Excel2007');
-				$excel = $objet_read_write->load($lien_vers_mon_document_excel);			 
-				$sheet = $excel->getSheet(0);
-				// pour lecture début - fin seulement
-				$XLSXDocument = new PHPExcel_Reader_Excel2007();
-			} else {
-				$objet_read_write = PHPExcel_IOFactory::createReader('Excel2007');
-				$excel = $objet_read_write->load($lien_vers_mon_document_excel);			 
-				$sheet = $excel->getSheet(0);
-				$XLSXDocument = new PHPExcel_Reader_Excel5();
-			}
-			$Excel = $XLSXDocument->load($lien_vers_mon_document_excel);
 			// Contrôler si doublon dans la table suivi_menage_entete ou suivi_individu_entete selon les cas
 			$retour = $this->ValidationinterventionManager->RechercheDoublonInterventionParDateEtFokontany($menage_ou_individu,$date_intervention,$id_fokontany,$id_intervention);
 			$nombre=0;
@@ -700,6 +695,13 @@ class Validationintervention extends CI_Controller {
 			$trouver= array("’");
 			$remplacer=array('&eacute;','e','e','a','o','c','_');
 			$trouver= array('é','è','ê','à','ö','ç',' ');
+			$code_precedent="";
+			$retour=$this->ValidationinterventionManager->recuperer_code_region_district_commune_fokontany($id_fokontany);
+			if($retour) {
+				foreach($retour as $k=>$v) {
+					$code_precedent=$v->code_precedent;
+				}
+			}													
 			foreach($rowIterator as $row) {
 				// Contrôle détail s'il y a des doublons
 				// Le controle se fait en 2 étapes
@@ -724,12 +726,15 @@ class Validationintervention extends CI_Controller {
 					}
 					//$id_acteur
 					// 1- Recherche par identifiant_appariement = $identifiant_appariement et $id_acteur stocké auparavant
-					$retour=$this->ValidationinterventionManager->RechercheParIdentifiantActeur($identifiant_appariement,$id_acteur);
+						$retour=$this->ValidationinterventionManager->RechercheParIdentifiantActeur($menage_ou_individu,$identifiant_appariement,$id_acteur);
 					$nombre=0;
-					foreach($retour as $k=>$v) {
-						$nombre = $v->nombre;
-					}
-					if($nombre ==0) {
+					$identifiant_unique=null;
+					if($retour) {
+						foreach($retour as $k=>$v) {
+							$identifiant_unique = $v->identifiant_unique;
+						}
+					}	
+					if($identifiant_unique ==null) {
 						 // Bénéficiaire introuvable : ERREUR Marquage colonne F par Bénéficiaire inexistant dans la BDD de couleur Jaune
 						$sheet->getStyle("F".$ligne)->getFill()->applyFromArray(
 								 array('type'       => PHPExcel_Style_Fill::FILL_SOLID,'rotation'   => 0,
@@ -740,6 +745,8 @@ class Validationintervention extends CI_Controller {
 						 $sheet->getStyle('F'.$ligne)->getAlignment()->setWrapText(true);
 						 $sheet->setCellValue('F'.$ligne, 'Bénéficiaire inexistant dans la BDD');
 						$nombre_erreur = $nombre_erreur + 1;						
+					} else {
+						$sheet->setCellValue('E'.$ligne, $code_precedent."-".$identifiant_unique);
 					}
 				}	
 				$ligne = $ligne + 1;

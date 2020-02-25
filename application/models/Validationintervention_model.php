@@ -70,8 +70,12 @@ class Validationintervention_model extends CI_Model
         return $query->result();
 	}	
 	// Comptage bénéficiaire par identifiant_appariement et id_acteur
-    public function RechercheParIdentifiantActeur($identifiant_appariement,$id_acteur) {
-		$requete= "select count(*) as nombre from menage where identifiant_appariement='".$identifiant_appariement."' and id_acteur=".$id_acteur;
+    public function RechercheParIdentifiantActeur($table,$identifiant_appariement,$id_acteur) {
+		if($table=="menage") {
+			$requete= "select identifiant_unique from menage where identifiant_appariement='".$identifiant_appariement."' and id_acteur=".$id_acteur;
+		} else {	
+			$requete= "select identifiant_unique from individu where identifiant_appariement='".$identifiant_appariement."' and id_acteur=".$id_acteur;
+		} 	
 		$query = $this->db->query($requete);
         return $query->result();				
     }
@@ -114,4 +118,20 @@ class Validationintervention_model extends CI_Model
 		}	
 		return $query->result();					
 	}
+	public function recuperer_code_region_district_commune_fokontany($id_fokontany) {
+		$requete ="select concat_ws('-',r.code,d.code,c.code,f.code) as code_precedent,r.nom as region,"
+				." d.nom as district,c.nom as commune,f.nom as fokontany"
+				." from fokontany as f"
+				." join commune as c on f.id_commune=c.id"
+				." join district as d on c.district_id=d.id"
+				." join region as r on d.region_id=r.id"
+				." where f.id=".$id_fokontany;
+		$query = $this->db->query($requete);
+        $result= $query->result();				
+        if($result) {
+            return $result;
+        }else{
+            return null;
+        }                 		
+	}	
 }

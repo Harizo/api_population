@@ -50,8 +50,12 @@ class Importationbeneficiaire_model extends CI_Model
         return $query->result();				
 	}
 	// Récupère id_menage par l'intermediaire de l'identifiant_appariement et id_acteur
-    public function RechercheParIdentifiantActeur($identifiant_appariement,$id_acteur) {
-		$requete= "select id as id_menage from menage where identifiant_appariement='".$identifiant_appariement."' and id_acteur=".$id_acteur;
+    public function RechercheParIdentifiantActeur($table,$identifiant_appariement,$id_acteur) {
+		if($table=="menage") {
+			$requete= "select id as id_menage from menage where identifiant_appariement='".$identifiant_appariement."' and id_acteur=".$id_acteur;
+		} else {
+			$requete= "select id as id_individu from individu where identifiant_appariement='".$identifiant_appariement."' and id_acteur=".$id_acteur;			
+		}	
 		$query = $this->db->query($requete);
         return $query->result();				
     }

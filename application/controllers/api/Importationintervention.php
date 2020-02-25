@@ -114,6 +114,7 @@ class Importationintervention extends CI_Controller {
 		$search=array("'");
 		$replace= array("’");
 		$nombre_insertion_entete=0; // Utilisée une fois pour toute pendant la lecture du fichier et les détails à insérer par ligne excel
+		$code_precedent="";
 		foreach($rowIterator as $row) {
 			$ligne = $row->getRowIndex ();
 			if($ligne >=2) {
@@ -150,7 +151,7 @@ class Importationintervention extends CI_Controller {
 							$id_acteur = $v->id;
 						}	
 					} else {
-						$id_acteur=null;
+						$id_acteur=null;						
 					}
 					// récupération id_intervention  dans la BDD
 					$trouve= array("é","è","ê","à","ö","ç","'","ô"," ");
@@ -160,7 +161,7 @@ class Importationintervention extends CI_Controller {
 					if(count($retour) >0) {
 						foreach($retour as $k=>$v) {
 							$id_intervention = $v->id;
-							$montant_transfert = $v->montant_transfert;
+							$montant_transfert = $v->montant_transfert;							
 						}	
 					} else {
 						$id_intervention=null;
@@ -168,8 +169,8 @@ class Importationintervention extends CI_Controller {
 					}					
 					// A utliser ultérieurement si tout est OK pour lamise à jour de la table menage ou individu selon le cas
 					$menage_ou_individu = strtolower($menage_ou_individu);
-					if($menage_ou_individu=="ménage" || $menage_ou_individu=="menage") {
-						$menage_ou_individu="ménage";
+					if($menage_ou_individu=="ménage" || $menage_ou_individu=="menage" || $menage_ou_individu=="groupe") {
+						$menage_ou_individu="menage";
 					} else {
 						$menage_ou_individu="individu";
 					}
@@ -194,6 +195,9 @@ class Importationintervention extends CI_Controller {
 						 }	else if('H' == $cell->getColumn()) {
 								$nom_fokontany =$cell->getValue();
 								$nom_fokontany_original =$cell->getValue();
+						 }	else if('I' == $cell->getColumn()) {
+								$nom_fokontany =$cell->getValue();
+								$fokontany_id =$cell->getValue();
 						 }
 					}
 					// Controle region,district,commune : si tout est ok =>
@@ -306,30 +310,40 @@ class Importationintervention extends CI_Controller {
 										}	
 										if(intval($id_commune) >0) {
 											if($nom_fokontany >'') {
-												$place_espace = strpos($nom_fokontany," ");
-												$place_apostrophe = strpos($nom_fokontany,"'");
-												if($place_espace >0) {
-													$commune_temporaire1 = substr ( $nom_fokontany , 0 ,($place_espace - 1));
-													$commune_temporaire2 = substr ( $nom_fokontany , ($place_espace + 1));
-													$fkt = $this->ImportationinterventionManager->selectionfokontany_avec_espace($commune_temporaire1,$commune_temporaire2,$id_commune);
-												} else if($place_apostrophe >0){
-													$commune_temporaire1 = substr ( $nom_fokontany , 0 ,($place_apostrophe - 1));
-													$commune_temporaire2 = substr ( $nom_fokontany , ($place_apostrophe + 1));
-													$fkt = $this->ImportationinterventionManager->selectionfokontany_avec_espace($commune_temporaire1,$commune_temporaire2,$id_commune);
-												} else {
-													$fkt = $this->ImportationinterventionManager->selectionfokontany($nom_fokontany,$id_commune);
-												}	
-												if(count($fkt) >0) {
-													foreach($fkt as $indice=>$v) {
-														// A utliser ultérieurement lors de la deuxième vérification : id_fokontany
-														$id_fokontany = $v->id;
-														$code_fokontany = $v->code;
-													}
+												if(intval($fokontany_id) >0) {
+													$id_fokontany=$fokontany_id;
+													$retour=$this->ImportationinterventionManager->recuperer_code_region_district_commune_fokontany($id_fokontany);
+													if($retour) {
+														foreach($retour as $k=>$v) {
+															$code_precedent=$v->code_precedent;
+														}
+													}													
 												} else {													
-													// Pas de fokontany : marquer fokontany 
-													$id_fokontany = null;
-													$code_fokontany = "????";
-												}												
+													$place_espace = strpos($nom_fokontany," ");
+													$place_apostrophe = strpos($nom_fokontany,"'");
+													if($place_espace >0) {
+														$commune_temporaire1 = substr ( $nom_fokontany , 0 ,($place_espace - 1));
+														$commune_temporaire2 = substr ( $nom_fokontany , ($place_espace + 1));
+														$fkt = $this->ImportationinterventionManager->selectionfokontany_avec_espace($commune_temporaire1,$commune_temporaire2,$id_commune);
+													} else if($place_apostrophe >0){
+														$commune_temporaire1 = substr ( $nom_fokontany , 0 ,($place_apostrophe - 1));
+														$commune_temporaire2 = substr ( $nom_fokontany , ($place_apostrophe + 1));
+														$fkt = $this->ImportationinterventionManager->selectionfokontany_avec_espace($commune_temporaire1,$commune_temporaire2,$id_commune);
+													} else {
+														$fkt = $this->ImportationinterventionManager->selectionfokontany($nom_fokontany,$id_commune);
+													}	
+													if(count($fkt) >0) {
+														foreach($fkt as $indice=>$v) {
+															// A utliser ultérieurement lors de la deuxième vérification : id_fokontany
+															$id_fokontany = $v->id;
+															$code_fokontany = $v->code;														
+														}
+													} else {													
+														// Pas de fokontany : marquer fokontany 
+														$id_fokontany = null;
+														$code_fokontany = "????";													
+													}	
+												}	
 											}
 										} 
 									} else {										
@@ -348,7 +362,7 @@ class Importationintervention extends CI_Controller {
 						// Pas de région : marquer tous les découpages administratif 
 						$id_region=null;
 						$code_region="????";
-					}
+					}										
 				}		
 				if($ligne >=5) {
 					// Contrôle de toutes les cellules à partir de la ligne 5
@@ -377,7 +391,7 @@ class Importationintervention extends CI_Controller {
 							// Si chef ménage
 							$parametre_table="menage";
 						}
-					if($menage_ou_individu=="ménage") {						
+					if($menage_ou_individu=="menage" || $menage_ou_individu=="groupe") {						
 						// 1- Recherche par identifiant_appariement = $identifiant_appariement et $id_acteur stocké auparavant
 						$parametre_table="menage";
 						$id_menage=null;
@@ -527,11 +541,15 @@ class Importationintervention extends CI_Controller {
 							// Insertion détail_suivi_individu : à chaque lecture ligne du fichier excel
 							$data = array(
 								'id_individu' => $id_individu,
-								'id_suivi_menage_entete' => $id_entete,
+								'id_suivi_individu_entete' => $id_entete,
 							);
 							$id_suivi = $this->SuiviIndividuManager->add($data);
 						}
-						$sheet->setCellValue("E".$ligne, $code_region."-".$code_district."-".$code_commune."-".$code_fokontany."-".$identifiant_unique);
+						if($code_precedent >"") {
+							$sheet->setCellValue("E".$ligne, $code_precedent."-".$identifiant_unique);
+						} else {
+							$sheet->setCellValue("E".$ligne, $code_region."-".$code_district."-".$code_commune."-".$code_fokontany."-".$identifiant_unique);
+						}
 					}
 				}	
 				$ligne = $ligne + 1;
