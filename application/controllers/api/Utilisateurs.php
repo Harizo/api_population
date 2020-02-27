@@ -266,6 +266,14 @@ class Utilisateurs extends REST_Controller {
 					// DEBUT ENVOI MAIL SIGNALANT LA CREATION D'UTILISATEUR
 					$nom = $this->post('nom');
 					$prenom = $this->post('prenom');
+                    
+                    //LIEN DE L'APPLICATION
+
+                    $data["connexion"] = "192.168.1.69/sys3p";
+
+
+                    //LIEN DE L'APPLICATION
+
 					$data["nom"] = $this->post('nom');
 					$data["prenom"] =$this->post('prenom');
 					$data["password"] =$this->post('password');

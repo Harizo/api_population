@@ -494,7 +494,7 @@
                                             <tr>
                                                 <td class="button">
                                                     <div><a class="button-mobile"
-                                                            href="<?php /* echo $connexion;*/ ?>"
+                                                            href="<?php echo $connexion; ?>"
                                                             style="background-color:#4a89dc;border-radius:5px;color:#ffffff;display:inline-block;font-family:'Cabin', Helvetica, Arial, sans-serif;font-size:14px;font-weight:regular;line-height:45px;text-align:center;text-decoration:none;width:200px;-webkit-text-size-adjust:none;mso-hide:all;">
                                                             Connexion à l'application</a>
                                                     </div>
