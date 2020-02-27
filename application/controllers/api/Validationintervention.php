@@ -140,6 +140,7 @@ class Validationintervention extends CI_Controller {
 		$search=array("'");
 		$replace= array("’");
 		$nombre_erreur=0; // compter le nombre d'erreur afin de pouvoir renvoyer le fichier à l'envoyeur
+		$id_intervention=null;
 		foreach($rowIterator as $row) {
 			$ligne = $row->getRowIndex ();
 			if($ligne >=2) {
@@ -618,6 +619,11 @@ class Validationintervention extends CI_Controller {
 			$val_ret["nombre_erreur"] = $nombre_erreur;
 			$val_ret["date_inscription"] = $date_inscription;
 			$val_ret["id_fokontany"] = $id_fokontany;
+			if($id_intervention) {
+				$val_ret["id_intervention"] = $id_intervention;
+			} else {
+				$val_ret["id_intervention"] = null;				
+			}
 			$val_ret["id_intervention"] = $id_intervention;
 			$objWriter = PHPExcel_IOFactory::createWriter($excel, 'Excel2007');
 			$objWriter->save(dirname(__FILE__) . "/../../../../" .$repertoire. $nomfichier);
