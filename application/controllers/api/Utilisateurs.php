@@ -12,14 +12,18 @@ class Utilisateurs extends REST_Controller {
         $this->load->model('utilisateurs_model', 'UserManager');
 
         $this->load->model('region_model', 'RegionManager');
+        $this->load->model('privilege_groupe_model', 'Privilege_groupeManager');
     }
     public function index_get() {
         //find by id
         $id = $this->get('id');
         $enabled = $this->get('enabled');
-        if ($id) {
+        $tab_groupe = $this->get('tab_groupe');
+        if ($id) 
+        {
             $user = $this->UserManager->findById($id);
-            if ($user) {
+            if ($user) 
+            {
                 #$data['id'] = $user->id;
                 $data['nom'] = $user->nom;
                 $data['prenom'] = $user->prenom;
@@ -27,55 +31,108 @@ class Utilisateurs extends REST_Controller {
                 $data['token'] = $user->token;
                 $data['email'] = $user->email;
                 $data['enabled'] = $user->enabled;      
-                $data['roles'] = unserialize($user->roles);
-            }  else {
+                //$data['roles'] = unserialize($user->roles);
+
+                $data['groupes'] = unserialize($user->roles);
+
+                $data['roles'] =array();
+
+                foreach ($data['groupes'] as $k => $v) 
+                {
+                    $tmp = $this->Privilege_groupeManager->findBygroupe($v);
+
+                    $privileges = unserialize($tmp[0]->privileges) ;
+
+                    $data['roles'] = array_unique(array_merge($data['roles'], $privileges)) ;
+                }
+            }  
+            else 
+            {
                 $data = array();
             }                               
-        } else {
-            if ($enabled == 1) {
+        } 
+        else 
+        {
+            if ($enabled == 1) 
+            {
 				// Récupération par actif ou inactif
                 $nbr = 0 ;
                 $user = $this->UserManager->findAllByEnabled(0);
-                if ($user) {
+                if ($user) 
+                {
                     foreach ($user as $key => $value) 
                     {
                         $nbr++ ;
                     }
                 }               
                 $data = $nbr;
-            } else {
-				// Récupération de tous les enregistrements de la table utlisateur
-                $usr = $this->UserManager->findAll();
-                if ($usr) {
-                    foreach ($usr as $key => $value)  {
-                        $data[$key]['id'] = $value->id;
-                        $data[$key]['nom'] = $value->nom;
-                        $data[$key]['prenom'] = $value->prenom;
-                        $data[$key]['password'] = $value->password;
-                        $data[$key]['default_password'] = $value->default_password;
-                        $data[$key]['token'] = $value->token;
-                        $data[$key]['email'] = $value->email;
-                        $data[$key]['enabled'] = $value->enabled;                  
-                        $data[$key]['roles'] = unserialize($value->roles);
-                        $data[$key]['id_region'] = $value->id_region;
-                        $data[$key]['id_district'] = $value->id_district;
-                        $data[$key]['id_commune'] = $value->id_commune;
-                        $data[$key]['id_fokontany'] = $value->id_fokontany;
-                        $data[$key]['id_intervention'] = $value->id_intervention;
-						$data[$key]['piece_identite'] = $value->piece_identite;
-                        $data[$key]['adresse'] = $value->adresse;
-                        $data[$key]['fonction'] = $value->fonction;
-                        $data[$key]['telephone'] = $value->telephone;
-                        $data[$key]['raison_sociale'] = $value->raison_sociale;
-                        $data[$key]['adresse_hote'] = $value->adresse_hote;
-                        $data[$key]['nom_responsable'] = $value->nom_responsable;
-                        $data[$key]['fonction_responsable'] = $value->fonction_responsable;
-                        $data[$key]['email_hote'] = $value->email_hote;
-                        $data[$key]['telephone_hote'] = $value->telephone_hote;
-                        $data[$key]['description_hote'] = $value->description_hote;
-                    }
-                } else {
+            } 
+            else 
+            {
+				if ($tab_groupe) //recuperation des acces menu et sous menu 
+                {
                     $data = array();
+                    $tab = explode(",",$tab_groupe);
+                    foreach ($tab as $k => $v) 
+                    {
+                        $tmp = $this->Privilege_groupeManager->findBygroupe($v);
+
+                        $privileges = unserialize($tmp[0]->privileges) ;
+
+                        $data = array_unique(array_merge($data, $privileges)) ;
+                    }
+                }
+                else
+                {
+                    // Récupération de tous les enregistrements de la table utlisateur
+                    $usr = $this->UserManager->findAll();
+                    if ($usr) 
+                    {
+                        foreach ($usr as $key => $value)  
+                        {
+                            $data[$key]['id'] = $value->id;
+                            $data[$key]['nom'] = $value->nom;
+                            $data[$key]['prenom'] = $value->prenom;
+                            $data[$key]['password'] = $value->password;
+                            $data[$key]['default_password'] = $value->default_password;
+                            $data[$key]['token'] = $value->token;
+                            $data[$key]['email'] = $value->email;
+                            $data[$key]['enabled'] = $value->enabled;                  
+                            $data[$key]['groupes'] = unserialize($value->roles);
+
+                            $data[$key]['roles'] =array();
+
+                            foreach ($data[$key]['groupes'] as $k => $v) 
+                            {
+                                $tmp = $this->Privilege_groupeManager->findBygroupe($v);
+
+                                $privileges = unserialize($tmp[0]->privileges) ;
+
+                                $data[$key]['roles'] = array_unique(array_merge($data[$key]['roles'], $privileges)) ;
+                            }
+
+                            $data[$key]['id_region'] = $value->id_region;
+                            $data[$key]['id_district'] = $value->id_district;
+                            $data[$key]['id_commune'] = $value->id_commune;
+                            $data[$key]['id_fokontany'] = $value->id_fokontany;
+                            $data[$key]['id_intervention'] = $value->id_intervention;
+                            $data[$key]['piece_identite'] = $value->piece_identite;
+                            $data[$key]['adresse'] = $value->adresse;
+                            $data[$key]['fonction'] = $value->fonction;
+                            $data[$key]['telephone'] = $value->telephone;
+                            $data[$key]['raison_sociale'] = $value->raison_sociale;
+                            $data[$key]['adresse_hote'] = $value->adresse_hote;
+                            $data[$key]['nom_responsable'] = $value->nom_responsable;
+                            $data[$key]['fonction_responsable'] = $value->fonction_responsable;
+                            $data[$key]['email_hote'] = $value->email_hote;
+                            $data[$key]['telephone_hote'] = $value->telephone_hote;
+                            $data[$key]['description_hote'] = $value->description_hote;
+                        }
+                    } 
+                    else 
+                    {
+                        $data = array();
+                    }
                 }
             }                             
         }
@@ -83,9 +140,11 @@ class Utilisateurs extends REST_Controller {
         $email = $this->get('email');
         $pwd = sha1($this->get('pwd'));
         $site = $this->get('site');
-        if ($email && $pwd) {
+        if ($email && $pwd) 
+        {
             $value = $this->UserManager->sign_in($email, $pwd);
-            if ($value) {
+            if ($value) 
+            {
                 $data = array();
                 $data['id'] = $value[0]->id;
                 $data['nom'] = $value[0]->nom;
@@ -95,7 +154,9 @@ class Utilisateurs extends REST_Controller {
                 $data['enabled'] = $value[0]->enabled;         
                 $data['default_password'] = $value[0]->default_password;         
                 $data['roles'] = unserialize($value[0]->roles);
-            }else{
+            }
+            else
+            {
                 $data = array();
             }
         }
@@ -167,9 +228,11 @@ class Utilisateurs extends REST_Controller {
         $gestion_utilisateur = intval($this->post('gestion_utilisateur')) ;
         $supprimer = $this->post('supprimer') ;
 		// Menu gestion utlisateur : ajout utlisateur ou mise à jour utlisateur
-        if ($gestion_utilisateur == 1) {
+        if ($gestion_utilisateur == 1) 
+        {
 			// $supprimer =0 : veut dire ajout ou mise à jour
-            if ($supprimer == 0) {
+            if ($supprimer == 0) 
+            {
 				$envoyer_mail_creation_user=false;
 				$message_retour="Data insert success";
 				$id_region=null;
@@ -224,7 +287,9 @@ class Utilisateurs extends REST_Controller {
 						'telephone_hote' => $this->post('telephone_hote'),
 						'description_hote' => $this->post('description_hote'),
 					);
-				} else {
+				} 
+                else 
+                {
 					// Mot de passe par défaut : création d'un utlisateur
 					$data = array(
 						'nom' => $this->post('nom'),
@@ -269,7 +334,7 @@ class Utilisateurs extends REST_Controller {
                     
                     //LIEN DE L'APPLICATION
 
-                    $data["connexion"] = "192.168.1.69/sys3p";
+                    $data["connexion"] = "196.192.38.40/sys3p";
 
 
                     //LIEN DE L'APPLICATION
@@ -337,7 +402,9 @@ class Utilisateurs extends REST_Controller {
                         'message' => 'No request found'
                             ], REST_Controller::HTTP_OK);
                 }
-            } else {
+            } 
+            else 
+            {
 			// suppression d'un utlisateur
 				$dataId = $this->UserManager->delete($id); 
                 if(!is_null($dataId))  {
@@ -353,7 +420,9 @@ class Utilisateurs extends REST_Controller {
                             ], REST_Controller::HTTP_OK);
                 }
             }            
-        } else {       
+        } 
+        else 
+        {       
                 $getrole = array("USER");
                 $data = array(
                     'nom' => $this->post('nom'),

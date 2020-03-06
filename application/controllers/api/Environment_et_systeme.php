@@ -136,6 +136,12 @@ class Environment_et_systeme extends REST_Controller {
                 $data = $this->Systeme_protection_socialManager->req6_theme2() ;
             }
 
+
+            if ($menu == 'liste_beneficiaire_intevention') 
+            {
+                $data = $this->Systeme_protection_socialManager->liste_beneficiaire_intevention($this->generer_requete_filtre($id_region,$id_district,$id_commune,$id_intervention)) ;   
+            }
+
             
 
 
@@ -143,46 +149,46 @@ class Environment_et_systeme extends REST_Controller {
 
 
         //CODE CORRIGER Par Harizo
-        if ($menu =='req1_theme1') //Age par rapport à la date du jour 
-        {
-            $data = $this->Environment_demo_socioManager->effectif_par_age_sexe_population($enfant,$scolaire_min,$scolaire_max,$travail_min,$travail_max,$agee);
-           
-        }
-        if ($menu == 'req34_theme2') //Age par rapport à la date d'inscription
-        {
-            $data = $this->Systeme_protection_socialManager->taux_atteinte_resultat() ;
-        }
-        if ($menu =='req3_theme1')
-        {            
-            $data = $this->Environment_demo_socioManager->menage_ayant_efant($enfant,$scolaire_min,$scolaire_max);      
-           
-        }
-        if ($menu=='req7_theme2')//situtation(en cours ou new) par rapport à la debut et fin du programme
-        {
-            $tmp = $this->Systeme_protection_socialManager->repartition_financement_programme();
-            if($tmp)
+            if ($menu =='req1_theme1') //Age par rapport à la date du jour 
             {
-                $data=$tmp;
-            }else $data = array();
-        }
+                $data = $this->Environment_demo_socioManager->effectif_par_age_sexe_population($enfant,$scolaire_min,$scolaire_max,$travail_min,$travail_max,$agee);
+               
+            }
+            if ($menu == 'req34_theme2') //Age par rapport à la date d'inscription
+            {
+                $data = $this->Systeme_protection_socialManager->taux_atteinte_resultat() ;
+            }
+            if ($menu =='req3_theme1')
+            {            
+                $data = $this->Environment_demo_socioManager->menage_ayant_efant($enfant,$scolaire_min,$scolaire_max);      
+               
+            }
+            if ($menu=='req7_theme2')//situtation(en cours ou new) par rapport à la debut et fin du programme
+            {
+                $tmp = $this->Systeme_protection_socialManager->repartition_financement_programme();
+                if($tmp)
+                {
+                    $data=$tmp;
+                }else $data = array();
+            }
 
-        if ($menu=='req8_theme2')//situtation(en cours ou new) par rapport à la debut et fin du programme
-        {
-            $tmp = $this->Systeme_protection_socialManager->repartition_financement_source_financement();
-            if($tmp)
+            if ($menu=='req8_theme2')//situtation(en cours ou new) par rapport à la debut et fin du programme
             {
-                $data=$tmp;
-            }else $data = array();
-        }
+                $tmp = $this->Systeme_protection_socialManager->repartition_financement_source_financement();
+                if($tmp)
+                {
+                    $data=$tmp;
+                }else $data = array();
+            }
 
-        if ($menu=='req9_theme2')//situtation(en cours ou new) par rapport à la debut et fin du programme
-        {
-            $tmp = $this->Systeme_protection_socialManager->repartition_financement_tutelle();
-            if($tmp)
+            if ($menu=='req9_theme2')//situtation(en cours ou new) par rapport à la debut et fin du programme
             {
-                $data=$tmp;
-            }else $data = array();
-        }
+                $tmp = $this->Systeme_protection_socialManager->repartition_financement_tutelle();
+                if($tmp)
+                {
+                    $data=$tmp;
+                }else $data = array();
+            }
         //fin CODE CORRIGER Par Harizo
 
         

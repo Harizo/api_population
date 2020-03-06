@@ -1497,7 +1497,7 @@ class Systeme_protection_social_model extends CI_Model
                                 sie.montant_transfert as montant_transfert_individu
                             from suivi_individu as si
                                 join suivi_individu_entete as sie on sie.id = si.id_suivi_individu_entete
-                                join menage as m on m.id = si.id_individu
+                                join individu as m on m.id = si.id_individu
                                 join intervention as int on int.id = sie.id_intervention
                                 group by sie.id_intervention , int.id, sie.montant_transfert
 
@@ -1540,9 +1540,90 @@ class Systeme_protection_social_model extends CI_Model
 
                       (sum(niveau_1.nbr_intervention_total_menage) + sum(niveau_1.nbr_intervention_total_individu)) as nbr_total_interv,
 
+                      ((select count(suivi_menage_entete.id) from suivi_menage_entete where suivi_menage_entete.id_intervention = niveau_1.id_interv)
+                      
+                        +
+  
+                        (select count(suivi_individu_entete.id) from suivi_individu_entete where suivi_individu_entete.id_intervention = niveau_1.id_interv)) as total_interv,
+
                       (sum(nbr_intervention_menage_par_district) + sum(nbr_intervention_individu_par_district)) as nbr_interv_par_district,
 
                       (((sum(nbr_intervention_menage_par_district) + sum(nbr_intervention_individu_par_district)) * 100)/(sum(niveau_1.nbr_intervention_total_menage) + sum(niveau_1.nbr_intervention_total_individu))) as effectif_intervention,
+
+                      ((select 
+                          count (sme.id)
+                         from 
+                          suivi_menage_entete as sme,
+
+                          fokontany as fkt,
+                          commune as com,
+                          district as dist,
+                          region as reg
+                         where
+                          fkt.id = sme.id_fokontany
+                          and com.id = fkt.id_commune
+                          and dist.id = com.district_id
+                          and reg.id = dist.region_id
+                          and sme.id_intervention = niveau_1.id_interv
+                          and dist.id = niveau_1.id_district
+
+                        ) + (select 
+                          count (sme.id)
+                         from 
+                          suivi_individu_entete as sme,
+
+                          fokontany as fkt,
+                          commune as com,
+                          district as dist,
+                          region as reg
+                         where
+                          fkt.id = sme.id_fokontany
+                          and com.id = fkt.id_commune
+                          and dist.id = com.district_id
+                          and reg.id = dist.region_id
+                          and sme.id_intervention = niveau_1.id_interv
+                          and dist.id = niveau_1.id_district
+
+                        )) as nbr_interv_dist,
+
+
+                      (select 
+                                count (sme.id)
+                               from 
+                                suivi_menage_entete as sme,
+
+                                fokontany as fkt,
+                                commune as com,
+                                district as dist,
+                                region as reg
+                               where
+                                fkt.id = sme.id_fokontany
+                                and com.id = fkt.id_commune
+                                and dist.id = com.district_id
+                                and reg.id = dist.region_id
+                                and sme.id_intervention = niveau_1.id_interv
+                                and dist.id = niveau_1.id_district
+
+                              ) as nbr_interv_dist_menage,
+
+                        (select 
+                                count (sme.id)
+                               from 
+                                suivi_individu_entete as sme,
+
+                                fokontany as fkt,
+                                commune as com,
+                                district as dist,
+                                region as reg
+                               where
+                                fkt.id = sme.id_fokontany
+                                and com.id = fkt.id_commune
+                                and dist.id = com.district_id
+                                and reg.id = dist.region_id
+                                and sme.id_intervention = niveau_1.id_interv
+                                and dist.id = niveau_1.id_district
+
+                              ) as nbr_interv_dist_individu,
 
                       ( select
 
@@ -4149,6 +4230,84 @@ class Systeme_protection_social_model extends CI_Model
           return $this->db->query($sql)->result();
       }
     //fin req_6_theme2
+
+    //liste_beneficiaire_intevention
+      public function liste_beneficiaire_intevention($requete)
+      {
+
+
+        $sql =  " select
+                    niveau_1.nom as nom,
+                    niveau_1.prenom as prenom,
+                    niveau_1.intitule_intervention as intitule_intervention,
+                    niveau_1.nom_region as nom_region,
+                    niveau_1.nom_district as nom_district,
+                    niveau_1.nom_commune as nom_commune,
+                    niveau_1.nom_fokontany as nom_fokontany
+
+                  from
+
+                  (
+
+                      select 
+                        individu.nom as nom,
+                        individu.prenom as prenom,
+                        intervention.intitule as intitule_intervention,
+                        region.nom as nom_region,
+                        district.nom as nom_district,
+                        commune.nom as nom_commune,
+                        fokontany.nom as nom_fokontany
+                      from
+                        individu_beneficiaire,
+                        individu,
+                        intervention,
+                        fokontany,
+                        commune,
+                        district,
+                        region
+                      where
+                        individu.id = individu_beneficiaire.id_individu
+                        and intervention.id = individu_beneficiaire.id_intervention
+                        and fokontany.id = individu.id_fokontany
+                        and commune.id = fokontany.id_commune
+                        and district.id = commune.district_id
+                        and region.id = district.region_id
+                        and ".$requete."
+
+                      UNION
+
+                      select 
+                        menage.nom as nom,
+                        menage.prenom as prenom,
+                        intervention.intitule as intitule_intervention,
+                        region.nom as nom_region,
+                        district.nom as nom_district,
+                        commune.nom as nom_commune,
+                        fokontany.nom as nom_fokontany
+                      from
+                        menage_beneficiaire,
+                        menage,
+                        intervention,
+                        fokontany,
+                        commune,
+                        district,
+                        region
+                      where
+                        menage.id = menage_beneficiaire.id_menage
+                        and intervention.id = menage_beneficiaire.id_intervention
+                        and fokontany.id = menage.id_fokontany
+                        and commune.id = fokontany.id_commune
+                        and district.id = commune.district_id
+                        and region.id = district.region_id
+                        and ".$requete."
+
+                ) niveau_1
+                ";
+        return $this->db->query($sql)->result();
+      }
+
+      
+    //fin liste_beneficiaire_intevention
     //FIN CODE HARIZO
 
    
