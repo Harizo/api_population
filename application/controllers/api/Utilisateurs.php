@@ -153,7 +153,20 @@ class Utilisateurs extends REST_Controller {
                 $data['email'] = $value[0]->email;
                 $data['enabled'] = $value[0]->enabled;         
                 $data['default_password'] = $value[0]->default_password;         
-                $data['roles'] = unserialize($value[0]->roles);
+               // $data['roles'] = unserialize($value[0]->roles);
+
+                $data['groupes'] = unserialize($value[0]->roles);
+
+                $data['roles'] =array();
+
+                foreach ($data['groupes'] as $k => $v) 
+                {
+                    $tmp = $this->Privilege_groupeManager->findBygroupe($v);
+
+                    $privileges = unserialize($tmp[0]->privileges) ;
+
+                    $data['roles'] = array_unique(array_merge($data['roles'], $privileges)) ;
+                }
             }
             else
             {
@@ -179,7 +192,21 @@ class Utilisateurs extends REST_Controller {
                 $data['email'] = $value->email;
                 $data['enabled'] = $value->enabled;         
                 $data['default_password'] = $value->default_password;         
-                $data['roles'] = unserialize($value->roles);
+               // $data['roles'] = unserialize($value->roles);
+
+                $data['groupes'] = unserialize($value->roles);
+
+                $data['roles'] =array();
+
+                foreach ($data['groupes'] as $k => $v) 
+                {
+                    $tmp = $this->Privilege_groupeManager->findBygroupe($v);
+
+                    $privileges = unserialize($tmp[0]->privileges) ;
+
+                    $data['roles'] = array_unique(array_merge($data['roles'], $privileges)) ;
+                }
+
             }else{
                 $data = array();
             }
