@@ -1,0 +1,41 @@
+-- Table: public.groupe_utilisateur
+
+-- DROP TABLE public.groupe_utilisateur;
+
+CREATE TABLE public.groupe_utilisateur
+(
+    id integer NOT NULL DEFAULT nextval('groupe_utilisateur_id_seq'::regclass),
+    nom character varying(50) COLLATE pg_catalog."default" NOT NULL,
+    CONSTRAINT groupe_utilisateur_pkey PRIMARY KEY (id)
+)
+WITH (
+    OIDS = FALSE
+)
+TABLESPACE pg_default;
+
+ALTER TABLE public.groupe_utilisateur
+    OWNER to postgres;
+
+
+-- Table: public.privilege_groupe
+
+-- DROP TABLE public.privilege_groupe;
+
+CREATE TABLE public.privilege_groupe
+(
+    id integer NOT NULL DEFAULT nextval('privilege_groupe_id_seq'::regclass),
+    privileges text COLLATE pg_catalog."default",
+    id_groupe integer,
+    CONSTRAINT privilege_groupe_pkey PRIMARY KEY (id),
+    CONSTRAINT privilege_groupe_id_groupe_fkey FOREIGN KEY (id_groupe)
+        REFERENCES public.groupe_utilisateur (id) MATCH SIMPLE
+        ON UPDATE CASCADE
+        ON DELETE CASCADE
+)
+WITH (
+    OIDS = FALSE
+)
+TABLESPACE pg_default;
+
+ALTER TABLE public.privilege_groupe
+    OWNER to postgres;
