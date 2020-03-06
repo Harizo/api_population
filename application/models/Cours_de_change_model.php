@@ -1,44 +1,42 @@
 <?php  if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
-class Zone_intervention_programme_model extends CI_Model {
-    protected $table = 'zone_intervention_programme';
+class Cours_de_change_model extends CI_Model {
+    protected $table = 'cours_de_change';
 
-    public function add($ziprg)  {
+    public function add($cours_de_change) {
 		// Ajout d'un enregitrement
-        $this->db->set($this->_set($ziprg))
+        $this->db->set($this->_set($cours_de_change))
                             ->insert($this->table);
-        if($this->db->affected_rows() === 1)  {
+        if($this->db->affected_rows() === 1)
+        {
             return $this->db->insert_id();
         }else{
             return null;
         }                    
     }
-    public function update($id, $ziprg)  {
+    public function update($id, $cours_de_change) {
 		// Mise à jour d'un enregitrement
-        $this->db->set($this->_set($ziprg))
+        $this->db->set($this->_set($cours_de_change))
                             ->where('id', (int) $id)
                             ->update($this->table);
-        if($this->db->affected_rows() === 1)  {
+        if($this->db->affected_rows() === 1) {
             return true;
         }else{
             return null;
         }                      
     }
-    public function _set($ziprg) {
+    public function _set($cours_de_change) {
 		// Affectation des valeurs
         return array(
-            'id_programme' => $ziprg['id_programme'],
-            'id_district' => $ziprg['id_district'],
-            'id_region' => $ziprg['id_region'],
-            'menage_beneficiaire_prevu' => $ziprg['menage_beneficiaire_prevu'],
-            'individu_beneficiaire_prevu' => $ziprg['individu_beneficiaire_prevu'],
-            'groupe_beneficiaire_prevu'   => $ziprg['groupe_beneficiaire_prevu'],
+            'id_devise'  => $cours_de_change['id_devise'],
+            'date_cours' => $cours_de_change['date_cours'],
+            'cours'      => $cours_de_change['cours'],
         );
     }
     public function delete($id) {
 		// Suppression d'un enregitrement
         $this->db->where('id', (int) $id)->delete($this->table);
-        if($this->db->affected_rows() === 1)  {
+        if($this->db->affected_rows() === 1) {
             return true;
         }else{
             return null;
@@ -51,7 +49,8 @@ class Zone_intervention_programme_model extends CI_Model {
                         ->order_by('id')
                         ->get()
                         ->result();
-        if($result) {
+        if($result)
+        {
             return $result;
         }else{
             return null;
@@ -70,20 +69,6 @@ class Zone_intervention_programme_model extends CI_Model {
         }else{
             return null;
         }                 
-    }
-    public function findByIdProgramme($id) {
-		// Selection par id_programme
-        $result =  $this->db->select('*')
-                        ->from($this->table)
-                        ->where("id_programme", $id)
-                        ->order_by('id', 'asc')
-                        ->get()
-                        ->result();
-        if($result) {
-            return $result;
-        }else{
-            return array();
-        }                 
-    }
+    }	
 }
 ?>

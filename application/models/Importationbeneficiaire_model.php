@@ -161,6 +161,20 @@ class Importationbeneficiaire_model extends CI_Model
         }                 		
 		
 	}
+	// Récupération id de lien de parenté
+	public function recuperer_id_liendeparente($lien_de_parente) {
+		$requete ="select id as id_liendeparente from liendeparente"
+				." where lower(description) like '%".$lien_de_parente."%'";
+		$query = $this->db->query($requete);
+        $result= $query->result();				
+        if($result) {
+            return $result;
+        }else{
+            return null;
+        }                 		
+		
+	}
+	// Récupération id niveau de classe
 	public function recuperer_id_niveau_de_classe($niveau_classe) {
 		$requete ="select id as id_niveau_de_classe from niveau_de_classe"
 				." where lower(description) like '%".$niveau_classe."%'";
@@ -173,7 +187,7 @@ class Importationbeneficiaire_model extends CI_Model
         }                 		
 		
 	}
-	// Récupérationid de l'indice de vulnérabilité
+	// Récupération id de l'indice de vulnérabilité
 	public function recuperer_id_indice_vulnerabilite($description) {
 		$requete="select id as id_indice_vulnerabilite from indice_vulnerabilite where lower(description) like '%".$description."%'";
 		$query = $this->db->query($requete);

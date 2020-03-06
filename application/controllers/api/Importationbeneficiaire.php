@@ -387,8 +387,19 @@ class Importationbeneficiaire extends CI_Controller {
 					if($surnom =="" || $surnom=="-") {
 						$surnom=null;
 					}
+					$id_liendeparente=null;
+					if($lien_de_parente >"" && $lien_de_parente!="-") {
+						$lien_de_parente=strtolower($lien_de_parente);
+						$retour=$this->ImportationbeneficiaireManager->recuperer_id_liendeparente($lien_de_parente);
+						if($retour) {
+							foreach($retour as $k=>$v) {
+								$id_liendeparente=$v->id_liendeparente;
+							}
+						}
+					}
 					$id_niveau_de_classe=null;
 					if($niveau_classe >"" && $niveau_classe!="-") {
+						$niveau_classe=strtolower($niveau_classe);
 						$retour=$this->ImportationbeneficiaireManager->recuperer_id_niveau_de_classe($niveau_classe);
 						if($retour) {
 							foreach($retour as $k=>$v) {
@@ -768,7 +779,7 @@ class Importationbeneficiaire extends CI_Controller {
 									'cin'                      => $cin,
 									'date_naissance'           => $date_naissance,
 									'sexe'                     => $sexe,
-									'id_liendeparente'         => null,
+									'id_liendeparente'         => 2,
 									'id_handicap_visuel'       => null,
 									'id_handicap_parole'       => null,
 									'id_handicap_auditif'      => null,
@@ -843,7 +854,7 @@ class Importationbeneficiaire extends CI_Controller {
 									'cin'                      => $cin,
 									'date_naissance'           => $date_naissance,
 									'sexe'                     => $sexe,
-									'id_liendeparente'         => null,
+									'id_liendeparente'         => $id_liendeparente,
 									'id_handicap_visuel'       => null,
 									'id_handicap_parole'       => null,
 									'id_handicap_auditif'      => null,

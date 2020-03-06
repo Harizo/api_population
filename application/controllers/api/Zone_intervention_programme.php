@@ -69,6 +69,7 @@ class Zone_intervention_programme extends REST_Controller {
                     $data[$key]['region'] = $region;
                     $data[$key]['menage_beneficiaire_prevu'] = $value->menage_beneficiaire_prevu;
                     $data[$key]['individu_beneficiaire_prevu'] = $value->individu_beneficiaire_prevu;
+                    $data[$key]['groupe_beneficiaire_prevu'] = $value->groupe_beneficiaire_prevu;
 				}
 			}			
 		}
@@ -100,13 +101,29 @@ class Zone_intervention_programme extends REST_Controller {
 		if(isset($temporaire) && $temporaire !="" && intval($temporaire) >0) {
 			$id_region=$temporaire;
 		}
+		$menage_beneficiaire_prevu=null;
+		$temporaire=$this->post('menage_beneficiaire_prevu');
+		if(isset($temporaire) && $temporaire !="" && intval($temporaire) >0) {
+			$menage_beneficiaire_prevu=$temporaire;
+		}
+		$individu_beneficiaire_prevu=null;
+		$temporaire=$this->post('individu_beneficiaire_prevu');
+		if(isset($temporaire) && $temporaire !="" && intval($temporaire) >0) {
+			$individu_beneficiaire_prevu=$temporaire;
+		}
+		$groupe_beneficiaire_prevu=null;
+		$temporaire=$this->post('groupe_beneficiaire_prevu');
+		if(isset($temporaire) && $temporaire !="" && intval($temporaire) >0) {
+			$groupe_beneficiaire_prevu=$temporaire;
+		}
 		// Affectation des valeurs de chaque colonne
  		$data = array(
 			'id_programme' => $this->post('id_programme'),
 			'id_district' => $id_district,
 			'id_region' => $id_region,
-			'menage_beneficiaire_prevu' => $this->post('menage_beneficiaire_prevu'),
-			'individu_beneficiaire_prevu' => $this->post('individu_beneficiaire_prevu'),
+			'menage_beneficiaire_prevu' => $menage_beneficiaire_prevu,
+			'individu_beneficiaire_prevu' => $individu_beneficiaire_prevu,
+			'groupe_beneficiaire_prevu' => $groupe_beneficiaire_prevu,
 		);               
         if ($supprimer == 0) {
             if ($id == 0) {

@@ -12,6 +12,8 @@ class Financement_intervention extends REST_Controller {
         $this->load->model('intervention_model', 'InterventionManager');
         $this->load->model('sourcefinancement_model', 'SourcefinancementManager');
         $this->load->model('action_strategique_model', 'ActionstrategiqueManager');
+        $this->load->model('axe_strategique_model', 'AxetrategiqueManager');
+        $this->load->model('programme_model', 'ProgrammeManager');
         $this->load->model('devise_model', 'DeviseManager');
         $this->load->model('type_secteur_model', 'TypesecteurManager');
     }
@@ -39,12 +41,20 @@ class Financement_intervention extends REST_Controller {
 		if($choix==2) {
 			if ($menu) {
                 foreach ($menu as $key => $value) {
-					// Détail description intervention
+					// Détail description intervention / Programme
 					$intervention =array();
+					$programme =array();
 					if($value->id_intervention) {
 						$prg = $this->InterventionManager->findById($value->id_intervention);
 						if(count($prg) >0) {
 							$intervention=$prg;
+							$id_programme=null;
+							foreach($intervention as $k=>$v) {
+								$id_programme=$v->id_programme;
+							}
+							if(intval($id_programme) >0) {
+								$programme=$this->ProgrammeManager->findById($id_programme);
+							}
 						}						
 					}	
 					// Détail description source de financement
@@ -53,12 +63,20 @@ class Financement_intervention extends REST_Controller {
 					if(count($tpf) >0) {
 						$sourcefinancement=$tpf;
 					}
-					// Détail description action stratégique
+					// Détail description axe / action stratégique
+					$axestrategique =array();
 					$actionstrategique =array();
 					if($value->id_action_strategique) {
 						$reg = $this->ActionstrategiqueManager->findById($value->id_action_strategique);
 						if(count($reg) >0) {
 							$actionstrategique=$reg;
+							$id_axe_strategique=null;
+							foreach($actionstrategique as $k=>$v) {
+								$id_axe_strategique=$v->id_axe_strategique;
+							}
+							if(intval($id_axe_strategique) >0) {
+								$axestrategique=$this->AxetrategiqueManager->findById($id_axe_strategique);
+							}
 						}						
 					}	
 					// Détail description devise	
@@ -83,8 +101,12 @@ class Financement_intervention extends REST_Controller {
                     $data[$key]['intervention'] = $intervention;
                     $data[$key]['id_source_financement'] = $value->id_source_financement;
                     $data[$key]['sourcefinancement'] = $sourcefinancement;
+                    $data[$key]['id_programme'] = $id_programme;
+                    $data[$key]['programme'] = $programme;
                     $data[$key]['id_action_strategique'] = $value->id_action_strategique;
                     $data[$key]['actionstrategique'] = $actionstrategique;
+                    $data[$key]['id_axe_strategique'] = $id_axe_strategique;
+                    $data[$key]['axestrategique'] = $axestrategique;
                     $data[$key]['id_devise'] = $value->id_devise;
                     $data[$key]['devise'] = $devise;
                     $data[$key]['id_type_secteur'] = $value->id_type_secteur;

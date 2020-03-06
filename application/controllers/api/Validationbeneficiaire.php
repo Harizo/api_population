@@ -171,6 +171,40 @@ class Validationbeneficiaire extends CI_Controller {
 		$remplacer=array('&eacute;','e','e','a','o','c','_');
 		$trouver= array('é','è','ê','à','ö','ç',' ');
 		$nombre_erreur=0; // compter le nombre d'erreur afin de pouvoir renvoyer le fichier à l'envoyeur
+		// Variable pour le nombre d'erreur par colonne
+		$erreur_nom_acteur=0;
+		$erreur_intitule_intervention=0;
+		$erreur_date_envoi_fichier=0;
+		$erreur_menage_ou_individu=0;
+		$erreur_nom_region=0;
+		$erreur_nom_district=0;
+		$erreur_nom_commune=0;
+		$erreur_nom_fokontany=0;
+		$erreur_identifiant_appariement =0;
+		$erreur_nom =0;
+		$erreur_prenom =0;
+		$erreur_date_naissance_age=0;
+		$erreur_sexe=0;
+		$erreur_situation_matrimonale=0;
+		$erreur_cin=0;
+		$erreur_profession=0;
+		$erreur_adresse=0;
+		$erreur_surnom=0;
+		$erreur_lien_de_parente=0;
+		$erreur_niveau_classe=0;
+		$erreur_langue=0;
+		$erreur_revenu=0;
+		$erreur_depense=0;
+		$erreur_date_inscription_detail_beneficiaire=0;
+		$erreur_telephone=0;
+		$erreur_handicap_visuel=0;
+		$erreur_handicap_auditif=0;
+		$erreur_handicap_parole=0;
+		$erreur_handicap_moteur=0;
+		$erreur_handicap_mental=0;
+		$erreur_nom_enqueteur=0;
+		$erreur_date_inscription=0;
+		$erreur_indice_vulnerabilite=0;
 		foreach($rowIterator as $row) {
 			$ligne = $row->getRowIndex ();
 			if($ligne >=2) {
@@ -206,7 +240,8 @@ class Validationbeneficiaire extends CI_Controller {
 					}
 					// Si donnée incorrect : coleur cellule en rouge
 					if($nom_acteur=="") {
-						$nombre_erreur = $nombre_erreur + 1;						
+						$nombre_erreur = $nombre_erreur + 1;
+						$erreur_nom_acteur=$erreur_nom_acteur +1;	
 						$sheet->getStyle("B2")->getFill()->applyFromArray(
 								 array('type'       => PHPExcel_Style_Fill::FILL_SOLID,'rotation'   => 0,
 									 'startcolor' => array('rgb' => 'FF0000'),
@@ -215,6 +250,7 @@ class Validationbeneficiaire extends CI_Controller {
 						 );													
 					} else {
 						// Vérifier si nom_acteur existe dans la BDD
+						$id_acteur = 9999999; // initialisation valeur id_acteur
 						$nom_acteur=strtolower($nom_acteur);
 						$retour = $this->ActeurManager->findByNom($nom_acteur);
 						if(count($retour) >0) {
@@ -230,10 +266,12 @@ class Validationbeneficiaire extends CI_Controller {
 									 )
 							 );		
 							$nombre_erreur = $nombre_erreur + 1; 
+							$erreur_nom_acteur=$erreur_nom_acteur + 1;
 						}
 					} 
 					if($intitule_intervention=="") {
-						$nombre_erreur = $nombre_erreur + 1;						
+						$nombre_erreur = $nombre_erreur + 1;
+						$erreur_intitule_intervention=$erreur_intitule_intervention + 1;
 						$sheet->getStyle("D2")->getFill()->applyFromArray(
 								 array('type'       => PHPExcel_Style_Fill::FILL_SOLID,'rotation'   => 0,
 									 'startcolor' => array('rgb' => 'FF0000'),
@@ -255,6 +293,7 @@ class Validationbeneficiaire extends CI_Controller {
 									 )
 							 );		
 							$nombre_erreur = $nombre_erreur + 1; 
+							$erreur_intitule_intervention=$erreur_intitule_intervention + 1;
 						} else {
 							foreach($retour as $k=>$v) {
 								$id_intervention = $v->id;
@@ -262,7 +301,8 @@ class Validationbeneficiaire extends CI_Controller {
 						}
 					}
 					if(!$date_inscription) {
-						$nombre_erreur = $nombre_erreur + 1;						
+						$nombre_erreur = $nombre_erreur + 1;
+						$erreur_date_envoi_fichier=$erreur_date_envoi_fichier + 1;	
 						$sheet->getStyle("F2")->getFill()->applyFromArray(
 								 array('type'       => PHPExcel_Style_Fill::FILL_SOLID,'rotation'   => 0,
 									 'startcolor' => array('rgb' => 'FF0000'),
@@ -271,7 +311,8 @@ class Validationbeneficiaire extends CI_Controller {
 						 );													
 					} 
 					if($menage_ou_individu=="") {
-						$nombre_erreur = $nombre_erreur + 1;						
+						$nombre_erreur = $nombre_erreur + 1;	
+						$erreur_menage_ou_individu = $erreur_menage_ou_individu + 1;	
 						$sheet->getStyle("H2")->getFill()->applyFromArray(
 								 array('type'       => PHPExcel_Style_Fill::FILL_SOLID,'rotation'   => 0,
 									 'startcolor' => array('rgb' => 'FF0000'),
@@ -390,7 +431,8 @@ class Validationbeneficiaire extends CI_Controller {
 										 'endcolor'   => array('argb' => 'FF0000')
 									 )
 							 );	
-							$nombre_erreur = $nombre_erreur + 1;						 
+							$nombre_erreur = $nombre_erreur + 1;
+							$erreur_nom_region = $erreur_nom_region + 1;	
 						}	
 						if(intval($id_region) >0) {
 							if($nom_district >'') {
@@ -433,7 +475,8 @@ class Validationbeneficiaire extends CI_Controller {
 												 'endcolor'   => array('argb' => 'FF0000')
 											 )
 									 );	
-									$nombre_erreur = $nombre_erreur + 1;						 								
+									$nombre_erreur = $nombre_erreur + 1;	
+									$erreur_nom_district = $erreur_nom_district + 1;	
 								}
 								if(intval($id_district) >0) {
 									if($nom_commune >'') {
@@ -470,7 +513,8 @@ class Validationbeneficiaire extends CI_Controller {
 														 'endcolor'   => array('argb' => 'FF0000')
 													 )
 											 );	
-											$nombre_erreur = $nombre_erreur + 1;						 								
+											$nombre_erreur = $nombre_erreur + 1;
+											$erreur_nom_commune = $erreur_nom_commune + 1;	
 										}	
 										if(intval($id_commune) >0) {
 											if($nom_fokontany >'') {
@@ -502,7 +546,8 @@ class Validationbeneficiaire extends CI_Controller {
 																 'endcolor'   => array('argb' => 'FF0000')
 															 )
 													 );	
-													$nombre_erreur = $nombre_erreur + 1;												
+													$nombre_erreur = $nombre_erreur + 1;
+													$erreur_nom_fokontany = $erreur_nom_fokontany + 1;	
 												}												
 											} else {
 												// Pas de fokontany : marquer fokontany 
@@ -512,7 +557,8 @@ class Validationbeneficiaire extends CI_Controller {
 															 'endcolor'   => array('argb' => 'FF0000')
 														 )
 												 );	
-												$nombre_erreur = $nombre_erreur + 1;												
+												$nombre_erreur = $nombre_erreur + 1;
+												$erreur_nom_fokontany = $erreur_nom_fokontany + 1;	
 											}
 										} 
 									} else {										
@@ -529,7 +575,8 @@ class Validationbeneficiaire extends CI_Controller {
 													 'endcolor'   => array('argb' => 'FF0000')
 												 )
 										 );	
-										$nombre_erreur = $nombre_erreur + 1;						 								
+										$nombre_erreur = $nombre_erreur + 1;
+										$erreur_nom_commune = $erreur_nom_commune + 1;	
 									}		
 								}
 							} else {
@@ -552,7 +599,8 @@ class Validationbeneficiaire extends CI_Controller {
 											 'endcolor'   => array('argb' => 'FF0000')
 										 )
 								 );	
-								$nombre_erreur = $nombre_erreur + 1;						 								
+								$nombre_erreur = $nombre_erreur + 1;
+								$erreur_nom_district = $erreur_nom_district + 1;	
 							}		
 						}
 					} else {
@@ -581,7 +629,8 @@ class Validationbeneficiaire extends CI_Controller {
 									 'endcolor'   => array('argb' => 'FF0000')
 								 )
 						 );	
-						$nombre_erreur = $nombre_erreur + 1;						 
+						$nombre_erreur = $nombre_erreur + 1;
+						$erreur_nom_region = $erreur_nom_region + 1;	
 					}
 				}		
 				if($ligne >=5) {
@@ -679,7 +728,8 @@ class Validationbeneficiaire extends CI_Controller {
 									 'endcolor'   => array('argb' => 'FF0000')
 								 )
 						 );	
-						$nombre_erreur = $nombre_erreur + 1;						
+						$nombre_erreur = $nombre_erreur + 1;
+						$erreur_identifiant_appariement=$erreur_identifiant_appariement + 1;	
 					}
 					if($nom=='') {
 						$sheet->getStyle("C".$ligne)->getFill()->applyFromArray(
@@ -688,7 +738,8 @@ class Validationbeneficiaire extends CI_Controller {
 									 'endcolor'   => array('argb' => 'FF0000')
 								 )
 						 );	
-						$nombre_erreur = $nombre_erreur + 1;						
+						$nombre_erreur = $nombre_erreur + 1;
+						$erreur_nom=$erreur_nom + 1;	
 					}
 				/*	if($prenom=='') {
 						$sheet->getStyle("D".$ligne)->getFill()->applyFromArray(
@@ -697,7 +748,8 @@ class Validationbeneficiaire extends CI_Controller {
 									 'endcolor'   => array('argb' => 'FF0000')
 								 )
 						 );	
-						$nombre_erreur = $nombre_erreur + 1;						
+						$nombre_erreur = $nombre_erreur + 1;
+						$erreur_prenom=$erreur_prenom + 1;	
 					} */
 				/*	if($chef_menage=='') {
 						$sheet->getStyle("E".$ligne)->getFill()->applyFromArray(
@@ -721,7 +773,8 @@ class Validationbeneficiaire extends CI_Controller {
 									 'endcolor'   => array('argb' => 'FF0000')
 								 )
 						 );	
-						$nombre_erreur = $nombre_erreur + 1;						
+						$nombre_erreur = $nombre_erreur + 1;	
+						$erreur_date_naissance_age=$erreur_date_naissance_age + 1;
 					} else if(intval($age)>0) {
 						// Calcul par défaut date naissance au 01/01/AAAA
 						
@@ -733,7 +786,8 @@ class Validationbeneficiaire extends CI_Controller {
 									 'endcolor'   => array('argb' => 'FF0000')
 								 )
 						 );	
-						$nombre_erreur = $nombre_erreur + 1;												
+						$nombre_erreur = $nombre_erreur + 1;	
+						$erreur_date_naissance_age=$erreur_date_naissance_age + 1;	
 					}
 					if(intval($age) >120) {
 						$sheet->getStyle("G".$ligne)->getFill()->applyFromArray(
@@ -742,7 +796,8 @@ class Validationbeneficiaire extends CI_Controller {
 									 'endcolor'   => array('argb' => 'FF0000')
 								 )
 						 );	
-						$nombre_erreur = $nombre_erreur + 1;						
+						$nombre_erreur = $nombre_erreur + 1;
+						$erreur_date_naissance_age=$erreur_date_naissance_age + 1;	
 					}
 					if($sexe=='') {
 						$sheet->getStyle("H".$ligne)->getFill()->applyFromArray(
@@ -752,6 +807,7 @@ class Validationbeneficiaire extends CI_Controller {
 								 )
 						 );	
 						$nombre_erreur = $nombre_erreur + 1;						
+						$erreur_sexe=$erreur_sexe + 1;
 					}
 				/*	if($situation_matrimonale=='') {
 						$sheet->getStyle("I".$ligne)->getFill()->applyFromArray(
@@ -761,6 +817,7 @@ class Validationbeneficiaire extends CI_Controller {
 								 )
 						 );	
 						$nombre_erreur = $nombre_erreur + 1;						
+						$erreur_situation_matrimonale=$erreur_situation_matrimonale + 1;
 					}
 					if($cin=='') {
 						$sheet->getStyle("J".$ligne)->getFill()->applyFromArray(
@@ -770,6 +827,7 @@ class Validationbeneficiaire extends CI_Controller {
 								 )
 						 );	
 						$nombre_erreur = $nombre_erreur + 1;						
+						$erreur_cin=$erreur_cin + 1;
 					} */
 				/*	if($profession=='') {
 						$sheet->getStyle("K".$ligne)->getFill()->applyFromArray(
@@ -779,6 +837,7 @@ class Validationbeneficiaire extends CI_Controller {
 								 )
 						 );	
 						$nombre_erreur = $nombre_erreur + 1;						
+						$erreur_profession=$erreur_profession + 1;
 					}*/
 				/*	if($adresse=='') {
 						$sheet->getStyle("L".$ligne)->getFill()->applyFromArray(
@@ -788,6 +847,7 @@ class Validationbeneficiaire extends CI_Controller {
 								 )
 						 );	
 						$nombre_erreur = $nombre_erreur + 1;						
+						$erreur_adresse=$erreur_adresse + 1;
 					}
 					if($surnom=='') {
 						$sheet->getStyle("M".$ligne)->getFill()->applyFromArray(
@@ -797,6 +857,7 @@ class Validationbeneficiaire extends CI_Controller {
 								 )
 						 );	
 						$nombre_erreur = $nombre_erreur + 1;						
+						$erreur_surnom=$erreur_surnom + 1;
 					}
 					if($lien_de_parente=='') {
 						$sheet->getStyle("N".$ligne)->getFill()->applyFromArray(
@@ -806,6 +867,7 @@ class Validationbeneficiaire extends CI_Controller {
 								 )
 						 );	
 						$nombre_erreur = $nombre_erreur + 1;						
+						$erreur_lien_de_parente=$erreur_lien_de_parente + 1;
 					}
 					if($niveau_classe=='') {
 						$sheet->getStyle("P".$ligne)->getFill()->applyFromArray(
@@ -815,6 +877,7 @@ class Validationbeneficiaire extends CI_Controller {
 								 )
 						 );	
 						$nombre_erreur = $nombre_erreur + 1;						
+						$erreur_niveau_classe=$erreur_niveau_classe + 1;
 					}
 					if($langue=='') {
 						$sheet->getStyle("Q".$ligne)->getFill()->applyFromArray(
@@ -824,6 +887,7 @@ class Validationbeneficiaire extends CI_Controller {
 								 )
 						 );	
 						$nombre_erreur = $nombre_erreur + 1;						
+						$erreur_langue=$erreur_langue + 1;
 					}
 					if($revenu=='') {
 						$sheet->getStyle("R".$ligne)->getFill()->applyFromArray(
@@ -833,6 +897,7 @@ class Validationbeneficiaire extends CI_Controller {
 								 )
 						 );	
 						$nombre_erreur = $nombre_erreur + 1;						
+						$erreur_revenu=$erreur_revenu + 1;
 					}
 					if($depense=='') {
 						$sheet->getStyle("S".$ligne)->getFill()->applyFromArray(
@@ -842,6 +907,7 @@ class Validationbeneficiaire extends CI_Controller {
 								 )
 						 );	
 						$nombre_erreur = $nombre_erreur + 1;						
+						$erreur_depense=$erreur_depense + 1;
 					}*/
 					if($date_inscription_detail_beneficiaire=='') {
 						$sheet->getStyle("T".$ligne)->getFill()->applyFromArray(
@@ -851,6 +917,7 @@ class Validationbeneficiaire extends CI_Controller {
 								 )
 						 );	
 						$nombre_erreur = $nombre_erreur + 1;						
+						$erreur_date_inscription_detail_beneficiaire=$erreur_date_inscription_detail_beneficiaire + 1;
 					}
 					if($date_inscription_detail_chaine=="0000-00-00" || $date_inscription_detail_chaine=="00-00-0000" || $date_inscription_detail_chaine=="00/00/0000") {
 						$sheet->getStyle("T".$ligne)->getFill()->applyFromArray(
@@ -868,6 +935,7 @@ class Validationbeneficiaire extends CI_Controller {
 								 )
 						 );	
 						$nombre_erreur = $nombre_erreur + 1;						
+						$erreur_telephone=$erreur_telephone + 1;
 					}
 					if($handicap_visuel=='') {
 						$sheet->getStyle("V".$ligne)->getFill()->applyFromArray(
@@ -877,6 +945,7 @@ class Validationbeneficiaire extends CI_Controller {
 								 )
 						 );	
 						$nombre_erreur = $nombre_erreur + 1;						
+						$erreur_handicap_visuel=$erreur_handicap_visuel + 1;
 					}
 					if($handicap_auditif=='') {
 						$sheet->getStyle("W".$ligne)->getFill()->applyFromArray(
@@ -886,6 +955,7 @@ class Validationbeneficiaire extends CI_Controller {
 								 )
 						 );	
 						$nombre_erreur = $nombre_erreur + 1;						
+						$erreur_handicap_auditif=$erreur_handicap_auditif + 1;
 					}
 					if($handicap_parole=='') {
 						$sheet->getStyle("X".$ligne)->getFill()->applyFromArray(
@@ -895,6 +965,7 @@ class Validationbeneficiaire extends CI_Controller {
 								 )
 						 );	
 						$nombre_erreur = $nombre_erreur + 1;						
+						$erreur_handicap_parole=$erreur_handicap_parole + 1;
 					}
 					if($handicap_moteur=='') {
 						$sheet->getStyle("Y".$ligne)->getFill()->applyFromArray(
@@ -904,6 +975,7 @@ class Validationbeneficiaire extends CI_Controller {
 								 )
 						 );	
 						$nombre_erreur = $nombre_erreur + 1;						
+						$erreur_handicap_moteur=$erreur_handicap_moteur + 1;
 					}
 					if($handicap_mental=='') {
 						$sheet->getStyle("Z".$ligne)->getFill()->applyFromArray(
@@ -913,6 +985,7 @@ class Validationbeneficiaire extends CI_Controller {
 								 )
 						 );	
 						$nombre_erreur = $nombre_erreur + 1;						
+						$erreur_handicap_mental=$erreur_handicap_mental + 1;
 					}
 					if($nom_enqueteur=='') {
 						$sheet->getStyle("AA".$ligne)->getFill()->applyFromArray(
@@ -922,6 +995,7 @@ class Validationbeneficiaire extends CI_Controller {
 								 )
 						 );	
 						$nombre_erreur = $nombre_erreur + 1;						
+						$erreur_nom_enqueteur=$erreur_nom_enqueteur + 1;
 					}
 					if($date_inscription=='') {
 						$sheet->getStyle("AB".$ligne)->getFill()->applyFromArray(
@@ -931,6 +1005,7 @@ class Validationbeneficiaire extends CI_Controller {
 								 )
 						 );	
 						$nombre_erreur = $nombre_erreur + 1;						
+						$erreur_date_inscription=$erreur_date_inscription + 1;
 					} */
 					if($indice_vulnerabilite>'') {
 						$indice_vulnerabilite=strtolower($indice_vulnerabilite);
@@ -943,6 +1018,7 @@ class Validationbeneficiaire extends CI_Controller {
 									 )
 							 );		
 							$nombre_erreur = $nombre_erreur + 1; 
+							$erreur_indice_vulnerabilite=$erreur_indice_vulnerabilite + 1;
 						}
 					}	
 				}	
@@ -951,10 +1027,12 @@ class Validationbeneficiaire extends CI_Controller {
 		}
 		$date_inscription_beneficiaire = new DateTime($date_inscription_beneficiaire); 
 		$date_inscription_beneficiaire =$date_inscription_beneficiaire->format('d/m/Y');				
+		$objWriter = PHPExcel_IOFactory::createWriter($excel, 'Excel2007');
+		$objWriter->save(dirname(__FILE__) . "/../../../../" .$repertoire. $nomfichier);
 		$val_ret = array();
 			$sender = "ndrianaina.aime.bruno@gmail.com";
 			$mdpsender = "finaritra";
-		if($nombre_erreur > 0) {
+		/*if($nombre_erreur > 0) {
 			// Signaler les erreurs par mail
 			$val_ret["reponse"] = "ERREUR";
 			$val_ret["region"] = $nom_region_original;
@@ -1013,7 +1091,7 @@ class Validationbeneficiaire extends CI_Controller {
 				$data = 1;
 			}		
 			// FIN ENVOI MAIL SIGNALANT LES ERREURS
-		} else {
+		} else { */
 			// DEUXIEME VERIFICATION : vérification doublon			
 			$chemin=dirname(__FILE__) . "/../../../../".$repertoire;
 			$lien_vers_mon_document_excel = $chemin . $nomfichier;
@@ -1038,7 +1116,7 @@ class Validationbeneficiaire extends CI_Controller {
 			$trouver= array("’");
 			$remplacer=array('&eacute;','e','e','a','o','c','_');
 			$trouver= array('é','è','ê','à','ö','ç',' ');
-			$nombre_erreur=0; // compter le nombre d'erreur afin de pouvoir renvoyer le fichier à l'envoyeur
+			//$nombre_erreur=0; // compter le nombre d'erreur afin de pouvoir renvoyer le fichier à l'envoyeur
 			$id_menage=null;
 			$search=array("'");
 			$replace= array("’");
@@ -1410,14 +1488,13 @@ class Validationbeneficiaire extends CI_Controller {
 						// Calcul date_naissance par défaut
 						$date_actuelle  = new DateTime();
 						$annee_actuelle= $date_actuelle->format("Y");
-						$sheet->setCellValue('I'.$ligne, $annee_actuelle);
 						$age=intval($age);
 						$date_par_defaut = $annee_actuelle."-01-01";	
 						$date_par_defaut = new DateTime($date_par_defaut);
 						$date_naissance = $date_par_defaut->sub(DateInterval::createFromDateString("'".$age." year'"));
 						$date_naissance=$date_naissance->format("d/m/Y");
 						$sheet->setCellValue('F'.$ligne, $date_naissance);
-						$sheet->setCellValue('I3', $id_fokontany);
+						// $sheet->setCellValue('I3', $id_fokontany);
 					}
 				}	
 				$ligne = $ligne + 1;
@@ -1436,7 +1513,271 @@ class Validationbeneficiaire extends CI_Controller {
 				$val_ret["nombre_erreur"] = $nombre_erreur;				
 				$newchiffrelettre = new chiffreEnLettre;
 				$nombre_erreur_en_lettre= $newchiffrelettre->ConvNumberLetter($nombre_erreur,0,0);
-				$val_ret["nombre_erreur_en_lettre"] = $nombre_erreur_en_lettre;				
+				$val_ret["nombre_erreur_en_lettre"] = $nombre_erreur_en_lettre;		
+				// Création deuxième feuille pour récapituler les erreurs
+				$objPHPExcel = $excel->createSheet(1);
+				$sheet = $excel->getSheet(1);
+				$objPHPExcel =$sheet;
+				$objPHPExcel->getColumnDimension('A')->setWidth(30);
+				$objPHPExcel->getColumnDimension('B')->setWidth(13);
+				$objPHPExcel->getStyle("A1:B2")->getFont()->setSize(12);			
+				$objPHPExcel->getStyle('A1:B2')->getFont()->setBold(true);
+				$objPHPExcel->getPageSetup()->setHorizontalCentered(true);
+				$objPHPExcel->getStyle("A1:B2")->getAlignment()->setWrapText(true);				
+				$objPHPExcel->getStyle("A1:B2")->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+				$objPHPExcel->getStyle("A1:B2")->getAlignment()->setVertical(PHPExcel_Style_Alignment::VERTICAL_CENTER);
+				$objPHPExcel->setTitle('Recapitulatif des erreurs');
+				$objPHPExcel->mergeCells("A1:B1");				
+				$objPHPExcel->setCellValue("A1", "RECAPITULATIF DES ERREURS");					
+				$styleArray = array(
+				  'borders' => array(
+					'allborders' => array(
+					  'style' => PHPExcel_Style_Border::BORDER_THIN
+					)
+				  )
+				);		
+				$objPHPExcel->getStyle("A1:B1")->applyFromArray($styleArray);
+				$objPHPExcel->setCellValue("A2", "Colonne");					
+				$objPHPExcel->setCellValue("B2", "Nombre d'erreur");					
+				$objPHPExcel->getStyle("A2:B2")->applyFromArray($styleArray);
+				$ligne=3;
+				if($erreur_nom_acteur>0) {
+					$objPHPExcel->setCellValue("A".$ligne, "Nom acteur");					
+					$objPHPExcel->setCellValue("B".$ligne, $erreur_nom_acteur);					
+					$objPHPExcel->getStyle("A".$ligne.":B".$ligne)->applyFromArray($styleArray);	
+					$objPHPExcel->getStyle("A".$ligne)->getAlignment()->setWrapText(true);		
+					$ligne=$ligne + 1;	
+				}
+				if($erreur_intitule_intervention>0) {
+					$objPHPExcel->setCellValue("A".$ligne, "Intitule intervention");					
+					$objPHPExcel->setCellValue("B".$ligne, $erreur_intitule_intervention);					
+					$objPHPExcel->getStyle("A".$ligne.":B".$ligne)->applyFromArray($styleArray);	
+					$objPHPExcel->getStyle("A".$ligne)->getAlignment()->setWrapText(true);		
+					$ligne=$ligne + 1;						
+				}
+				if($erreur_date_envoi_fichier>0) {
+					$objPHPExcel->setCellValue("A".$ligne, "Date d'envoi");					
+					$objPHPExcel->setCellValue("B".$ligne, $erreur_date_envoi_fichier);					
+					$objPHPExcel->getStyle("A".$ligne.":B".$ligne)->applyFromArray($styleArray);	
+					$objPHPExcel->getStyle("A".$ligne)->getAlignment()->setWrapText(true);		
+					$ligne=$ligne + 1;						
+				}
+				if($erreur_menage_ou_individu>0) {					
+					$objPHPExcel->setCellValue("A".$ligne, "Cible");					
+					$objPHPExcel->setCellValue("B".$ligne, $erreur_menage_ou_individu);					
+					$objPHPExcel->getStyle("A".$ligne.":B".$ligne)->applyFromArray($styleArray);	
+					$objPHPExcel->getStyle("A".$ligne)->getAlignment()->setWrapText(true);		
+					$ligne=$ligne + 1;						
+				}
+				if($erreur_nom_region>0) {					
+					$objPHPExcel->setCellValue("A".$ligne, "Région");					
+					$objPHPExcel->setCellValue("B".$ligne, $erreur_nom_region);					
+					$objPHPExcel->getStyle("A".$ligne.":B".$ligne)->applyFromArray($styleArray);	
+					$objPHPExcel->getStyle("A".$ligne)->getAlignment()->setWrapText(true);		
+					$ligne=$ligne + 1;						
+				}
+				if($erreur_nom_district>0) {					
+					$objPHPExcel->setCellValue("A".$ligne, "District");					
+					$objPHPExcel->setCellValue("B".$ligne, $erreur_nom_district);					
+					$objPHPExcel->getStyle("A".$ligne.":B".$ligne)->applyFromArray($styleArray);	
+					$objPHPExcel->getStyle("A".$ligne)->getAlignment()->setWrapText(true);		
+					$ligne=$ligne + 1;						
+				}
+				if($erreur_nom_commune>0) {					
+					$objPHPExcel->setCellValue("A".$ligne, "Commune");					
+					$objPHPExcel->setCellValue("B".$ligne, $erreur_nom_commune);					
+					$objPHPExcel->getStyle("A".$ligne.":B".$ligne)->applyFromArray($styleArray);	
+					$objPHPExcel->getStyle("A".$ligne)->getAlignment()->setWrapText(true);		
+					$ligne=$ligne + 1;						
+				}
+				if($erreur_nom_fokontany>0) {					
+					$objPHPExcel->setCellValue("A".$ligne, "Fokontany");					
+					$objPHPExcel->setCellValue("B".$ligne, $erreur_nom_fokontany);					
+					$objPHPExcel->getStyle("A".$ligne.":B".$ligne)->applyFromArray($styleArray);	
+					$objPHPExcel->getStyle("A".$ligne)->getAlignment()->setWrapText(true);		
+					$ligne=$ligne + 1;						
+				}
+				if($erreur_identifiant_appariement >0) {					
+					$objPHPExcel->setCellValue("A".$ligne, "Identifiant appariement");					
+					$objPHPExcel->setCellValue("B".$ligne, $erreur_identifiant_appariement);					
+					$objPHPExcel->getStyle("A".$ligne.":B".$ligne)->applyFromArray($styleArray);	
+					$objPHPExcel->getStyle("A".$ligne)->getAlignment()->setWrapText(true);		
+					$ligne=$ligne + 1;						
+				}
+				if($erreur_nom >0) {					
+					$objPHPExcel->setCellValue("A".$ligne, "Nom");					
+					$objPHPExcel->setCellValue("B".$ligne, $erreur_nom);					
+					$objPHPExcel->getStyle("A".$ligne.":B".$ligne)->applyFromArray($styleArray);	
+					$objPHPExcel->getStyle("A".$ligne)->getAlignment()->setWrapText(true);		
+					$ligne=$ligne + 1;						
+				}
+				if($erreur_prenom >0) {					
+					$objPHPExcel->setCellValue("A".$ligne, "Prénom");					
+					$objPHPExcel->setCellValue("B".$ligne, $erreur_prenom);					
+					$objPHPExcel->getStyle("A".$ligne.":B".$ligne)->applyFromArray($styleArray);	
+					$objPHPExcel->getStyle("A".$ligne)->getAlignment()->setWrapText(true);		
+					$ligne=$ligne + 1;						
+				}				
+				if($erreur_date_naissance_age>0) {					
+					$objPHPExcel->setCellValue("A".$ligne, "Date de naissance/Age");					
+					$objPHPExcel->setCellValue("B".$ligne, $erreur_date_naissance_age);					
+					$objPHPExcel->getStyle("A".$ligne.":B".$ligne)->applyFromArray($styleArray);	
+					$objPHPExcel->getStyle("A".$ligne)->getAlignment()->setWrapText(true);		
+					$ligne=$ligne + 1;						
+				}
+				if($erreur_sexe>0) {					
+					$objPHPExcel->setCellValue("A".$ligne, "Sexe");					
+					$objPHPExcel->setCellValue("B".$ligne, $erreur_sexe);					
+					$objPHPExcel->getStyle("A".$ligne.":B".$ligne)->applyFromArray($styleArray);	
+					$objPHPExcel->getStyle("A".$ligne)->getAlignment()->setWrapText(true);		
+					$ligne=$ligne + 1;						
+				}
+				if($erreur_situation_matrimonale>0) {					
+					$objPHPExcel->setCellValue("A".$ligne, "Situation matrimoniale");					
+					$objPHPExcel->setCellValue("B".$ligne, $erreur_situation_matrimonale);					
+					$objPHPExcel->getStyle("A".$ligne.":B".$ligne)->applyFromArray($styleArray);	
+					$objPHPExcel->getStyle("A".$ligne)->getAlignment()->setWrapText(true);		
+					$ligne=$ligne + 1;						
+				}
+				if($erreur_cin>0) {					
+					$objPHPExcel->setCellValue("A".$ligne, "CIN");					
+					$objPHPExcel->setCellValue("B".$ligne, $erreur_cin);					
+					$objPHPExcel->getStyle("A".$ligne.":B".$ligne)->applyFromArray($styleArray);	
+					$objPHPExcel->getStyle("A".$ligne)->getAlignment()->setWrapText(true);		
+					$ligne=$ligne + 1;						
+				}
+				if($erreur_profession>0) {					
+					$objPHPExcel->setCellValue("A".$ligne, "Profession");					
+					$objPHPExcel->setCellValue("B".$ligne, $erreur_profession);					
+					$objPHPExcel->getStyle("A".$ligne.":B".$ligne)->applyFromArray($styleArray);	
+					$objPHPExcel->getStyle("A".$ligne)->getAlignment()->setWrapText(true);		
+					$ligne=$ligne + 1;						
+				}
+				if($erreur_adresse>0) {					
+					$objPHPExcel->setCellValue("A".$ligne, "Adresse");					
+					$objPHPExcel->setCellValue("B".$ligne, $erreur_adresse);					
+					$objPHPExcel->getStyle("A".$ligne.":B".$ligne)->applyFromArray($styleArray);	
+					$objPHPExcel->getStyle("A".$ligne)->getAlignment()->setWrapText(true);		
+					$ligne=$ligne + 1;						
+				}
+				if($erreur_surnom>0) {					
+					$objPHPExcel->setCellValue("A".$ligne, "Surnom");					
+					$objPHPExcel->setCellValue("B".$ligne, $erreur_surnom);					
+					$objPHPExcel->getStyle("A".$ligne.":B".$ligne)->applyFromArray($styleArray);	
+					$objPHPExcel->getStyle("A".$ligne)->getAlignment()->setWrapText(true);		
+					$ligne=$ligne + 1;						
+				}
+				if($erreur_lien_de_parente>0) {					
+					$objPHPExcel->setCellValue("A".$ligne, "Lien de parenté");					
+					$objPHPExcel->setCellValue("B".$ligne, $erreur_lien_de_parente);					
+					$objPHPExcel->getStyle("A".$ligne.":B".$ligne)->applyFromArray($styleArray);	
+					$objPHPExcel->getStyle("A".$ligne)->getAlignment()->setWrapText(true);		
+					$ligne=$ligne + 1;						
+				}
+				if($erreur_niveau_classe>0) {					
+					$objPHPExcel->setCellValue("A".$ligne, "Niveau de classe");					
+					$objPHPExcel->setCellValue("B".$ligne, $erreur_niveau_classe);					
+					$objPHPExcel->getStyle("A".$ligne.":B".$ligne)->applyFromArray($styleArray);	
+					$objPHPExcel->getStyle("A".$ligne)->getAlignment()->setWrapText(true);		
+					$ligne=$ligne + 1;						
+				}
+				if($erreur_langue>0) {					
+					$objPHPExcel->setCellValue("A".$ligne, "Langue");					
+					$objPHPExcel->setCellValue("B".$ligne, $erreur_langue);					
+					$objPHPExcel->getStyle("A".$ligne.":B".$ligne)->applyFromArray($styleArray);	
+					$objPHPExcel->getStyle("A".$ligne)->getAlignment()->setWrapText(true);		
+					$ligne=$ligne + 1;						
+				}
+				if($erreur_revenu>0) {					
+					$objPHPExcel->setCellValue("A".$ligne, "Revenu");					
+					$objPHPExcel->setCellValue("B".$ligne, $erreur_revenu);					
+					$objPHPExcel->getStyle("A".$ligne.":B".$ligne)->applyFromArray($styleArray);	
+					$objPHPExcel->getStyle("A".$ligne)->getAlignment()->setWrapText(true);		
+					$ligne=$ligne + 1;						
+				}
+				if($erreur_depense>0) {					
+					$objPHPExcel->setCellValue("A".$ligne, "Dépense");					
+					$objPHPExcel->setCellValue("B".$ligne, $erreur_depense);					
+					$objPHPExcel->getStyle("A".$ligne.":B".$ligne)->applyFromArray($styleArray);	
+					$objPHPExcel->getStyle("A".$ligne)->getAlignment()->setWrapText(true);		
+					$ligne=$ligne + 1;						
+				}
+				if($erreur_date_inscription_detail_beneficiaire>0) {					
+					$objPHPExcel->setCellValue("A".$ligne, "Date inscription bénéficiaire");					
+					$objPHPExcel->setCellValue("B".$ligne, $erreur_date_inscription_detail_beneficiaire);					
+					$objPHPExcel->getStyle("A".$ligne.":B".$ligne)->applyFromArray($styleArray);	
+					$objPHPExcel->getStyle("A".$ligne)->getAlignment()->setWrapText(true);		
+					$ligne=$ligne + 1;						
+				}
+				if($erreur_telephone>0) {					
+					$objPHPExcel->setCellValue("A".$ligne, "Téléphone");					
+					$objPHPExcel->setCellValue("B".$ligne, $erreur_telephone);					
+					$objPHPExcel->getStyle("A".$ligne.":B".$ligne)->applyFromArray($styleArray);	
+					$objPHPExcel->getStyle("A".$ligne)->getAlignment()->setWrapText(true);		
+					$ligne=$ligne + 1;						
+				}
+				if($erreur_handicap_visuel>0) {					
+					$objPHPExcel->setCellValue("A".$ligne, "Handicap visuel");					
+					$objPHPExcel->setCellValue("B".$ligne, $erreur_handicap_visuel);					
+					$objPHPExcel->getStyle("A".$ligne.":B".$ligne)->applyFromArray($styleArray);	
+					$objPHPExcel->getStyle("A".$ligne)->getAlignment()->setWrapText(true);		
+					$ligne=$ligne + 1;						
+				}
+				if($erreur_handicap_auditif>0) {					
+					$objPHPExcel->setCellValue("A".$ligne, "Handicap auditif");					
+					$objPHPExcel->setCellValue("B".$ligne, $erreur_handicap_auditif);					
+					$objPHPExcel->getStyle("A".$ligne.":B".$ligne)->applyFromArray($styleArray);	
+					$objPHPExcel->getStyle("A".$ligne)->getAlignment()->setWrapText(true);		
+					$ligne=$ligne + 1;						
+				}
+				if($erreur_handicap_parole>0) {					
+					$objPHPExcel->setCellValue("A".$ligne, "Handicap parole");					
+					$objPHPExcel->setCellValue("B".$ligne, $erreur_handicap_parole);					
+					$objPHPExcel->getStyle("A".$ligne.":B".$ligne)->applyFromArray($styleArray);	
+					$objPHPExcel->getStyle("A".$ligne)->getAlignment()->setWrapText(true);		
+					$ligne=$ligne + 1;						
+				}
+				if($erreur_handicap_moteur>0) {					
+					$objPHPExcel->setCellValue("A".$ligne, "Handicap moteur");					
+					$objPHPExcel->setCellValue("B".$ligne, $erreur_handicap_moteur);					
+					$objPHPExcel->getStyle("A".$ligne.":B".$ligne)->applyFromArray($styleArray);	
+					$objPHPExcel->getStyle("A".$ligne)->getAlignment()->setWrapText(true);		
+					$ligne=$ligne + 1;						
+				}
+				if($erreur_handicap_mental>0) {					
+					$objPHPExcel->setCellValue("A".$ligne, "Handicap mental");					
+					$objPHPExcel->setCellValue("B".$ligne, $erreur_handicap_mental);					
+					$objPHPExcel->getStyle("A".$ligne.":B".$ligne)->applyFromArray($styleArray);	
+					$objPHPExcel->getStyle("A".$ligne)->getAlignment()->setWrapText(true);		
+					$ligne=$ligne + 1;						
+				}
+				if($erreur_nom_enqueteur>0) {					
+					$objPHPExcel->setCellValue("A".$ligne, "Nom enqueteur");					
+					$objPHPExcel->setCellValue("B".$ligne, $erreur_nom_enqueteur);					
+					$objPHPExcel->getStyle("A".$ligne.":B".$ligne)->applyFromArray($styleArray);	
+					$objPHPExcel->getStyle("A".$ligne)->getAlignment()->setWrapText(true);		
+					$ligne=$ligne + 1;						
+				}
+				if($erreur_date_inscription>0) {					
+					$objPHPExcel->setCellValue("A".$ligne, "Date inscription");					
+					$objPHPExcel->setCellValue("B".$ligne, $erreur_date_inscription);					
+					$objPHPExcel->getStyle("A".$ligne.":B".$ligne)->applyFromArray($styleArray);	
+					$objPHPExcel->getStyle("A".$ligne)->getAlignment()->setWrapText(true);		
+					$ligne=$ligne + 1;						
+				}
+				if($erreur_indice_vulnerabilite>0) {					
+					$objPHPExcel->setCellValue("A".$ligne, "Indice de vulnérabilité");					
+					$objPHPExcel->setCellValue("B".$ligne, $erreur_indice_vulnerabilite);					
+					$objPHPExcel->getStyle("A".$ligne.":B".$ligne)->applyFromArray($styleArray);	
+					$objPHPExcel->getStyle("A".$ligne)->getAlignment()->setWrapText(true);		
+					$ligne=$ligne + 1;						
+				}	
+				$objPHPExcel->getStyle("A".$ligne)->getFont()->setSize(12);			
+				$objPHPExcel->getStyle("A".$ligne)->getFont()->setBold(true);
+				$objPHPExcel->getStyle("A".$ligne.":B".$ligne)->applyFromArray($styleArray);
+				$objPHPExcel->setCellValue("A".$ligne, "TOTAL : ");					
+				$objPHPExcel->getStyle("A".$ligne)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_RIGHT);
+				$objPHPExcel->setCellValue('B'. ($ligne),'=SUM(B3:B'.($ligne - 1).')');				
 				$objWriter = PHPExcel_IOFactory::createWriter($excel, 'Excel2007');
 				$objWriter->save(dirname(__FILE__) . "/../../../../" .$repertoire. $nomfichier);
 				// Fermer fichier Excel
@@ -1495,7 +1836,7 @@ class Validationbeneficiaire extends CI_Controller {
 				$objWriter = PHPExcel_IOFactory::createWriter($excel, 'Excel2007');
 				$objWriter->save(dirname(__FILE__) . "/../../../../" .$repertoire. $nomfichier);
 			}
-		}	
+	/*	}	*/
 		return ($val_ret);
 	}	
 	// Envoi email vers acteur pour signaler qu'aucune erreur a été détéctée

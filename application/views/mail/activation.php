@@ -467,7 +467,7 @@
 					<?php }?>	
                     <tr>
                         <td class="free-text" colspan="2">
-                            Lors de votre première connexion, l'application vous redirigéra vers la modification du mot de passe par défaut que nous venons d'envoyer.
+                            Lors de votre première connexion, l'application vous redirigera vers la modification du mot de passe par défaut que nous venons d'envoyer.
                         </td>
                     </tr>
                     <tr>

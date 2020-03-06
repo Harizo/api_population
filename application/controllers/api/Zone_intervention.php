@@ -86,6 +86,7 @@ class Zone_intervention extends REST_Controller {
                     $data[$key]['region'] = $region;
                     $data[$key]['menage_beneficiaire_prevu'] = $value->menage_beneficiaire_prevu;
                     $data[$key]['individu_beneficiaire_prevu'] = $value->individu_beneficiaire_prevu;
+                    $data[$key]['groupe_beneficiaire_prevu'] = $value->groupe_beneficiaire_prevu;
 				}
 			}
 		}
@@ -121,12 +122,18 @@ class Zone_intervention extends REST_Controller {
 		if(isset($temporaire) && $temporaire !="" && intval($temporaire) >0) {
 			$individu_beneficiaire_prevu=$temporaire;
 		}
+		$groupe_beneficiaire_prevu=null;
+		$temporaire=$this->post('groupe_beneficiaire_prevu');
+		if(isset($temporaire) && $temporaire !="" && intval($temporaire) >0) {
+			$groupe_beneficiaire_prevu=$temporaire;
+		}
 		// Affectation des valeurs
  		$data = array(
 			'id_intervention'             => $this->post('id_intervention'),
 			'id_fokontany'                => $id_fokontany,
 			'menage_beneficiaire_prevu'   => $menage_beneficiaire_prevu,
 			'individu_beneficiaire_prevu' => $individu_beneficiaire_prevu,
+			'groupe_beneficiaire_prevu'   => $groupe_beneficiaire_prevu,
 		);               
         if ($supprimer == 0) {
             if ($id == 0) {

@@ -31,6 +31,7 @@ class Zone_intervention_model extends CI_Model {
             'id_fokontany'                => $zoneinterv['id_fokontany'],
             'menage_beneficiaire_prevu'   => $zoneinterv['menage_beneficiaire_prevu'],
             'individu_beneficiaire_prevu' => $zoneinterv['individu_beneficiaire_prevu'],
+            'groupe_beneficiaire_prevu'   => $zoneinterv['groupe_beneficiaire_prevu'],
         );
     }
     public function delete($id) {
