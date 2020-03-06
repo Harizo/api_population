@@ -1,0 +1,19 @@
+-- Table: public.cours_de_change
+
+-- DROP TABLE public.cours_de_change;
+
+CREATE TABLE public.cours_de_change
+(
+    id integer NOT NULL DEFAULT nextval('cours_de_change_id_seq'::regclass),
+    id_devise integer,
+    date_cours date,
+    cours numeric(12,2),
+    CONSTRAINT cours_de_change_pkey PRIMARY KEY (id)
+)
+WITH (
+    OIDS = FALSE
+)
+TABLESPACE pg_default;
+
+ALTER TABLE public.cours_de_change
+    OWNER to postgres;
