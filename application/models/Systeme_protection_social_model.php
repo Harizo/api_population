@@ -4243,7 +4243,8 @@ class Systeme_protection_social_model extends CI_Model
                     niveau_1.nom_region as nom_region,
                     niveau_1.nom_district as nom_district,
                     niveau_1.nom_commune as nom_commune,
-                    niveau_1.nom_fokontany as nom_fokontany
+                    niveau_1.nom_fokontany as nom_fokontany,
+                    type as type
 
                   from
 
@@ -4256,7 +4257,8 @@ class Systeme_protection_social_model extends CI_Model
                         region.nom as nom_region,
                         district.nom as nom_district,
                         commune.nom as nom_commune,
-                        fokontany.nom as nom_fokontany
+                        fokontany.nom as nom_fokontany,
+                        'Individu' as type
                       from
                         individu_beneficiaire,
                         individu,
@@ -4283,7 +4285,8 @@ class Systeme_protection_social_model extends CI_Model
                         region.nom as nom_region,
                         district.nom as nom_district,
                         commune.nom as nom_commune,
-                        fokontany.nom as nom_fokontany
+                        fokontany.nom as nom_fokontany,
+                        'Menage' as type
                       from
                         menage_beneficiaire,
                         menage,
@@ -4300,6 +4303,36 @@ class Systeme_protection_social_model extends CI_Model
                         and district.id = commune.district_id
                         and region.id = district.region_id
                         and ".$requete."
+                        and menage.etat_groupe = 0
+
+                      UNION
+
+                      select 
+                        menage.nom as nom,
+                        menage.prenom as prenom,
+                        intervention.intitule as intitule_intervention,
+                        region.nom as nom_region,
+                        district.nom as nom_district,
+                        commune.nom as nom_commune,
+                        fokontany.nom as nom_fokontany,
+                        'Groupe' as type
+                      from
+                        menage_beneficiaire,
+                        menage,
+                        intervention,
+                        fokontany,
+                        commune,
+                        district,
+                        region
+                      where
+                        menage.id = menage_beneficiaire.id_menage
+                        and intervention.id = menage_beneficiaire.id_intervention
+                        and fokontany.id = menage.id_fokontany
+                        and commune.id = fokontany.id_commune
+                        and district.id = commune.district_id
+                        and region.id = district.region_id
+                        and ".$requete."
+                        and menage.etat_groupe = 1
 
                 ) niveau_1
                 ";

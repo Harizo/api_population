@@ -24,7 +24,7 @@ class Utilisateurs extends REST_Controller {
             $user = $this->UserManager->findById($id);
             if ($user) 
             {
-                #$data['id'] = $user->id;
+                $data['id'] = $user->id;
                 $data['nom'] = $user->nom;
                 $data['prenom'] = $user->prenom;
                 $data['raison_sociale'] = $user->raison_sociale;
@@ -254,6 +254,7 @@ class Utilisateurs extends REST_Controller {
         $id = $this->post('id') ;
         $gestion_utilisateur = intval($this->post('gestion_utilisateur')) ;
         $supprimer = $this->post('supprimer') ;
+        $profil = $this->post('profil') ;
 		// Menu gestion utlisateur : ajout utlisateur ou mise à jour utlisateur
         if ($gestion_utilisateur == 1) 
         {
@@ -450,6 +451,39 @@ class Utilisateurs extends REST_Controller {
         } 
         else 
         {       
+            if ($profil == 1) 
+            {
+                $data = array(
+                    'nom' => $this->post('nom'),
+                    'prenom' => $this->post('prenom'),
+                    'email' => $this->post('email'),
+                    'password' => sha1($this->post('password'))
+          
+                );
+
+                if (!$data) {
+                    $this->response([
+                        'status' => FALSE,
+                        'response' => 0,
+                        'message' => 'No request found'
+                            ], REST_Controller::HTTP_OK);
+                }
+
+                $dataId = $this->UserManager->update_profil($id, $data);
+                if (!is_null($dataId)) {
+                    $this->response([
+                        'status' => TRUE,
+                        'response' => $dataId
+                            ], REST_Controller::HTTP_OK);
+                } else {
+                    $this->response([
+                        'status' => FALSE,
+                        'message' => 'No request found 2'
+                            ], REST_Controller::HTTP_OK);
+                }
+            }
+            else
+            {
                 $getrole = array("USER");
                 $data = array(
                     'nom' => $this->post('nom'),
@@ -478,7 +512,9 @@ class Utilisateurs extends REST_Controller {
                         'status' => FALSE,
                        'message' => 'No request found'
                             ], REST_Controller::HTTP_OK);
-                }           
+                }  
+            }
+                         
         }       
     }
 } 

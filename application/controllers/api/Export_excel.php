@@ -129,6 +129,12 @@ class Export_excel extends REST_Controller {
             }
 
 
+            if ($menu == 'liste_beneficiaire_intevention') 
+            {
+                $data = $this->Systeme_protection_socialManager->liste_beneficiaire_intevention($this->generer_requete_filtre($id_region,$id_district,$id_commune,$id_intervention)) ;   
+            }
+
+
             
 
             
@@ -2276,6 +2282,93 @@ class Export_excel extends REST_Controller {
 
                     $objPHPExcel->getActiveSheet()->getStyle("A".$ligne.":H".$ligne)->applyFromArray($stylecontenu);
                 $objPHPExcel->getActiveSheet()->getStyle("A".$ligne.":H".$ligne)->getAlignment()->setWrapText(true);
+                $objPHPExcel->getActiveSheet()->getRowDimension($ligne)->setRowHeight(30);
+                    $ligne++;
+                }
+            }
+
+            if ($menu == 'liste_beneficiaire_intevention') 
+            {
+                $objPHPExcel->getActiveSheet()->getColumnDimension('A')->setAutoSize(true);
+                $objPHPExcel->getActiveSheet()->getColumnDimension('B')->setAutoSize(true);
+                $objPHPExcel->getActiveSheet()->getColumnDimension('C')->setAutoSize(true);
+                $objPHPExcel->getActiveSheet()->getColumnDimension('D')->setAutoSize(true);
+                $objPHPExcel->getActiveSheet()->getColumnDimension('E')->setAutoSize(true);
+                $objPHPExcel->getActiveSheet()->getColumnDimension('F')->setAutoSize(true);
+                $objPHPExcel->getActiveSheet()->getColumnDimension('G')->setAutoSize(true);
+                $objPHPExcel->getActiveSheet()->getColumnDimension('H')->setAutoSize(true);
+                $objPHPExcel->getActiveSheet()->getColumnDimension('I')->setAutoSize(true);
+                $objPHPExcel->getActiveSheet()->getColumnDimension('J')->setAutoSize(true);
+                $objPHPExcel->getActiveSheet()->getColumnDimension('K')->setAutoSize(true);
+                
+                $objPHPExcel->getActiveSheet()->setTitle("Tableau de bord");
+
+                $objPHPExcel->getActiveSheet()->getHeaderFooter()->setOddFooter('&R&11&B Page &P / &N');
+                $objPHPExcel->getActiveSheet()->getHeaderFooter()->setEvenFooter('&R&11&B Page &P / &N');
+
+                $objPHPExcel->getActiveSheet()->getRowDimension($ligne)->setRowHeight(30);
+                $objPHPExcel->getActiveSheet()->mergeCells("A".$ligne.":K".$ligne);
+                $objPHPExcel->getActiveSheet()->getStyle("A".$ligne.":K".$ligne)->applyFromArray($styleTitre);
+                $objPHPExcel->setActiveSheetIndex(0)->setCellValue('A'.$ligne, $nom_file);
+
+
+                $ligne = $ligne + 2 ;
+
+                $objPHPExcel->setActiveSheetIndex(0)->setCellValue('A'.$ligne, "Région: ".$data[0]->nom_region);
+                $objPHPExcel->getActiveSheet()->mergeCells("A".$ligne.":D".$ligne);
+
+                $ligne++;
+
+                
+
+
+                $objPHPExcel->setActiveSheetIndex(0)->setCellValue('A'.$ligne, "District");
+                $objPHPExcel->getActiveSheet()->mergeCells("A".$ligne.":B".$ligne);
+
+                $objPHPExcel->setActiveSheetIndex(0)->setCellValue('C'.$ligne, 'Commune');
+                $objPHPExcel->getActiveSheet()->mergeCells("C".$ligne.":D".$ligne);
+
+                $objPHPExcel->setActiveSheetIndex(0)->setCellValue('E'.$ligne, 'Fokontany');
+                $objPHPExcel->getActiveSheet()->mergeCells("E".$ligne.":F".$ligne);
+
+                $objPHPExcel->setActiveSheetIndex(0)->setCellValue('G'.$ligne, 'Intervention');
+                $objPHPExcel->getActiveSheet()->mergeCells("G".$ligne.":H".$ligne);
+
+                $objPHPExcel->setActiveSheetIndex(0)->setCellValue('I'.$ligne, 'Bénéficiaire');
+                $objPHPExcel->getActiveSheet()->mergeCells("I".$ligne.":J".$ligne);
+
+                $objPHPExcel->setActiveSheetIndex(0)->setCellValue('K'.$ligne, 'Type Bénéficiaire');
+
+
+                $objPHPExcel->getActiveSheet()->getStyle("A".$ligne.":K".$ligne)->applyFromArray($stylesousTitre);
+                $objPHPExcel->getActiveSheet()->getStyle("A".$ligne.":K".$ligne)->getAlignment()->setWrapText(true);
+                $objPHPExcel->getActiveSheet()->getRowDimension($ligne)->setRowHeight(30);
+
+                $ligne++;
+
+                foreach ($data as $key => $value) 
+                {
+                    $objPHPExcel->setActiveSheetIndex(0)->setCellValue('A'.$ligne, $value->nom_district);
+                    $objPHPExcel->getActiveSheet()->mergeCells("A".$ligne.":B".$ligne);
+
+                    $objPHPExcel->setActiveSheetIndex(0)->setCellValue('C'.$ligne, $value->nom_commune);
+                    $objPHPExcel->getActiveSheet()->mergeCells("C".$ligne.":D".$ligne);
+
+                   
+
+                    $objPHPExcel->setActiveSheetIndex(0)->setCellValue('E'.$ligne, $value->nom_fokontany);
+                    $objPHPExcel->getActiveSheet()->mergeCells("E".$ligne.":F".$ligne);
+
+                    $objPHPExcel->setActiveSheetIndex(0)->setCellValue('G'.$ligne, $value->intitule_intervention);
+                    $objPHPExcel->getActiveSheet()->mergeCells("G".$ligne.":H".$ligne);
+
+                    $objPHPExcel->setActiveSheetIndex(0)->setCellValue('I'.$ligne, strtoupper($value->nom)." ".$value->prenom);
+                    $objPHPExcel->getActiveSheet()->mergeCells("I".$ligne.":J".$ligne);
+
+                    $objPHPExcel->setActiveSheetIndex(0)->setCellValue('K'.$ligne, $value->type);
+
+                    $objPHPExcel->getActiveSheet()->getStyle("A".$ligne.":K".$ligne)->applyFromArray($stylecontenu);
+                $objPHPExcel->getActiveSheet()->getStyle("A".$ligne.":K".$ligne)->getAlignment()->setWrapText(true);
                 $objPHPExcel->getActiveSheet()->getRowDimension($ligne)->setRowHeight(30);
                     $ligne++;
                 }
