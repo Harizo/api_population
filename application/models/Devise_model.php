@@ -40,12 +40,25 @@ class Devise_model extends CI_Model {
         }  
     }
     public function findAll() {
-		// Selection de tous les enregitrements
-        $result =  $this->db->select('*')
+		// Selection de tous les enregitrements : modifie car le titre est utilisé dans la saisie cours de change
+		// et necessaire pour l'affichage croisé dynamique (en colonne par date)
+		$requete="select base.id,base.description,
+			 case when base.position_caractere >0 then
+				concat_ws('_',substring(lower(base.description) from 1 for (base.position_caractere - 1)),
+				substring(lower(base.description) from (base.position_caractere + 1)))
+			 else
+				lower(base.description)
+			 end as titre
+			 from 
+			 (
+			 select id,description,position(' ' in description) as position_caractere from devise
+			 order by id ) as base";
+		$result = $this->db->query($requete)->result();
+        /*$result =  $this->db->select('*')
                         ->from($this->table)
                         ->order_by('description')
                         ->get()
-                        ->result();
+                        ->result();*/
         if($result) {
             return $result;
         }else{
