@@ -1,60 +1,45 @@
 <?php
 
 defined('BASEPATH') OR exit('No direct script access allowed');
+//harizo
+// afaka fafana refa ts ilaina
 require APPPATH . '/libraries/REST_Controller.php';
 
-class Liste_variable extends REST_Controller {
+class Listecanevasformate extends REST_Controller {
 
     public function __construct() {
         parent::__construct();
-        $this->load->model('liste_variable_model', 'ListevariableManager');
-        $this->load->model('variable_model', 'VariableManager');
+        $this->load->model('listecanevasformate_model', 'ListecanevasformateManager');
     }
-    //recuperation liste variable
+public function convertDateAngular($daty){
+	// Conversion date angular en format Y-m-d
+        if(isset($daty) && $daty != ""){
+            if(strlen($daty) >33) {
+                $daty=substr($daty,0,33);
+            }
+            $xx  = new DateTime($daty);
+            if($xx->getTimezone()->getName() == "Z"){
+                $xx->add(new DateInterval("P1D"));
+                return $xx->format("Y-m-d");
+            }else{
+                return $xx->format("Y-m-d");
+            }
+        }else{
+            return null;
+        }
+    }
     public function index_get() {
-        $id = $this->get('id');
-		if ($id) {
-			$data = array();
-			$listevar = $this->ListevariableManager->findById($id);
-			$data['id'] = $listevar->id;
-			$data['code'] = $listevar->code;
-			$data['description'] = $listevar->description;			
-			$data['choix_unique'] = $listevar->choix_unique;			
+        $data = array();
+		$id = $this->get('id');
+        if ($id) {
+			// Récupération des recommandations non id
+            $data = $this->ListecanevasformateManager->findById();
 		} else {
-			$listevar = $this->ListevariableManager->findAll();
-			if ($listevar) {
-				foreach ($listevar as $key => $value) {                      
-					$data[$key]['id'] = $value->id;
-					$data[$key]['code'] = $value->code;
-					$data[$key]['description'] = $value->description;  
-					$data[$key]['choix_unique'] = $value->choix_unique;  
-					// Liste choix unique : reonse Oui ou Non
-					$liste_reponse=array();
-					if(intval($value->choix_unique)==0) {
-						$liste_reponse = array(
-							'id' => 0,
-							'libelle' => "Non"
-						); 
-						$ng_model=null;	
-					} else {
-						$liste_reponse = array(
-							'id' => 1,
-							'libelle' => "Oui"
-						);  
-						$ng_model="model_".$value->id;
-					}
-					$data[$key]['liste_reponse']=$liste_reponse;	
-					$data[$key]['ng_model']=$ng_model;	
-					$data[$key]['detail_variable']=array();	
-					// DÃ©tail liste variable pour chaque id
-					$temporaire = $this->VariableManager->findAllByIdlistevariable($value->id);
-					if($temporaire) {
-						$data[$key]['detail_variable']=$temporaire;
-					}
-				};
-			} else
-				$data = array();
-		}
+			// Récupération de tous les recommandations
+            $data = $this->ListecanevasformateManager->getlescanevasformate();
+		}	
+		if(!$data)
+			$data=array();
         if (count($data)>0) {
             $this->response([
                 'status' => TRUE,
@@ -69,18 +54,31 @@ class Liste_variable extends REST_Controller {
             ], REST_Controller::HTTP_OK);
         }
     }
-    //insertion,modification,suppression liste variable
     public function index_post() {
         $id = $this->post('id') ;
         $supprimer = $this->post('supprimer') ;
-        if ($supprimer == 0) {
-            if ($id == 0) {
-				// Nouvel enregistrement
-                $data = array(
-                    'code' => $this->post('code'),
-                    'description' => $this->post('description'),
-                    'choix_unique' => $this->post('choix_unique'),
-                );               
+        $dateupld = $this->convertDateAngular($this->post('date_upload'));     
+		$emplacement = $this->post('repertoire');
+		$temporaire = $this->post('id_utilisateur');
+		$id_utilisateur=null;
+		if(isset($temporaire) && $temporaire !="" && intval($temporaire) >0) {
+			$id_utilisateur=$temporaire;
+		}		
+		$temporaire = $this->post('site_id');
+		$site_id=null;
+		if(isset($temporaire) && $temporaire !="" && intval($temporaire) >0) {
+			$site_id=$temporaire;
+		}	
+		// Affectation des valeurs
+		$data = array(
+			'resume' => $this->post('resume'),
+			'id_utilisateur' => $id_utilisateur,
+			'nom_fichier' => $this->post('nom_fichier'),
+			'repertoire' => $this->post('repertoire'),
+			'date_upload' => $dateupld,
+		);
+        if ($supprimer == 0)  {
+            if ($id == 0)  {
                 if (!$data) {
                     $this->response([
                         'status' => FALSE,
@@ -88,7 +86,9 @@ class Liste_variable extends REST_Controller {
                         'message' => 'No request found'
                             ], REST_Controller::HTTP_BAD_REQUEST);
                 }
-                $dataId = $this->ListevariableManager->add($data);              
+				// Ajout d'un enregistrement
+                $dataId = $this->ListecanevasformateManager->add($data);
+                
                 if (!is_null($dataId)) {
                     $this->response([
                         'status' => TRUE,
@@ -102,13 +102,7 @@ class Liste_variable extends REST_Controller {
                         'message' => 'No request found'
                             ], REST_Controller::HTTP_BAD_REQUEST);
                 }
-            } else {
-				// Mise Ã  jour d'un enregistrement
-                $data = array(
-                    'code' => $this->post('code'),
-                    'description' => $this->post('description'),
-                    'choix_unique' => $this->post('choix_unique')
-                );              
+            }  else {
                 if (!$data || !$id) {
                     $this->response([
                         'status' => FALSE,
@@ -116,10 +110,11 @@ class Liste_variable extends REST_Controller {
                         'message' => 'No request found'
                             ], REST_Controller::HTTP_BAD_REQUEST);
                 }
-                $update = $this->ListevariableManager->update($id, $data);              
-                if(!is_null($update)){
+				// Mise à jour d'un enregistrement
+                $update = $this->ListecanevasformateManager->update($id, $data);
+                if(!is_null($update)) {
                     $this->response([
-                        'status' => TRUE, 
+                        'status' => TRUE,
                         'response' => 1,
                         'message' => 'Update data success'
                             ], REST_Controller::HTTP_OK);
@@ -130,16 +125,16 @@ class Liste_variable extends REST_Controller {
                             ], REST_Controller::HTTP_OK);
                 }
             }
-        } else {
+        } else  {
             if (!$id) {
-            $this->response([
-            'status' => FALSE,
-            'response' => 0,
-            'message' => 'No request found'
-                ], REST_Controller::HTTP_BAD_REQUEST);
+                $this->response([
+                    'status' => FALSE,
+                    'response' => 0,
+                    'message' => 'No request found'
+                        ], REST_Controller::HTTP_BAD_REQUEST);
             }
 			// Suppression d'un enregistrement
-            $delete = $this->ListevariableManager->delete($id);          
+            $delete = $this->ListecanevasformateManager->delete($id);     
             if (!is_null($delete)) {
                 $this->response([
                     'status' => TRUE,
@@ -151,9 +146,9 @@ class Liste_variable extends REST_Controller {
                     'status' => FALSE,
                     'response' => 0,
                     'message' => 'No request found'
-                        ], REST_Controller::HTTP_OK);
+                        ], REST_Controller::HTTP_BAD_REQUEST);
             }
-        }   
+        }        
     }
 }
 /* End of file controllername.php */
