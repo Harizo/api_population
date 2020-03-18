@@ -1,0 +1,25 @@
+-- Table: public.liste_canevas_formtate
+
+-- DROP TABLE public.liste_canevas_formtate;
+
+CREATE TABLE public.liste_canevas_formtate
+(
+    id serial NOT NULL DEFAULT nextval('liste_canevas_formate_id_seq'::regclass),
+    resume character varying(150) COLLATE pg_catalog."default",
+    id_utilisateur integer,
+    nom_fichier character varying(255) COLLATE pg_catalog."default",
+    repertoire character varying(255) COLLATE pg_catalog."default",
+    date_upload date,
+    CONSTRAINT liste_canevas_formate_pkey PRIMARY KEY (id),
+    CONSTRAINT liste_canevas_formate_id_utilisateur_fkey FOREIGN KEY (id_utilisateur)
+        REFERENCES public.utilisateur (id) MATCH SIMPLE
+        ON UPDATE CASCADE
+        ON DELETE RESTRICT
+)
+WITH (
+    OIDS = FALSE
+)
+TABLESPACE pg_default;
+
+ALTER TABLE public.liste_canevas_formtate
+    OWNER to postgres;

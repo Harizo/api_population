@@ -28,8 +28,9 @@ class Liste_variable_model extends CI_Model
 	// Affectation colonne de la table
     public function _set($liste_variable)  {
         return array(
-            'code'        => $liste_variable['code'],
-            'description' => $liste_variable['description'],
+            'code'         => $liste_variable['code'],
+            'description'  => $liste_variable['description'],
+            'choix_unique' => $liste_variable['choix_unique'],
         );
     }
 	// Suppression d'un enregistrement

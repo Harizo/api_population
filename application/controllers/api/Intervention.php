@@ -110,7 +110,8 @@ class Intervention extends REST_Controller {
                     $data[$key]['id_nomenclature_intervention'] = $value->id_nomenclature_intervention;
                     $data[$key]['nomenclatureintervention'] = $nomenclatureintervention;
                     $data[$key]['detail_financement_intervention'] = array();
-                    $data[$key]['detail_zone_intervention'] = array();
+                    $data[$key]['detail_zone_intervention_unique'] = array(); // Choix unique
+                    $data[$key]['detail_zone_intervention_multiple'] = array(); // Choix unique
                     $data[$key]['detail_type_transfert'] = array();
                     $data[$key]['detail_charge'] = 0;
 				}
