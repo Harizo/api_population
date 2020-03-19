@@ -362,7 +362,7 @@ class Utilisateurs extends REST_Controller {
                     
                     //LIEN DE L'APPLICATION
 
-                    $data["connexion"] = "localhost/sys3p";
+                    $data["connexion"] = "41.207.51.186/registresocial/";
 
 
                     //LIEN DE L'APPLICATION

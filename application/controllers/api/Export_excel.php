@@ -2383,6 +2383,7 @@ class Export_excel extends REST_Controller {
         try
         {
             $objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel2007');
+           // $objWriter->save(dirname(__FILE__) . "/../../../../exportexcel/".$repertoire.$nom_file.".xlsx");
             $objWriter->save(dirname(__FILE__) . "/../../../../exportexcel/".$repertoire.$nom_file.".xlsx");
             
             $this->response([
