@@ -1491,7 +1491,11 @@ class Validationbeneficiaire extends CI_Controller {
 						$age=intval($age);
 						$date_par_defaut = $annee_actuelle."-01-01";	
 						$date_par_defaut = new DateTime($date_par_defaut);
-						$date_naissance = $date_par_defaut->sub(DateInterval::createFromDateString("'".$age." year'"));
+						
+						$now = date('Y-m-d');
+						$date_naissance = date('Y-m-d', strtotime($now. ' -'.$age.' years +1 days'));
+						
+						// $date_naissance = $date_par_defaut->sub(DateInterval::createFromDateString("'".$age." year'"));
 						$date_naissance=$date_naissance->format("d/m/Y");
 						$sheet->setCellValue('F'.$ligne, $date_naissance);
 						// $sheet->setCellValue('I3', $id_fokontany);
