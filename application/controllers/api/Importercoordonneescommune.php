@@ -359,7 +359,7 @@ class Importercoordonneescommune extends CI_Controller {
 		$nombre_miseajour=0;
 		foreach($les_communes as $k=>$v) {
 			$id_commune = $v->id;
-			// if($id_commune==240 || $id_commune==21) { // Pour test
+			if($id_commune==240 || $id_commune==21) { // Pour test
 				$liste_coordonees=$this->ImportercoordonneescommuneManager->selection_coordonnees_commune($id_commune);
 				$coordonnees_text="";
 				$resultat_coordonnees=array();
@@ -379,9 +379,9 @@ class Importercoordonneescommune extends CI_Controller {
 					$coordonnees_text=explode(",",$coordonnees_text);
 					foreach($coordonnees_text as $indice=>$valeur) {
 						// Eclater chaque élément en 2 parties : latitude et longitude
-						$position_espace=strpos($valeur," ");
-						$longitude=substr($valeur,0,$position_espace);
-						$latitude=substr($valeur,($position_espace + 1));
+						$position_espace=strpos($valeur,"-");
+						$longitude=substr($valeur,0,($position_espace - 1));
+						$latitude=substr($valeur,($position_espace));
 						$valeur_temp=array();
 						$valeur_temp["latitude"]=$latitude;
 						$valeur_temp["longitude"]=$longitude;						
@@ -393,7 +393,7 @@ class Importercoordonneescommune extends CI_Controller {
 					}
 				}
 			}	
-			// }	
+			}	
 		}
 		echo json_encode($nombre_miseajour);
 	}
