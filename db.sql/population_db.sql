@@ -18,7 +18,6 @@ CREATE DATABASE IF NOT EXISTS `population_db` /*!40100 DEFAULT CHARACTER SET utf
 USE `population_db`;
 
 -- Export de la structure de la table population_db. acteur
-DROP TABLE IF EXISTS `acteur`;
 CREATE TABLE IF NOT EXISTS `acteur` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `code` varchar(10) DEFAULT NULL,
@@ -47,7 +46,6 @@ INSERT INTO `acteur` (`id`, `code`, `nom`, `nif`, `representant`, `adresse`, `id
 /*!40000 ALTER TABLE `acteur` ENABLE KEYS */;
 
 -- Export de la structure de la table population_db. action_strategique
-DROP TABLE IF EXISTS `action_strategique`;
 CREATE TABLE IF NOT EXISTS `action_strategique` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `code` varchar(20) DEFAULT '',
@@ -78,7 +76,6 @@ INSERT INTO `action_strategique` (`id`, `code`, `id_axe_strategique`, `action`) 
 /*!40000 ALTER TABLE `action_strategique` ENABLE KEYS */;
 
 -- Export de la structure de la table population_db. alimentation
-DROP TABLE IF EXISTS `alimentation`;
 CREATE TABLE IF NOT EXISTS `alimentation` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
   `id_menage` int(11) DEFAULT NULL,
@@ -95,7 +92,6 @@ CREATE TABLE IF NOT EXISTS `alimentation` (
 /*!40000 ALTER TABLE `alimentation` ENABLE KEYS */;
 
 -- Export de la structure de la table population_db. axe_strategique
-DROP TABLE IF EXISTS `axe_strategique`;
 CREATE TABLE IF NOT EXISTS `axe_strategique` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `axe` longtext,
@@ -114,7 +110,6 @@ INSERT INTO `axe_strategique` (`id`, `axe`, `code`, `objectif`) VALUES
 /*!40000 ALTER TABLE `axe_strategique` ENABLE KEYS */;
 
 -- Export de la structure de la table population_db. biens_equipements
-DROP TABLE IF EXISTS `biens_equipements`;
 CREATE TABLE IF NOT EXISTS `biens_equipements` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
   `id_menage` int(11) DEFAULT NULL,
@@ -131,7 +126,6 @@ CREATE TABLE IF NOT EXISTS `biens_equipements` (
 /*!40000 ALTER TABLE `biens_equipements` ENABLE KEYS */;
 
 -- Export de la structure de la table population_db. combustible
-DROP TABLE IF EXISTS `combustible`;
 CREATE TABLE IF NOT EXISTS `combustible` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `id_menage` int(11) DEFAULT NULL,
@@ -148,12 +142,12 @@ CREATE TABLE IF NOT EXISTS `combustible` (
 /*!40000 ALTER TABLE `combustible` ENABLE KEYS */;
 
 -- Export de la structure de la table population_db. commune
-DROP TABLE IF EXISTS `commune`;
 CREATE TABLE IF NOT EXISTS `commune` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
   `code` varchar(10) DEFAULT '',
   `nom` varchar(100) DEFAULT '',
   `district_id` int(11) DEFAULT NULL,
-  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `coordonnees` text,
   PRIMARY KEY (`id`),
   KEY `commune_district_id_idx` (`district_id`),
   CONSTRAINT `FK_commune_district` FOREIGN KEY (`district_id`) REFERENCES `district` (`id`) ON UPDATE CASCADE
@@ -161,61 +155,75 @@ CREATE TABLE IF NOT EXISTS `commune` (
 
 -- Export de données de la table population_db.commune : ~50 rows (environ)
 /*!40000 ALTER TABLE `commune` DISABLE KEYS */;
-INSERT INTO `commune` (`code`, `nom`, `district_id`, `id`) VALUES
-	('10401', 'Ambohidratrimo', 4, 1),
-	('10402', 'Anosiala', 4, 2),
-	('10403', 'Talatamaty', 4, 3),
-	('10404', 'Antehiroka', 4, 4),
-	('10405', 'Iarinarivo', 4, 5),
-	('10406', 'Ivato-Firaisana', 4, 6),
-	('10407', 'Ivato-Airport', 4, 7),
-	('10408', 'Ambohitrimanjaka', 4, 8),
-	('10409', 'Mahitsy', 4, 9),
-	('10410', 'Merimandroso', 4, 10),
-	('10411', 'Ambatolampy', 4, 11),
-	('10412', 'Ampangabe', 4, 12),
-	('10413', 'Ampanotokana', 4, 13),
-	('10414', 'Mananjara', 4, 14),
-	('10415', 'Manjakavaradrano', 4, 15),
-	('10416', 'Antsahafilo', 4, 16),
-	('10417', 'Ambohimanjaka', 4, 17),
-	('10418', 'Fiadanana', 4, 18),
-	('10419', 'Mahabo', 4, 19),
-	('10420', 'Mahereza', 4, 20),
-	('10421', 'Antanetibe', 4, 21),
-	('10422', 'Ambohipihaonana', 4, 22),
-	('10423', 'Ambato', 4, 23),
-	('10424', 'Anjanadoria', 4, 24),
-	('10425', 'Avaratsena', 4, 25),
-	('10801', 'Andramasina', 8, 26),
-	('10802', 'Sabotsy-Ambohitromby', 8, 27),
-	('10803', 'Andohariana', 8, 28),
-	('10804', 'Mandrosoa', 8, 29),
-	('10805', 'Alatsinainy-Bakaro', 8, 30),
-	('10806', 'Antotohazo', 8, 31),
-	('10807', 'Ambohimiadana', 8, 32),
-	('10808', 'Tankafatra', 8, 33),
-	('10809', 'Alarobia-Vatosola', 8, 34),
-	('10810', 'Fitsinjovana-Bakaro', 8, 35),
-	('10811', 'Sabotsy-Manjakavahoaka', 8, 36),
-	('10812', 'Anosibe-Trimoloharano', 8, 37),
-	('10501', 'Ankazobe', 5, 38),
-	('10502', 'Talata-Angavo', 5, 39),
-	('10503', 'Ambohitromby', 5, 40),
-	('10504', 'Antotohazo', 5, 41),
-	('10505', 'Marondry', 5, 42),
-	('10506', 'Fihaonana', 5, 43),
-	('10507', 'Mahavelona', 5, 44),
-	('10508', 'Fiadanana', 5, 45),
-	('10509', 'Tsaramasoandro', 5, 46),
-	('10510', 'Ambolotarakely', 5, 47),
-	('10511', 'Antakavana', 5, 48),
-	('10512', 'Kiangara', 5, 49),
-	('10513', 'Miantso', 5, 50);
+INSERT INTO `commune` (`id`, `code`, `nom`, `district_id`, `coordonnees`) VALUES
+	(1, '10401', 'Ambohidratrimo', 4, NULL),
+	(2, '10402', 'Anosiala', 4, NULL),
+	(3, '10403', 'Talatamaty', 4, NULL),
+	(4, '10404', 'Antehiroka', 4, NULL),
+	(5, '10405', 'Iarinarivo', 4, NULL),
+	(6, '10406', 'Ivato-Firaisana', 4, NULL),
+	(7, '10407', 'Ivato-Airport', 4, NULL),
+	(8, '10408', 'Ambohitrimanjaka', 4, NULL),
+	(9, '10409', 'Mahitsy', 4, NULL),
+	(10, '10410', 'Merimandroso', 4, NULL),
+	(11, '10411', 'Ambatolampy', 4, NULL),
+	(12, '10412', 'Ampangabe', 4, NULL),
+	(13, '10413', 'Ampanotokana', 4, NULL),
+	(14, '10414', 'Mananjara', 4, NULL),
+	(15, '10415', 'Manjakavaradrano', 4, NULL),
+	(16, '10416', 'Antsahafilo', 4, NULL),
+	(17, '10417', 'Ambohimanjaka', 4, NULL),
+	(18, '10418', 'Fiadanana', 4, NULL),
+	(19, '10419', 'Mahabo', 4, NULL),
+	(20, '10420', 'Mahereza', 4, NULL),
+	(21, '10421', 'Antanetibe', 4, NULL),
+	(22, '10422', 'Ambohipihaonana', 4, NULL),
+	(23, '10423', 'Ambato', 4, NULL),
+	(24, '10424', 'Anjanadoria', 4, NULL),
+	(25, '10425', 'Avaratsena', 4, NULL),
+	(26, '10801', 'Andramasina', 8, NULL),
+	(27, '10802', 'Sabotsy-Ambohitromby', 8, NULL),
+	(28, '10803', 'Andohariana', 8, NULL),
+	(29, '10804', 'Mandrosoa', 8, NULL),
+	(30, '10805', 'Alatsinainy-Bakaro', 8, NULL),
+	(31, '10806', 'Antotohazo', 8, NULL),
+	(32, '10807', 'Ambohimiadana', 8, NULL),
+	(33, '10808', 'Tankafatra', 8, NULL),
+	(34, '10809', 'Alarobia-Vatosola', 8, NULL),
+	(35, '10810', 'Fitsinjovana-Bakaro', 8, NULL),
+	(36, '10811', 'Sabotsy-Manjakavahoaka', 8, NULL),
+	(37, '10812', 'Anosibe-Trimoloharano', 8, NULL),
+	(38, '10501', 'Ankazobe', 5, NULL),
+	(39, '10502', 'Talata-Angavo', 5, NULL),
+	(40, '10503', 'Ambohitromby', 5, NULL),
+	(41, '10504', 'Antotohazo', 5, NULL),
+	(42, '10505', 'Marondry', 5, NULL),
+	(43, '10506', 'Fihaonana', 5, NULL),
+	(44, '10507', 'Mahavelona', 5, NULL),
+	(45, '10508', 'Fiadanana', 5, NULL),
+	(46, '10509', 'Tsaramasoandro', 5, NULL),
+	(47, '10510', 'Ambolotarakely', 5, NULL),
+	(48, '10511', 'Antakavana', 5, NULL),
+	(49, '10512', 'Kiangara', 5, NULL),
+	(50, '10513', 'Miantso', 5, NULL);
 /*!40000 ALTER TABLE `commune` ENABLE KEYS */;
 
+-- Export de la structure de la table population_db. cours_de_change
+CREATE TABLE IF NOT EXISTS `cours_de_change` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `id_devise` int(11) DEFAULT NULL,
+  `date_cours` date DEFAULT NULL,
+  `cours` decimal(10,2) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `FK_cours_de_change_devise` (`id_devise`),
+  CONSTRAINT `FK_cours_de_change_devise` FOREIGN KEY (`id_devise`) REFERENCES `devise` (`id`) ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- Export de données de la table population_db.cours_de_change : ~0 rows (environ)
+/*!40000 ALTER TABLE `cours_de_change` DISABLE KEYS */;
+/*!40000 ALTER TABLE `cours_de_change` ENABLE KEYS */;
+
 -- Export de la structure de la table population_db. culture
-DROP TABLE IF EXISTS `culture`;
 CREATE TABLE IF NOT EXISTS `culture` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
   `id_menage` int(11) DEFAULT NULL,
@@ -232,7 +240,6 @@ CREATE TABLE IF NOT EXISTS `culture` (
 /*!40000 ALTER TABLE `culture` ENABLE KEYS */;
 
 -- Export de la structure de la table population_db. culture_femme
-DROP TABLE IF EXISTS `culture_femme`;
 CREATE TABLE IF NOT EXISTS `culture_femme` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `id_menage` int(11) DEFAULT NULL,
@@ -249,7 +256,6 @@ CREATE TABLE IF NOT EXISTS `culture_femme` (
 /*!40000 ALTER TABLE `culture_femme` ENABLE KEYS */;
 
 -- Export de la structure de la table population_db. decaissement
-DROP TABLE IF EXISTS `decaissement`;
 CREATE TABLE IF NOT EXISTS `decaissement` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `id_financement_intervention` int(11) DEFAULT NULL,
@@ -292,7 +298,6 @@ INSERT INTO `decaissement` (`id`, `id_financement_intervention`, `nom_informateu
 /*!40000 ALTER TABLE `decaissement` ENABLE KEYS */;
 
 -- Export de la structure de la table population_db. detail_type_transfert
-DROP TABLE IF EXISTS `detail_type_transfert`;
 CREATE TABLE IF NOT EXISTS `detail_type_transfert` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `description` varchar(50) DEFAULT '',
@@ -340,7 +345,6 @@ INSERT INTO `detail_type_transfert` (`id`, `description`, `id_unite_mesure`, `id
 /*!40000 ALTER TABLE `detail_type_transfert` ENABLE KEYS */;
 
 -- Export de la structure de la table population_db. detail_type_transfert_intervention
-DROP TABLE IF EXISTS `detail_type_transfert_intervention`;
 CREATE TABLE IF NOT EXISTS `detail_type_transfert_intervention` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `id_intervention` int(11) DEFAULT NULL,
@@ -361,7 +365,6 @@ INSERT INTO `detail_type_transfert_intervention` (`id`, `id_intervention`, `id_d
 /*!40000 ALTER TABLE `detail_type_transfert_intervention` ENABLE KEYS */;
 
 -- Export de la structure de la table population_db. devise
-DROP TABLE IF EXISTS `devise`;
 CREATE TABLE IF NOT EXISTS `devise` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `description` varchar(15) DEFAULT '',
@@ -376,7 +379,6 @@ INSERT INTO `devise` (`id`, `description`) VALUES
 /*!40000 ALTER TABLE `devise` ENABLE KEYS */;
 
 -- Export de la structure de la table population_db. difficultes_alimentaires
-DROP TABLE IF EXISTS `difficultes_alimentaires`;
 CREATE TABLE IF NOT EXISTS `difficultes_alimentaires` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
   `id_menage` int(11) DEFAULT NULL,
@@ -393,7 +395,6 @@ CREATE TABLE IF NOT EXISTS `difficultes_alimentaires` (
 /*!40000 ALTER TABLE `difficultes_alimentaires` ENABLE KEYS */;
 
 -- Export de la structure de la table population_db. district
-DROP TABLE IF EXISTS `district`;
 CREATE TABLE IF NOT EXISTS `district` (
   `code` varchar(10) DEFAULT '',
   `nom` varchar(45) DEFAULT '',
@@ -460,7 +461,6 @@ INSERT INTO `district` (`code`, `nom`, `region_id`, `id`) VALUES
 /*!40000 ALTER TABLE `district` ENABLE KEYS */;
 
 -- Export de la structure de la table population_db. eclairage
-DROP TABLE IF EXISTS `eclairage`;
 CREATE TABLE IF NOT EXISTS `eclairage` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `id_menage` int(11) DEFAULT NULL,
@@ -477,7 +477,6 @@ CREATE TABLE IF NOT EXISTS `eclairage` (
 /*!40000 ALTER TABLE `eclairage` ENABLE KEYS */;
 
 -- Export de la structure de la table population_db. elevage
-DROP TABLE IF EXISTS `elevage`;
 CREATE TABLE IF NOT EXISTS `elevage` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
   `id_menage` int(11) DEFAULT NULL,
@@ -494,7 +493,6 @@ CREATE TABLE IF NOT EXISTS `elevage` (
 /*!40000 ALTER TABLE `elevage` ENABLE KEYS */;
 
 -- Export de la structure de la table population_db. engagement_activite
-DROP TABLE IF EXISTS `engagement_activite`;
 CREATE TABLE IF NOT EXISTS `engagement_activite` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `id_menage` int(11) DEFAULT NULL,
@@ -511,7 +509,6 @@ CREATE TABLE IF NOT EXISTS `engagement_activite` (
 /*!40000 ALTER TABLE `engagement_activite` ENABLE KEYS */;
 
 -- Export de la structure de la table population_db. enquete_individu
-DROP TABLE IF EXISTS `enquete_individu`;
 CREATE TABLE IF NOT EXISTS `enquete_individu` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `id_individu` int(11) DEFAULT NULL,
@@ -553,7 +550,6 @@ INSERT INTO `enquete_individu` (`id`, `id_individu`, `id_lien_de_parente`, `id_h
 /*!40000 ALTER TABLE `enquete_individu` ENABLE KEYS */;
 
 -- Export de la structure de la table population_db. enquete_menage
-DROP TABLE IF EXISTS `enquete_menage`;
 CREATE TABLE IF NOT EXISTS `enquete_menage` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `id_menage` int(11) DEFAULT NULL,
@@ -595,7 +591,6 @@ INSERT INTO `enquete_menage` (`id`, `id_menage`, `id_type_logement`, `id_occupat
 /*!40000 ALTER TABLE `enquete_menage` ENABLE KEYS */;
 
 -- Export de la structure de la table population_db. financement_intervention
-DROP TABLE IF EXISTS `financement_intervention`;
 CREATE TABLE IF NOT EXISTS `financement_intervention` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `id_intervention` int(11) DEFAULT NULL,
@@ -625,7 +620,6 @@ INSERT INTO `financement_intervention` (`id`, `id_intervention`, `id_source_fina
 /*!40000 ALTER TABLE `financement_intervention` ENABLE KEYS */;
 
 -- Export de la structure de la table population_db. financement_programme
-DROP TABLE IF EXISTS `financement_programme`;
 CREATE TABLE IF NOT EXISTS `financement_programme` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `id_programme` int(11) DEFAULT NULL,
@@ -656,7 +650,6 @@ INSERT INTO `financement_programme` (`id`, `id_programme`, `id_source_financemen
 /*!40000 ALTER TABLE `financement_programme` ENABLE KEYS */;
 
 -- Export de la structure de la table population_db. fokontany
-DROP TABLE IF EXISTS `fokontany`;
 CREATE TABLE IF NOT EXISTS `fokontany` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `code` longtext NOT NULL,
@@ -725,7 +718,6 @@ INSERT INTO `fokontany` (`id`, `code`, `nom`, `id_commune`, `latitude`, `longitu
 /*!40000 ALTER TABLE `fokontany` ENABLE KEYS */;
 
 -- Export de la structure de la table population_db. frequence_transfert
-DROP TABLE IF EXISTS `frequence_transfert`;
 CREATE TABLE IF NOT EXISTS `frequence_transfert` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `code` varchar(5) DEFAULT '',
@@ -746,7 +738,6 @@ INSERT INTO `frequence_transfert` (`id`, `code`, `description`) VALUES
 /*!40000 ALTER TABLE `frequence_transfert` ENABLE KEYS */;
 
 -- Export de la structure de la table population_db. groupe_appartenance
-DROP TABLE IF EXISTS `groupe_appartenance`;
 CREATE TABLE IF NOT EXISTS `groupe_appartenance` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `code` varchar(2) DEFAULT '',
@@ -763,7 +754,6 @@ INSERT INTO `groupe_appartenance` (`id`, `code`, `description`) VALUES
 /*!40000 ALTER TABLE `groupe_appartenance` ENABLE KEYS */;
 
 -- Export de la structure de la table population_db. handicap_auditif
-DROP TABLE IF EXISTS `handicap_auditif`;
 CREATE TABLE IF NOT EXISTS `handicap_auditif` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `description` varchar(100) DEFAULT '',
@@ -779,7 +769,6 @@ INSERT INTO `handicap_auditif` (`id`, `description`, `code`) VALUES
 /*!40000 ALTER TABLE `handicap_auditif` ENABLE KEYS */;
 
 -- Export de la structure de la table population_db. handicap_mental
-DROP TABLE IF EXISTS `handicap_mental`;
 CREATE TABLE IF NOT EXISTS `handicap_mental` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `description` longtext,
@@ -796,7 +785,6 @@ INSERT INTO `handicap_mental` (`id`, `description`, `code`) VALUES
 /*!40000 ALTER TABLE `handicap_mental` ENABLE KEYS */;
 
 -- Export de la structure de la table population_db. handicap_moteur
-DROP TABLE IF EXISTS `handicap_moteur`;
 CREATE TABLE IF NOT EXISTS `handicap_moteur` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `description` longtext,
@@ -812,7 +800,6 @@ INSERT INTO `handicap_moteur` (`id`, `description`, `code`) VALUES
 /*!40000 ALTER TABLE `handicap_moteur` ENABLE KEYS */;
 
 -- Export de la structure de la table population_db. handicap_parole
-DROP TABLE IF EXISTS `handicap_parole`;
 CREATE TABLE IF NOT EXISTS `handicap_parole` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `description` longtext,
@@ -828,7 +815,6 @@ INSERT INTO `handicap_parole` (`id`, `description`, `code`) VALUES
 /*!40000 ALTER TABLE `handicap_parole` ENABLE KEYS */;
 
 -- Export de la structure de la table population_db. handicap_visuel
-DROP TABLE IF EXISTS `handicap_visuel`;
 CREATE TABLE IF NOT EXISTS `handicap_visuel` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `description` longtext,
@@ -844,7 +830,6 @@ INSERT INTO `handicap_visuel` (`id`, `description`, `code`) VALUES
 /*!40000 ALTER TABLE `handicap_visuel` ENABLE KEYS */;
 
 -- Export de la structure de la table population_db. historique_utilisateur
-DROP TABLE IF EXISTS `historique_utilisateur`;
 CREATE TABLE IF NOT EXISTS `historique_utilisateur` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `id_utilisateur` int(11) DEFAULT NULL,
@@ -857,8 +842,19 @@ CREATE TABLE IF NOT EXISTS `historique_utilisateur` (
 /*!40000 ALTER TABLE `historique_utilisateur` DISABLE KEYS */;
 /*!40000 ALTER TABLE `historique_utilisateur` ENABLE KEYS */;
 
+-- Export de la structure de la table population_db. indice_vulnerabilite
+CREATE TABLE IF NOT EXISTS `indice_vulnerabilite` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `code` varchar(2) DEFAULT NULL,
+  `description` varchar(50) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- Export de données de la table population_db.indice_vulnerabilite : ~0 rows (environ)
+/*!40000 ALTER TABLE `indice_vulnerabilite` DISABLE KEYS */;
+/*!40000 ALTER TABLE `indice_vulnerabilite` ENABLE KEYS */;
+
 -- Export de la structure de la table population_db. individu
-DROP TABLE IF EXISTS `individu`;
 CREATE TABLE IF NOT EXISTS `individu` (
   `id_menage` int(11) DEFAULT NULL,
   `identifiant_unique` varchar(60) DEFAULT '',
@@ -904,6 +900,7 @@ CREATE TABLE IF NOT EXISTS `individu` (
   `handicap_parole` varchar(3) DEFAULT NULL,
   `handicap_auditif` varchar(3) DEFAULT NULL,
   `handicap_moteur` varchar(3) DEFAULT NULL,
+  `id_indice_vulnerabilite` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `FK_individu_menage` (`id_menage`),
   KEY `FK_individu_handicap_visuel` (`id_handicap_visuel`),
@@ -916,6 +913,7 @@ CREATE TABLE IF NOT EXISTS `individu` (
   KEY `FK_individu_situation_matrimoniale` (`id_situation_matrimoniale`),
   KEY `FK_individu_groupe_appartenance` (`id_groupe_appartenance`),
   KEY `FK_individu_acteur` (`id_acteur`),
+  KEY `FK_individu_indice_vulnerabilite` (`id_indice_vulnerabilite`),
   CONSTRAINT `FK_individu_acteur` FOREIGN KEY (`id_acteur`) REFERENCES `acteur` (`id`) ON UPDATE CASCADE,
   CONSTRAINT `FK_individu_groupe_appartenance` FOREIGN KEY (`id_groupe_appartenance`) REFERENCES `groupe_appartenance` (`id`) ON UPDATE CASCADE,
   CONSTRAINT `FK_individu_handicap_auditif` FOREIGN KEY (`id_handicap_auditif`) REFERENCES `handicap_auditif` (`id`) ON UPDATE CASCADE,
@@ -923,20 +921,20 @@ CREATE TABLE IF NOT EXISTS `individu` (
   CONSTRAINT `FK_individu_handicap_moteur` FOREIGN KEY (`id_handicap_moteur`) REFERENCES `handicap_moteur` (`id`) ON UPDATE CASCADE,
   CONSTRAINT `FK_individu_handicap_parole` FOREIGN KEY (`id_handicap_parole`) REFERENCES `handicap_parole` (`id`) ON UPDATE CASCADE,
   CONSTRAINT `FK_individu_handicap_visuel` FOREIGN KEY (`id_handicap_visuel`) REFERENCES `handicap_visuel` (`id`),
+  CONSTRAINT `FK_individu_indice_vulnerabilite` FOREIGN KEY (`id_indice_vulnerabilite`) REFERENCES `indice_vulnerabilite` (`id`) ON UPDATE CASCADE,
   CONSTRAINT `FK_individu_menage` FOREIGN KEY (`id_menage`) REFERENCES `menage` (`id`) ON UPDATE CASCADE,
   CONSTRAINT `FK_individu_niveau_de_classe` FOREIGN KEY (`id_niveau_de_classe`) REFERENCES `niveau_de_classe` (`id`) ON UPDATE CASCADE,
   CONSTRAINT `FK_individu_situation_matrimoniale` FOREIGN KEY (`id_situation_matrimoniale`) REFERENCES `situation_matrimoniale` (`id`) ON UPDATE CASCADE,
   CONSTRAINT `FK_individu_type_ecole` FOREIGN KEY (`id_type_ecole`) REFERENCES `type_ecole` (`id`) ON UPDATE CASCADE
 ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
 
--- Export de données de la table population_db.individu : ~1 rows (environ)
+-- Export de données de la table population_db.individu : ~0 rows (environ)
 /*!40000 ALTER TABLE `individu` DISABLE KEYS */;
-INSERT INTO `individu` (`id_menage`, `identifiant_unique`, `nom`, `prenom`, `cin`, `date_naissance`, `sexe`, `id_handicap_visuel`, `id_handicap_parole`, `id_handicap_auditif`, `id_handicap_mental`, `id_handicap_moteur`, `id_type_ecole`, `id_niveau_de_classe`, `id`, `identifiant_appariement`, `date_enregistrement`, `numero_ordre`, `numero_ordre_pere`, `numero_ordre_mere`, `inscription_etatcivil`, `possede_cin`, `numero_extrait_naissance`, `id_groupe_appartenance`, `frequente_ecole`, `avait_frequente_ecole`, `occupation`, `statut`, `date_sortie`, `commentaire`, `nom_ecole`, `flag_integration_donnees`, `nouvelle_integration`, `id_liendeparente`, `id_situation_matrimoniale`, `id_acteur`, `langue`, `decede`, `date_deces`, `chef_menage`, `handicap_visuel`, `handicap_parole`, `handicap_auditif`, `handicap_moteur`) VALUES
-	(1, '12789456', 'KOTO', 'Florent', '101211100789', '2000-03-12', 'H', NULL, NULL, 2, 1, 2, 1, 7, 1, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, b'0', NULL, NULL, NULL, NULL, 0, NULL, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO `individu` (`id_menage`, `identifiant_unique`, `nom`, `prenom`, `cin`, `date_naissance`, `sexe`, `id_handicap_visuel`, `id_handicap_parole`, `id_handicap_auditif`, `id_handicap_mental`, `id_handicap_moteur`, `id_type_ecole`, `id_niveau_de_classe`, `id`, `identifiant_appariement`, `date_enregistrement`, `numero_ordre`, `numero_ordre_pere`, `numero_ordre_mere`, `inscription_etatcivil`, `possede_cin`, `numero_extrait_naissance`, `id_groupe_appartenance`, `frequente_ecole`, `avait_frequente_ecole`, `occupation`, `statut`, `date_sortie`, `commentaire`, `nom_ecole`, `flag_integration_donnees`, `nouvelle_integration`, `id_liendeparente`, `id_situation_matrimoniale`, `id_acteur`, `langue`, `decede`, `date_deces`, `chef_menage`, `handicap_visuel`, `handicap_parole`, `handicap_auditif`, `handicap_moteur`, `id_indice_vulnerabilite`) VALUES
+	(1, '12789456', 'KOTO', 'Florent', '101211100789', '2000-03-12', 'H', NULL, NULL, 2, 1, 2, 1, 7, 1, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, b'0', NULL, NULL, NULL, NULL, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
 /*!40000 ALTER TABLE `individu` ENABLE KEYS */;
 
 -- Export de la structure de la table population_db. individu_beneficiaire
-DROP TABLE IF EXISTS `individu_beneficiaire`;
 CREATE TABLE IF NOT EXISTS `individu_beneficiaire` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `id_individu` int(11) DEFAULT NULL,
@@ -957,7 +955,6 @@ INSERT INTO `individu_beneficiaire` (`id`, `id_individu`, `id_intervention`, `da
 /*!40000 ALTER TABLE `individu_beneficiaire` ENABLE KEYS */;
 
 -- Export de la structure de la table population_db. infrastructure
-DROP TABLE IF EXISTS `infrastructure`;
 CREATE TABLE IF NOT EXISTS `infrastructure` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `id_menage` int(11) DEFAULT NULL,
@@ -974,7 +971,6 @@ CREATE TABLE IF NOT EXISTS `infrastructure` (
 /*!40000 ALTER TABLE `infrastructure` ENABLE KEYS */;
 
 -- Export de la structure de la table population_db. intervention
-DROP TABLE IF EXISTS `intervention`;
 CREATE TABLE IF NOT EXISTS `intervention` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `identifiant` varchar(25) DEFAULT '',
@@ -1021,7 +1017,6 @@ INSERT INTO `intervention` (`id`, `identifiant`, `nom_informateur`, `prenom_info
 /*!40000 ALTER TABLE `intervention` ENABLE KEYS */;
 
 -- Export de la structure de la table population_db. langue
-DROP TABLE IF EXISTS `langue`;
 CREATE TABLE IF NOT EXISTS `langue` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `id_individu` int(11) DEFAULT NULL,
@@ -1038,7 +1033,6 @@ CREATE TABLE IF NOT EXISTS `langue` (
 /*!40000 ALTER TABLE `langue` ENABLE KEYS */;
 
 -- Export de la structure de la table population_db. liendeparente
-DROP TABLE IF EXISTS `liendeparente`;
 CREATE TABLE IF NOT EXISTS `liendeparente` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `description` varchar(100) DEFAULT '',
@@ -1055,8 +1049,24 @@ INSERT INTO `liendeparente` (`id`, `description`, `code`) VALUES
 	(5, 'Enfant', '03');
 /*!40000 ALTER TABLE `liendeparente` ENABLE KEYS */;
 
+-- Export de la structure de la table population_db. liste_canevas_formate
+CREATE TABLE IF NOT EXISTS `liste_canevas_formate` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `resume` varchar(150) DEFAULT NULL,
+  `id_utilisateur` int(11) DEFAULT NULL,
+  `nom_fichier` varchar(255) DEFAULT NULL,
+  `repertoire` varchar(255) DEFAULT NULL,
+  `date_upload` date DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `FK_liste_canevas_formate_utilisateur` (`id_utilisateur`),
+  CONSTRAINT `FK_liste_canevas_formate_utilisateur` FOREIGN KEY (`id_utilisateur`) REFERENCES `utilisateur` (`id`) ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- Export de données de la table population_db.liste_canevas_formate : ~0 rows (environ)
+/*!40000 ALTER TABLE `liste_canevas_formate` DISABLE KEYS */;
+/*!40000 ALTER TABLE `liste_canevas_formate` ENABLE KEYS */;
+
 -- Export de la structure de la table population_db. liste_langue
-DROP TABLE IF EXISTS `liste_langue`;
 CREATE TABLE IF NOT EXISTS `liste_langue` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `description` varchar(15) DEFAULT '',
@@ -1077,7 +1087,6 @@ INSERT INTO `liste_langue` (`id`, `description`, `code`) VALUES
 /*!40000 ALTER TABLE `liste_langue` ENABLE KEYS */;
 
 -- Export de la structure de la table population_db. liste_recommandations
-DROP TABLE IF EXISTS `liste_recommandations`;
 CREATE TABLE IF NOT EXISTS `liste_recommandations` (
   `id` smallint(6) NOT NULL AUTO_INCREMENT,
   `resume` varchar(150) DEFAULT '',
@@ -1099,7 +1108,6 @@ INSERT INTO `liste_recommandations` (`id`, `resume`, `url`, `validation`, `utili
 /*!40000 ALTER TABLE `liste_recommandations` ENABLE KEYS */;
 
 -- Export de la structure de la table population_db. liste_validation_beneficiaire
-DROP TABLE IF EXISTS `liste_validation_beneficiaire`;
 CREATE TABLE IF NOT EXISTS `liste_validation_beneficiaire` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `id_utiliateur` int(11) DEFAULT NULL,
@@ -1127,7 +1135,6 @@ CREATE TABLE IF NOT EXISTS `liste_validation_beneficiaire` (
 /*!40000 ALTER TABLE `liste_validation_beneficiaire` ENABLE KEYS */;
 
 -- Export de la structure de la table population_db. liste_validation_intervention
-DROP TABLE IF EXISTS `liste_validation_intervention`;
 CREATE TABLE IF NOT EXISTS `liste_validation_intervention` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `id_utilisateur` int(11) DEFAULT NULL,
@@ -1149,7 +1156,6 @@ CREATE TABLE IF NOT EXISTS `liste_validation_intervention` (
 /*!40000 ALTER TABLE `liste_validation_intervention` ENABLE KEYS */;
 
 -- Export de la structure de la table population_db. liste_variable
-DROP TABLE IF EXISTS `liste_variable`;
 CREATE TABLE IF NOT EXISTS `liste_variable` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `decription` varchar(70) DEFAULT NULL,
@@ -1162,7 +1168,6 @@ CREATE TABLE IF NOT EXISTS `liste_variable` (
 /*!40000 ALTER TABLE `liste_variable` ENABLE KEYS */;
 
 -- Export de la structure de la table population_db. menage
-DROP TABLE IF EXISTS `menage`;
 CREATE TABLE IF NOT EXISTS `menage` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `identifiant_unique` varchar(60) DEFAULT '',
@@ -1202,23 +1207,25 @@ CREATE TABLE IF NOT EXISTS `menage` (
   `etat_groupe` smallint(6) NOT NULL DEFAULT '0' COMMENT '0 : Ménage; 1 : Groupe',
   `decede` smallint(6) DEFAULT '0',
   `date_deces` date DEFAULT NULL,
+  `id_indice_vulnerabilite` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `FK_menage_type_beneficiaire` (`id_type_beneficiaire`),
   KEY `FK_menage_situation_matrimoniale` (`id_situation_matrimoniale`),
   KEY `FK_menage_acteur` (`id_acteur`),
+  KEY `FK_menage_indice_vulnerabilite` (`id_indice_vulnerabilite`),
   CONSTRAINT `FK_menage_acteur` FOREIGN KEY (`id_acteur`) REFERENCES `acteur` (`id`) ON UPDATE CASCADE,
+  CONSTRAINT `FK_menage_indice_vulnerabilite` FOREIGN KEY (`id_indice_vulnerabilite`) REFERENCES `indice_vulnerabilite` (`id`) ON UPDATE CASCADE,
   CONSTRAINT `FK_menage_situation_matrimoniale` FOREIGN KEY (`id_situation_matrimoniale`) REFERENCES `situation_matrimoniale` (`id`) ON UPDATE CASCADE,
   CONSTRAINT `FK_menage_type_beneficiaire` FOREIGN KEY (`id_type_beneficiaire`) REFERENCES `type_beneficiaire` (`id`) ON UPDATE CASCADE
 ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
 
--- Export de données de la table population_db.menage : ~1 rows (environ)
+-- Export de données de la table population_db.menage : ~0 rows (environ)
 /*!40000 ALTER TABLE `menage` DISABLE KEYS */;
-INSERT INTO `menage` (`id`, `identifiant_unique`, `nom`, `prenom`, `cin`, `chef_menage`, `adresse`, `date_naissance`, `nombre_beneficiaire`, `profession`, `tranche_age`, `id_situation_matrimoniale`, `sexe`, `date_inscription`, `revenu_mensuel`, `depense_mensuel`, `id_fokontany`, `id_type_beneficiaire`, `identifiant_appariement`, `numero_sequentiel`, `lieu_residence`, `surnom_chefmenage`, `nom_prenom_pere`, `nom_prenom_mere`, `telephone`, `statut`, `date_sortie`, `nom_enqueteur`, `date_enquete`, `nom_superviseur_enquete`, `date_supervision`, `flag_integration_donnees`, `nouvelle_integration`, `commentaire`, `id_acteur`, `etat_groupe`, `decede`, `date_deces`) VALUES
-	(1, '23456789', 'RAZAKANDRAINY', 'Jean Salomon', '101211100562', '1', 'Anjoma', '1977-12-30', NULL, 'Pecheur', NULL, 1, 'H', '2018-01-01', 50000, 70000, 1701, 1, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, NULL, NULL, NULL, NULL, NULL, NULL, b'0', NULL, NULL, 0, 0, NULL);
+INSERT INTO `menage` (`id`, `identifiant_unique`, `nom`, `prenom`, `cin`, `chef_menage`, `adresse`, `date_naissance`, `nombre_beneficiaire`, `profession`, `tranche_age`, `id_situation_matrimoniale`, `sexe`, `date_inscription`, `revenu_mensuel`, `depense_mensuel`, `id_fokontany`, `id_type_beneficiaire`, `identifiant_appariement`, `numero_sequentiel`, `lieu_residence`, `surnom_chefmenage`, `nom_prenom_pere`, `nom_prenom_mere`, `telephone`, `statut`, `date_sortie`, `nom_enqueteur`, `date_enquete`, `nom_superviseur_enquete`, `date_supervision`, `flag_integration_donnees`, `nouvelle_integration`, `commentaire`, `id_acteur`, `etat_groupe`, `decede`, `date_deces`, `id_indice_vulnerabilite`) VALUES
+	(1, '23456789', 'RAZAKANDRAINY', 'Jean Salomon', '101211100562', '1', 'Anjoma', '1977-12-30', NULL, 'Pecheur', NULL, 1, 'H', '2018-01-01', 50000, 70000, 1701, 1, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, NULL, NULL, NULL, NULL, NULL, NULL, b'0', NULL, NULL, 0, 0, NULL, NULL);
 /*!40000 ALTER TABLE `menage` ENABLE KEYS */;
 
 -- Export de la structure de la table population_db. menage_beneficiaire
-DROP TABLE IF EXISTS `menage_beneficiaire`;
 CREATE TABLE IF NOT EXISTS `menage_beneficiaire` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `id_menage` int(11) DEFAULT NULL,
@@ -1239,7 +1246,6 @@ INSERT INTO `menage_beneficiaire` (`id`, `id_menage`, `id_intervention`, `date_s
 /*!40000 ALTER TABLE `menage_beneficiaire` ENABLE KEYS */;
 
 -- Export de la structure de la table population_db. moyens_production
-DROP TABLE IF EXISTS `moyens_production`;
 CREATE TABLE IF NOT EXISTS `moyens_production` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
   `id_menage` int(11) DEFAULT NULL,
@@ -1256,7 +1262,6 @@ CREATE TABLE IF NOT EXISTS `moyens_production` (
 /*!40000 ALTER TABLE `moyens_production` ENABLE KEYS */;
 
 -- Export de la structure de la table population_db. niveau_de_classe
-DROP TABLE IF EXISTS `niveau_de_classe`;
 CREATE TABLE IF NOT EXISTS `niveau_de_classe` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `description` longtext,
@@ -1277,7 +1282,6 @@ INSERT INTO `niveau_de_classe` (`id`, `description`, `code`) VALUES
 /*!40000 ALTER TABLE `niveau_de_classe` ENABLE KEYS */;
 
 -- Export de la structure de la table population_db. nomenclature_intervention1
-DROP TABLE IF EXISTS `nomenclature_intervention1`;
 CREATE TABLE IF NOT EXISTS `nomenclature_intervention1` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `code` varchar(10) DEFAULT NULL,
@@ -1290,7 +1294,6 @@ CREATE TABLE IF NOT EXISTS `nomenclature_intervention1` (
 /*!40000 ALTER TABLE `nomenclature_intervention1` ENABLE KEYS */;
 
 -- Export de la structure de la table population_db. nomenclature_intervention2
-DROP TABLE IF EXISTS `nomenclature_intervention2`;
 CREATE TABLE IF NOT EXISTS `nomenclature_intervention2` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `id_nomenclature1` int(11) DEFAULT NULL,
@@ -1306,7 +1309,6 @@ CREATE TABLE IF NOT EXISTS `nomenclature_intervention2` (
 /*!40000 ALTER TABLE `nomenclature_intervention2` ENABLE KEYS */;
 
 -- Export de la structure de la table population_db. nomenclature_intervention3
-DROP TABLE IF EXISTS `nomenclature_intervention3`;
 CREATE TABLE IF NOT EXISTS `nomenclature_intervention3` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `id_nomenclature2` int(11) DEFAULT NULL,
@@ -1322,7 +1324,6 @@ CREATE TABLE IF NOT EXISTS `nomenclature_intervention3` (
 /*!40000 ALTER TABLE `nomenclature_intervention3` ENABLE KEYS */;
 
 -- Export de la structure de la table population_db. nomenclature_intervention4
-DROP TABLE IF EXISTS `nomenclature_intervention4`;
 CREATE TABLE IF NOT EXISTS `nomenclature_intervention4` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `id_nomenclature3` int(11) NOT NULL,
@@ -1338,7 +1339,6 @@ CREATE TABLE IF NOT EXISTS `nomenclature_intervention4` (
 /*!40000 ALTER TABLE `nomenclature_intervention4` ENABLE KEYS */;
 
 -- Export de la structure de la table population_db. occupation
-DROP TABLE IF EXISTS `occupation`;
 CREATE TABLE IF NOT EXISTS `occupation` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `id_menage` int(11) DEFAULT NULL,
@@ -1355,7 +1355,6 @@ CREATE TABLE IF NOT EXISTS `occupation` (
 /*!40000 ALTER TABLE `occupation` ENABLE KEYS */;
 
 -- Export de la structure de la table population_db. occupation_logement
-DROP TABLE IF EXISTS `occupation_logement`;
 CREATE TABLE IF NOT EXISTS `occupation_logement` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `description` longtext,
@@ -1375,7 +1374,6 @@ INSERT INTO `occupation_logement` (`id`, `description`, `code`) VALUES
 /*!40000 ALTER TABLE `occupation_logement` ENABLE KEYS */;
 
 -- Export de la structure de la table population_db. probleme_revenu
-DROP TABLE IF EXISTS `probleme_revenu`;
 CREATE TABLE IF NOT EXISTS `probleme_revenu` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `id_menage` int(11) DEFAULT NULL,
@@ -1392,7 +1390,6 @@ CREATE TABLE IF NOT EXISTS `probleme_revenu` (
 /*!40000 ALTER TABLE `probleme_revenu` ENABLE KEYS */;
 
 -- Export de la structure de la table population_db. programme
-DROP TABLE IF EXISTS `programme`;
 CREATE TABLE IF NOT EXISTS `programme` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `nom` varchar(50) DEFAULT '',
@@ -1423,7 +1420,6 @@ INSERT INTO `programme` (`id`, `nom`, `prenom`, `telephone`, `email`, `situation
 /*!40000 ALTER TABLE `programme` ENABLE KEYS */;
 
 -- Export de la structure de la table population_db. rattachement_individu
-DROP TABLE IF EXISTS `rattachement_individu`;
 CREATE TABLE IF NOT EXISTS `rattachement_individu` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `id_menage` int(11) DEFAULT NULL,
@@ -1443,7 +1439,6 @@ CREATE TABLE IF NOT EXISTS `rattachement_individu` (
 /*!40000 ALTER TABLE `rattachement_individu` ENABLE KEYS */;
 
 -- Export de la structure de la table population_db. region
-DROP TABLE IF EXISTS `region`;
 CREATE TABLE IF NOT EXISTS `region` (
   `code` varchar(10) DEFAULT '',
   `nom` varchar(100) DEFAULT '',
@@ -1480,7 +1475,6 @@ INSERT INTO `region` (`code`, `nom`, `id`, `surface`) VALUES
 /*!40000 ALTER TABLE `region` ENABLE KEYS */;
 
 -- Export de la structure de la table population_db. revetement_mur
-DROP TABLE IF EXISTS `revetement_mur`;
 CREATE TABLE IF NOT EXISTS `revetement_mur` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `id_menage` int(11) DEFAULT NULL,
@@ -1497,7 +1491,6 @@ CREATE TABLE IF NOT EXISTS `revetement_mur` (
 /*!40000 ALTER TABLE `revetement_mur` ENABLE KEYS */;
 
 -- Export de la structure de la table population_db. revetement_sol
-DROP TABLE IF EXISTS `revetement_sol`;
 CREATE TABLE IF NOT EXISTS `revetement_sol` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `id_menage` int(11) DEFAULT NULL,
@@ -1514,7 +1507,6 @@ CREATE TABLE IF NOT EXISTS `revetement_sol` (
 /*!40000 ALTER TABLE `revetement_sol` ENABLE KEYS */;
 
 -- Export de la structure de la table population_db. revetement_toit
-DROP TABLE IF EXISTS `revetement_toit`;
 CREATE TABLE IF NOT EXISTS `revetement_toit` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `id_menage` int(11) DEFAULT NULL,
@@ -1531,7 +1523,6 @@ CREATE TABLE IF NOT EXISTS `revetement_toit` (
 /*!40000 ALTER TABLE `revetement_toit` ENABLE KEYS */;
 
 -- Export de la structure de la table population_db. secteur_programme
-DROP TABLE IF EXISTS `secteur_programme`;
 CREATE TABLE IF NOT EXISTS `secteur_programme` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `id_financement_programme` int(11) DEFAULT NULL,
@@ -1548,7 +1539,6 @@ CREATE TABLE IF NOT EXISTS `secteur_programme` (
 /*!40000 ALTER TABLE `secteur_programme` ENABLE KEYS */;
 
 -- Export de la structure de la table population_db. service_beneficie
-DROP TABLE IF EXISTS `service_beneficie`;
 CREATE TABLE IF NOT EXISTS `service_beneficie` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `id_menage` int(11) DEFAULT NULL,
@@ -1565,7 +1555,6 @@ CREATE TABLE IF NOT EXISTS `service_beneficie` (
 /*!40000 ALTER TABLE `service_beneficie` ENABLE KEYS */;
 
 -- Export de la structure de la table population_db. situation_matrimoniale
-DROP TABLE IF EXISTS `situation_matrimoniale`;
 CREATE TABLE IF NOT EXISTS `situation_matrimoniale` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `description` varchar(30) DEFAULT '',
@@ -1582,7 +1571,6 @@ INSERT INTO `situation_matrimoniale` (`id`, `description`, `code`) VALUES
 /*!40000 ALTER TABLE `situation_matrimoniale` ENABLE KEYS */;
 
 -- Export de la structure de la table population_db. source_eau
-DROP TABLE IF EXISTS `source_eau`;
 CREATE TABLE IF NOT EXISTS `source_eau` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `id_menage` int(11) DEFAULT NULL,
@@ -1599,7 +1587,6 @@ CREATE TABLE IF NOT EXISTS `source_eau` (
 /*!40000 ALTER TABLE `source_eau` ENABLE KEYS */;
 
 -- Export de la structure de la table population_db. source_financement
-DROP TABLE IF EXISTS `source_financement`;
 CREATE TABLE IF NOT EXISTS `source_financement` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `nom` varchar(50) DEFAULT '',
@@ -1614,7 +1601,6 @@ INSERT INTO `source_financement` (`id`, `nom`) VALUES
 /*!40000 ALTER TABLE `source_financement` ENABLE KEYS */;
 
 -- Export de la structure de la table population_db. source_obtention_aliment
-DROP TABLE IF EXISTS `source_obtention_aliment`;
 CREATE TABLE IF NOT EXISTS `source_obtention_aliment` (
   `id` int(11) NOT NULL,
   `id_menage` int(11) DEFAULT NULL,
@@ -1631,7 +1617,6 @@ CREATE TABLE IF NOT EXISTS `source_obtention_aliment` (
 /*!40000 ALTER TABLE `source_obtention_aliment` ENABLE KEYS */;
 
 -- Export de la structure de la table population_db. source_revenu
-DROP TABLE IF EXISTS `source_revenu`;
 CREATE TABLE IF NOT EXISTS `source_revenu` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `id_menage` int(11) DEFAULT NULL,
@@ -1648,7 +1633,6 @@ CREATE TABLE IF NOT EXISTS `source_revenu` (
 /*!40000 ALTER TABLE `source_revenu` ENABLE KEYS */;
 
 -- Export de la structure de la table population_db. strategie_face_probleme
-DROP TABLE IF EXISTS `strategie_face_probleme`;
 CREATE TABLE IF NOT EXISTS `strategie_face_probleme` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `id_menage` int(11) DEFAULT NULL,
@@ -1665,7 +1649,6 @@ CREATE TABLE IF NOT EXISTS `strategie_face_probleme` (
 /*!40000 ALTER TABLE `strategie_face_probleme` ENABLE KEYS */;
 
 -- Export de la structure de la table population_db. suivi_individu
-DROP TABLE IF EXISTS `suivi_individu`;
 CREATE TABLE IF NOT EXISTS `suivi_individu` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `id_individu` int(11) DEFAULT NULL,
@@ -1682,7 +1665,6 @@ CREATE TABLE IF NOT EXISTS `suivi_individu` (
 /*!40000 ALTER TABLE `suivi_individu` ENABLE KEYS */;
 
 -- Export de la structure de la table population_db. suivi_individu_detail_transfert
-DROP TABLE IF EXISTS `suivi_individu_detail_transfert`;
 CREATE TABLE IF NOT EXISTS `suivi_individu_detail_transfert` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `id_suivi_individu_entete` int(11) DEFAULT NULL,
@@ -1700,7 +1682,6 @@ CREATE TABLE IF NOT EXISTS `suivi_individu_detail_transfert` (
 /*!40000 ALTER TABLE `suivi_individu_detail_transfert` ENABLE KEYS */;
 
 -- Export de la structure de la table population_db. suivi_individu_entete
-DROP TABLE IF EXISTS `suivi_individu_entete`;
 CREATE TABLE IF NOT EXISTS `suivi_individu_entete` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `id_intervention` int(11) DEFAULT NULL,
@@ -1723,7 +1704,6 @@ CREATE TABLE IF NOT EXISTS `suivi_individu_entete` (
 /*!40000 ALTER TABLE `suivi_individu_entete` ENABLE KEYS */;
 
 -- Export de la structure de la table population_db. suivi_menage
-DROP TABLE IF EXISTS `suivi_menage`;
 CREATE TABLE IF NOT EXISTS `suivi_menage` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `id_menage` int(11) DEFAULT NULL,
@@ -1740,7 +1720,6 @@ CREATE TABLE IF NOT EXISTS `suivi_menage` (
 /*!40000 ALTER TABLE `suivi_menage` ENABLE KEYS */;
 
 -- Export de la structure de la table population_db. suivi_menage_detail_transfert
-DROP TABLE IF EXISTS `suivi_menage_detail_transfert`;
 CREATE TABLE IF NOT EXISTS `suivi_menage_detail_transfert` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `id_suivi_menage_entete` int(11) DEFAULT NULL,
@@ -1758,7 +1737,6 @@ CREATE TABLE IF NOT EXISTS `suivi_menage_detail_transfert` (
 /*!40000 ALTER TABLE `suivi_menage_detail_transfert` ENABLE KEYS */;
 
 -- Export de la structure de la table population_db. suivi_menage_entete
-DROP TABLE IF EXISTS `suivi_menage_entete`;
 CREATE TABLE IF NOT EXISTS `suivi_menage_entete` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `id_intervention` int(11) DEFAULT NULL,
@@ -1781,7 +1759,6 @@ CREATE TABLE IF NOT EXISTS `suivi_menage_entete` (
 /*!40000 ALTER TABLE `suivi_menage_entete` ENABLE KEYS */;
 
 -- Export de la structure de la table population_db. toilette
-DROP TABLE IF EXISTS `toilette`;
 CREATE TABLE IF NOT EXISTS `toilette` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `id_menage` int(11) DEFAULT NULL,
@@ -1798,7 +1775,6 @@ CREATE TABLE IF NOT EXISTS `toilette` (
 /*!40000 ALTER TABLE `toilette` ENABLE KEYS */;
 
 -- Export de la structure de la table population_db. tutelle
-DROP TABLE IF EXISTS `tutelle`;
 CREATE TABLE IF NOT EXISTS `tutelle` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `nom` varchar(150) DEFAULT '',
@@ -1812,7 +1788,6 @@ INSERT INTO `tutelle` (`id`, `nom`) VALUES
 /*!40000 ALTER TABLE `tutelle` ENABLE KEYS */;
 
 -- Export de la structure de la table population_db. type_acteur
-DROP TABLE IF EXISTS `type_acteur`;
 CREATE TABLE IF NOT EXISTS `type_acteur` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `description` varchar(50) DEFAULT '',
@@ -1828,7 +1803,6 @@ INSERT INTO `type_acteur` (`id`, `description`, `code`) VALUES
 /*!40000 ALTER TABLE `type_acteur` ENABLE KEYS */;
 
 -- Export de la structure de la table population_db. type_action
-DROP TABLE IF EXISTS `type_action`;
 CREATE TABLE IF NOT EXISTS `type_action` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `description` varchar(50) DEFAULT '',
@@ -1842,7 +1816,6 @@ INSERT INTO `type_action` (`id`, `description`) VALUES
 /*!40000 ALTER TABLE `type_action` ENABLE KEYS */;
 
 -- Export de la structure de la table population_db. type_aliment
-DROP TABLE IF EXISTS `type_aliment`;
 CREATE TABLE IF NOT EXISTS `type_aliment` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `description` varchar(100) DEFAULT '',
@@ -1860,7 +1833,6 @@ INSERT INTO `type_aliment` (`id`, `description`, `code`) VALUES
 /*!40000 ALTER TABLE `type_aliment` ENABLE KEYS */;
 
 -- Export de la structure de la table population_db. type_beneficiaire
-DROP TABLE IF EXISTS `type_beneficiaire`;
 CREATE TABLE IF NOT EXISTS `type_beneficiaire` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `description` longtext,
@@ -1875,7 +1847,6 @@ INSERT INTO `type_beneficiaire` (`id`, `description`) VALUES
 /*!40000 ALTER TABLE `type_beneficiaire` ENABLE KEYS */;
 
 -- Export de la structure de la table population_db. type_bien_equipement
-DROP TABLE IF EXISTS `type_bien_equipement`;
 CREATE TABLE IF NOT EXISTS `type_bien_equipement` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `description` longtext,
@@ -1898,7 +1869,6 @@ INSERT INTO `type_bien_equipement` (`id`, `description`, `code`) VALUES
 /*!40000 ALTER TABLE `type_bien_equipement` ENABLE KEYS */;
 
 -- Export de la structure de la table population_db. type_combustible
-DROP TABLE IF EXISTS `type_combustible`;
 CREATE TABLE IF NOT EXISTS `type_combustible` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `description` longtext,
@@ -1917,7 +1887,6 @@ INSERT INTO `type_combustible` (`id`, `description`, `code`) VALUES
 /*!40000 ALTER TABLE `type_combustible` ENABLE KEYS */;
 
 -- Export de la structure de la table population_db. type_culture
-DROP TABLE IF EXISTS `type_culture`;
 CREATE TABLE IF NOT EXISTS `type_culture` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `description` longtext,
@@ -1935,7 +1904,6 @@ INSERT INTO `type_culture` (`id`, `description`, `code`) VALUES
 /*!40000 ALTER TABLE `type_culture` ENABLE KEYS */;
 
 -- Export de la structure de la table population_db. type_difficulte_alimentaire
-DROP TABLE IF EXISTS `type_difficulte_alimentaire`;
 CREATE TABLE IF NOT EXISTS `type_difficulte_alimentaire` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `description` longtext,
@@ -1954,7 +1922,6 @@ INSERT INTO `type_difficulte_alimentaire` (`id`, `description`, `code`) VALUES
 /*!40000 ALTER TABLE `type_difficulte_alimentaire` ENABLE KEYS */;
 
 -- Export de la structure de la table population_db. type_eclairage
-DROP TABLE IF EXISTS `type_eclairage`;
 CREATE TABLE IF NOT EXISTS `type_eclairage` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `description` longtext,
@@ -1975,7 +1942,6 @@ INSERT INTO `type_eclairage` (`id`, `description`, `code`) VALUES
 /*!40000 ALTER TABLE `type_eclairage` ENABLE KEYS */;
 
 -- Export de la structure de la table population_db. type_ecole
-DROP TABLE IF EXISTS `type_ecole`;
 CREATE TABLE IF NOT EXISTS `type_ecole` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `code` varchar(2) DEFAULT '',
@@ -1991,7 +1957,6 @@ INSERT INTO `type_ecole` (`id`, `code`, `description`) VALUES
 /*!40000 ALTER TABLE `type_ecole` ENABLE KEYS */;
 
 -- Export de la structure de la table population_db. type_elevage
-DROP TABLE IF EXISTS `type_elevage`;
 CREATE TABLE IF NOT EXISTS `type_elevage` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `description` longtext,
@@ -2009,7 +1974,6 @@ INSERT INTO `type_elevage` (`id`, `description`, `code`) VALUES
 /*!40000 ALTER TABLE `type_elevage` ENABLE KEYS */;
 
 -- Export de la structure de la table population_db. type_engagement_activite
-DROP TABLE IF EXISTS `type_engagement_activite`;
 CREATE TABLE IF NOT EXISTS `type_engagement_activite` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `description` longtext,
@@ -2027,7 +1991,6 @@ INSERT INTO `type_engagement_activite` (`id`, `description`, `code`) VALUES
 /*!40000 ALTER TABLE `type_engagement_activite` ENABLE KEYS */;
 
 -- Export de la structure de la table population_db. type_financement
-DROP TABLE IF EXISTS `type_financement`;
 CREATE TABLE IF NOT EXISTS `type_financement` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `intitule` varchar(20) DEFAULT '',
@@ -2042,7 +2005,6 @@ INSERT INTO `type_financement` (`id`, `intitule`) VALUES
 /*!40000 ALTER TABLE `type_financement` ENABLE KEYS */;
 
 -- Export de la structure de la table population_db. type_infrastructure
-DROP TABLE IF EXISTS `type_infrastructure`;
 CREATE TABLE IF NOT EXISTS `type_infrastructure` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `description` longtext,
@@ -2059,7 +2021,6 @@ INSERT INTO `type_infrastructure` (`id`, `description`, `code`) VALUES
 /*!40000 ALTER TABLE `type_infrastructure` ENABLE KEYS */;
 
 -- Export de la structure de la table population_db. type_logement
-DROP TABLE IF EXISTS `type_logement`;
 CREATE TABLE IF NOT EXISTS `type_logement` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `description` longtext,
@@ -2078,7 +2039,6 @@ INSERT INTO `type_logement` (`id`, `description`, `code`) VALUES
 /*!40000 ALTER TABLE `type_logement` ENABLE KEYS */;
 
 -- Export de la structure de la table population_db. type_moyen_production
-DROP TABLE IF EXISTS `type_moyen_production`;
 CREATE TABLE IF NOT EXISTS `type_moyen_production` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `description` longtext,
@@ -2107,7 +2067,6 @@ INSERT INTO `type_moyen_production` (`id`, `description`, `code`) VALUES
 /*!40000 ALTER TABLE `type_moyen_production` ENABLE KEYS */;
 
 -- Export de la structure de la table population_db. type_occupation
-DROP TABLE IF EXISTS `type_occupation`;
 CREATE TABLE IF NOT EXISTS `type_occupation` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `code` varchar(2) DEFAULT '',
@@ -2120,7 +2079,6 @@ CREATE TABLE IF NOT EXISTS `type_occupation` (
 /*!40000 ALTER TABLE `type_occupation` ENABLE KEYS */;
 
 -- Export de la structure de la table population_db. type_probleme_revenu
-DROP TABLE IF EXISTS `type_probleme_revenu`;
 CREATE TABLE IF NOT EXISTS `type_probleme_revenu` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `description` longtext,
@@ -2141,7 +2099,6 @@ INSERT INTO `type_probleme_revenu` (`id`, `description`, `code`) VALUES
 /*!40000 ALTER TABLE `type_probleme_revenu` ENABLE KEYS */;
 
 -- Export de la structure de la table population_db. type_revetement_mur
-DROP TABLE IF EXISTS `type_revetement_mur`;
 CREATE TABLE IF NOT EXISTS `type_revetement_mur` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `description` longtext,
@@ -2162,7 +2119,6 @@ INSERT INTO `type_revetement_mur` (`id`, `description`, `code`) VALUES
 /*!40000 ALTER TABLE `type_revetement_mur` ENABLE KEYS */;
 
 -- Export de la structure de la table population_db. type_revetement_sol
-DROP TABLE IF EXISTS `type_revetement_sol`;
 CREATE TABLE IF NOT EXISTS `type_revetement_sol` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `description` longtext,
@@ -2183,7 +2139,6 @@ INSERT INTO `type_revetement_sol` (`id`, `description`, `code`) VALUES
 /*!40000 ALTER TABLE `type_revetement_sol` ENABLE KEYS */;
 
 -- Export de la structure de la table population_db. type_revetement_toit
-DROP TABLE IF EXISTS `type_revetement_toit`;
 CREATE TABLE IF NOT EXISTS `type_revetement_toit` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `description` longtext,
@@ -2201,7 +2156,6 @@ INSERT INTO `type_revetement_toit` (`id`, `description`, `code`) VALUES
 /*!40000 ALTER TABLE `type_revetement_toit` ENABLE KEYS */;
 
 -- Export de la structure de la table population_db. type_secteur
-DROP TABLE IF EXISTS `type_secteur`;
 CREATE TABLE IF NOT EXISTS `type_secteur` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `nom` varchar(30) DEFAULT '',
@@ -2217,7 +2171,6 @@ INSERT INTO `type_secteur` (`id`, `nom`) VALUES
 /*!40000 ALTER TABLE `type_secteur` ENABLE KEYS */;
 
 -- Export de la structure de la table population_db. type_service_beneficie
-DROP TABLE IF EXISTS `type_service_beneficie`;
 CREATE TABLE IF NOT EXISTS `type_service_beneficie` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `description` longtext,
@@ -2234,7 +2187,6 @@ INSERT INTO `type_service_beneficie` (`id`, `description`, `code`) VALUES
 /*!40000 ALTER TABLE `type_service_beneficie` ENABLE KEYS */;
 
 -- Export de la structure de la table population_db. type_source_eau
-DROP TABLE IF EXISTS `type_source_eau`;
 CREATE TABLE IF NOT EXISTS `type_source_eau` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `description` longtext,
@@ -2256,7 +2208,6 @@ INSERT INTO `type_source_eau` (`id`, `description`, `code`) VALUES
 /*!40000 ALTER TABLE `type_source_eau` ENABLE KEYS */;
 
 -- Export de la structure de la table population_db. type_source_obtention_aliment
-DROP TABLE IF EXISTS `type_source_obtention_aliment`;
 CREATE TABLE IF NOT EXISTS `type_source_obtention_aliment` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `code` varchar(2) DEFAULT '',
@@ -2273,7 +2224,6 @@ INSERT INTO `type_source_obtention_aliment` (`id`, `code`, `description`) VALUES
 /*!40000 ALTER TABLE `type_source_obtention_aliment` ENABLE KEYS */;
 
 -- Export de la structure de la table population_db. type_source_revenu
-DROP TABLE IF EXISTS `type_source_revenu`;
 CREATE TABLE IF NOT EXISTS `type_source_revenu` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `description` longtext,
@@ -2292,7 +2242,6 @@ INSERT INTO `type_source_revenu` (`id`, `description`, `code`) VALUES
 /*!40000 ALTER TABLE `type_source_revenu` ENABLE KEYS */;
 
 -- Export de la structure de la table population_db. type_strategie_face_probleme
-DROP TABLE IF EXISTS `type_strategie_face_probleme`;
 CREATE TABLE IF NOT EXISTS `type_strategie_face_probleme` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `description` longtext,
@@ -2310,7 +2259,6 @@ INSERT INTO `type_strategie_face_probleme` (`id`, `description`, `code`) VALUES
 /*!40000 ALTER TABLE `type_strategie_face_probleme` ENABLE KEYS */;
 
 -- Export de la structure de la table population_db. type_toilette
-DROP TABLE IF EXISTS `type_toilette`;
 CREATE TABLE IF NOT EXISTS `type_toilette` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `description` longtext,
@@ -2331,7 +2279,6 @@ INSERT INTO `type_toilette` (`id`, `description`, `code`) VALUES
 /*!40000 ALTER TABLE `type_toilette` ENABLE KEYS */;
 
 -- Export de la structure de la table population_db. type_transfert
-DROP TABLE IF EXISTS `type_transfert`;
 CREATE TABLE IF NOT EXISTS `type_transfert` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `description` varchar(50) DEFAULT '',
@@ -2349,7 +2296,6 @@ INSERT INTO `type_transfert` (`id`, `description`, `code`) VALUES
 /*!40000 ALTER TABLE `type_transfert` ENABLE KEYS */;
 
 -- Export de la structure de la table population_db. type_usage_service_medical
-DROP TABLE IF EXISTS `type_usage_service_medical`;
 CREATE TABLE IF NOT EXISTS `type_usage_service_medical` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `code` varchar(2) DEFAULT '',
@@ -2362,7 +2308,6 @@ CREATE TABLE IF NOT EXISTS `type_usage_service_medical` (
 /*!40000 ALTER TABLE `type_usage_service_medical` ENABLE KEYS */;
 
 -- Export de la structure de la table population_db. unite_mesure
-DROP TABLE IF EXISTS `unite_mesure`;
 CREATE TABLE IF NOT EXISTS `unite_mesure` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `description` varchar(20) DEFAULT '',
@@ -2381,7 +2326,6 @@ INSERT INTO `unite_mesure` (`id`, `description`, `code`) VALUES
 /*!40000 ALTER TABLE `unite_mesure` ENABLE KEYS */;
 
 -- Export de la structure de la table population_db. usage_service_medical
-DROP TABLE IF EXISTS `usage_service_medical`;
 CREATE TABLE IF NOT EXISTS `usage_service_medical` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `id_individu` int(11) DEFAULT NULL,
@@ -2398,7 +2342,6 @@ CREATE TABLE IF NOT EXISTS `usage_service_medical` (
 /*!40000 ALTER TABLE `usage_service_medical` ENABLE KEYS */;
 
 -- Export de la structure de la table population_db. utilisateur
-DROP TABLE IF EXISTS `utilisateur`;
 CREATE TABLE IF NOT EXISTS `utilisateur` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `nom` varchar(255) DEFAULT '',
@@ -2437,7 +2380,6 @@ INSERT INTO `utilisateur` (`id`, `nom`, `prenom`, `email`, `password`, `date_cre
 /*!40000 ALTER TABLE `utilisateur` ENABLE KEYS */;
 
 -- Export de la structure de la table population_db. variable
-DROP TABLE IF EXISTS `variable`;
 CREATE TABLE IF NOT EXISTS `variable` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `id_liste_variable` int(11) DEFAULT NULL,
@@ -2453,7 +2395,6 @@ CREATE TABLE IF NOT EXISTS `variable` (
 /*!40000 ALTER TABLE `variable` ENABLE KEYS */;
 
 -- Export de la structure de la table population_db. variable_intervention
-DROP TABLE IF EXISTS `variable_intervention`;
 CREATE TABLE IF NOT EXISTS `variable_intervention` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `id_liste_variable` int(11) DEFAULT NULL,
@@ -2476,13 +2417,13 @@ CREATE TABLE IF NOT EXISTS `variable_intervention` (
 /*!40000 ALTER TABLE `variable_intervention` ENABLE KEYS */;
 
 -- Export de la structure de la table population_db. zone_intervention
-DROP TABLE IF EXISTS `zone_intervention`;
 CREATE TABLE IF NOT EXISTS `zone_intervention` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `id_intervention` int(11) DEFAULT NULL,
   `id_fokontany` int(11) DEFAULT NULL,
   `menage_beneficiaire_prevu` int(11) DEFAULT NULL,
   `individu_beneficiaire_prevu` int(11) DEFAULT NULL,
+  `groupe_beneficiaire_prevu` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `FK_zone_intervention_intervention` (`id_intervention`),
   KEY `FK_zone_intervention_fokontany` (`id_fokontany`),
@@ -2490,20 +2431,20 @@ CREATE TABLE IF NOT EXISTS `zone_intervention` (
   CONSTRAINT `FK_zone_intervention_intervention` FOREIGN KEY (`id_intervention`) REFERENCES `intervention` (`id`) ON UPDATE CASCADE
 ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
 
--- Export de données de la table population_db.zone_intervention : ~0 rows (environ)
+-- Export de données de la table population_db.zone_intervention : ~1 rows (environ)
 /*!40000 ALTER TABLE `zone_intervention` DISABLE KEYS */;
-INSERT INTO `zone_intervention` (`id`, `id_intervention`, `id_fokontany`, `menage_beneficiaire_prevu`, `individu_beneficiaire_prevu`) VALUES
-	(1, 1, 44, 125, 250);
+INSERT INTO `zone_intervention` (`id`, `id_intervention`, `id_fokontany`, `menage_beneficiaire_prevu`, `individu_beneficiaire_prevu`, `groupe_beneficiaire_prevu`) VALUES
+	(1, 1, 44, 125, 250, NULL);
 /*!40000 ALTER TABLE `zone_intervention` ENABLE KEYS */;
 
 -- Export de la structure de la table population_db. zone_intervention_programme
-DROP TABLE IF EXISTS `zone_intervention_programme`;
 CREATE TABLE IF NOT EXISTS `zone_intervention_programme` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `id_programme` int(11) DEFAULT NULL,
   `id_district` int(11) DEFAULT NULL,
   `menage_beneficiaire_prevu` int(11) DEFAULT NULL,
   `individu_beneficiaire_prevu` int(11) DEFAULT NULL,
+  `groupe_beneficiaire_prevu` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `FK_zone_intervention_programme_programme` (`id_programme`),
   KEY `FK_zone_intervention_programme_district` (`id_district`),
@@ -2511,10 +2452,10 @@ CREATE TABLE IF NOT EXISTS `zone_intervention_programme` (
   CONSTRAINT `FK_zone_intervention_programme_programme` FOREIGN KEY (`id_programme`) REFERENCES `programme` (`id`) ON UPDATE CASCADE
 ) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8;
 
--- Export de données de la table population_db.zone_intervention_programme : ~0 rows (environ)
+-- Export de données de la table population_db.zone_intervention_programme : ~1 rows (environ)
 /*!40000 ALTER TABLE `zone_intervention_programme` DISABLE KEYS */;
-INSERT INTO `zone_intervention_programme` (`id`, `id_programme`, `id_district`, `menage_beneficiaire_prevu`, `individu_beneficiaire_prevu`) VALUES
-	(2, 1, 41, 120, 150);
+INSERT INTO `zone_intervention_programme` (`id`, `id_programme`, `id_district`, `menage_beneficiaire_prevu`, `individu_beneficiaire_prevu`, `groupe_beneficiaire_prevu`) VALUES
+	(2, 1, 41, 120, 150, NULL);
 /*!40000 ALTER TABLE `zone_intervention_programme` ENABLE KEYS */;
 
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;
