@@ -34,9 +34,11 @@ class Programme extends REST_Controller {
 						$typeaction=$type_ac;
 					}	
                     $tutelle = array();
-                    $tut = $this->TutelleManager->findById($value->id_tutelle);
-					if(count($tut) >0) {
-						$tutelle=$tut;
+					if($value->id_tutelle) {
+						$tut = $this->TutelleManager->findById($value->id_tutelle);
+						if(count($tut) >0) {
+							$tutelle=$tut;
+						}	
 					}	
                     $data[$key]['id'] = $value->id;
                     $data[$key]['nom'] = $value->nom;

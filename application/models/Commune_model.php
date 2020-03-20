@@ -30,6 +30,7 @@ class Commune_model extends CI_Model {
         return array(
             'code'           =>      $commune['code'],
             'nom'            =>      $commune['nom'],
+            'coordonnees'    =>      $commune['coordonnees'],
             'district_id'    =>      $commune['district_id']                       
         );
     }
@@ -58,7 +59,7 @@ class Commune_model extends CI_Model {
     }
 	public function find_Commune_avec_District_et_Region($id_district) {
 		// Selection commune avec description district et région correspondant
-		$requete='select c.id,c.nom,c.code,c.district_id,d.nom as nomdistrict,d.region_id,r.nom as region'
+		$requete='select c.id,c.nom,c.code,c.district_id,d.nom as nomdistrict,d.region_id,r.nom as region,c.coordonnees'
 				.' from commune as c'
 				.' left outer join district as d on d.id=c.district_id'
 				.' left outer join region as r on r.id=d.region_id'
@@ -73,7 +74,7 @@ class Commune_model extends CI_Model {
 	}
 	public function find_Fokontany_avec_District_et_Region($id_commune) {
 		// Selection fokontany avec description commune,district et région correspondant
-		$requete='select f.id,f.nom,f.code,f.id_commune,c.nom as commune,d.nom as nomdistrict,d.region_id,r.nom as region'
+		$requete='select f.id,f.nom,f.code,f.id_commune,c.nom as commune,d.nom as nomdistrict,d.region_id,r.nom as region,c.coordonnees'
 				.' from fokontany as f'
 				.' left outer join commune as c on c.id=f.id_commune'
 				.' left outer join district as d on d.id=c.district_id'

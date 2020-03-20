@@ -33,6 +33,7 @@ class Commune extends REST_Controller {
                     $data[$key]['id'] = $value->id;
                     $data[$key]['code'] = $value->code;
                     $data[$key]['nom'] = $value->nom;
+                    $data[$key]['coordonnees'] = $value->coordonnees;
                     $data[$key]['district'] = $district;
                 }
             }           
@@ -64,6 +65,7 @@ class Commune extends REST_Controller {
                         $data[$key]['id'] = $value->id;
                         $data[$key]['code'] = $value->code;
                         $data[$key]['nom'] = $value->nom;
+                        $data[$key]['coordonnees'] = $value->coordonnees;
                         $data[$key]['district_id'] = $value->district_id;
                         $data[$key]['district'] = $district;
                     }
@@ -94,6 +96,7 @@ class Commune extends REST_Controller {
                 $data = array(
                     'code' => $this->post('code'),
                     'nom' => $this->post('nom'),
+                    'coordonnees' => $this->post('coordonnees'),
                     'district_id' => $this->post('district_id')
                 );
                 if (!$data) {
@@ -122,6 +125,7 @@ class Commune extends REST_Controller {
                 $data = array(
                     'code' => $this->post('code'),
                     'nom' => $this->post('nom'),
+                    'coordonnees' => $this->post('coordonnees'),
                     'district_id' => $this->post('district_id')
                 );
                 if (!$data || !$id) {

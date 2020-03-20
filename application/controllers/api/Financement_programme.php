@@ -80,6 +80,9 @@ class Financement_programme extends REST_Controller {
 					// Liste  type secteur concerné		
 					$typesecteur =array();
 					$tsecteur = $this->SecteurprogrammeManager->findByIdprogrammeAndIdfinancementprogramme($value->id_programme,$value->id);
+					if(!$tsecteur) {
+						$tsecteur=array();	
+					}
 					// Stocker dans tableau le id du type de secteur (seulement)
 					if(count($tsecteur) >0) {
 						foreach($tsecteur as $k=>$v) {
