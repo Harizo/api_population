@@ -13,7 +13,10 @@ class Commune extends REST_Controller {
         $this->load->model('district_model', 'DistrictManager');
     }
     
-    public function index_get() {
+    public function index_get() 
+    {
+        set_time_limit(0);
+        ini_set ('memory_limit', '2048M');
         $id = $this->get('id');
         $cle_etrangere = $this->get('cle_etrangere');
         $id_commune = $this->get('id_commune');
@@ -33,7 +36,7 @@ class Commune extends REST_Controller {
                     $data[$key]['id'] = $value->id;
                     $data[$key]['code'] = $value->code;
                     $data[$key]['nom'] = $value->nom;
-                    $data[$key]['coordonnees'] = $value->coordonnees;
+                    $data[$key]['coordonnees'] = unserialize($value->coordonnees);
                     $data[$key]['district'] = $district;
                 }
             }           
@@ -65,7 +68,7 @@ class Commune extends REST_Controller {
                         $data[$key]['id'] = $value->id;
                         $data[$key]['code'] = $value->code;
                         $data[$key]['nom'] = $value->nom;
-                        $data[$key]['coordonnees'] = $value->coordonnees;
+                        $data[$key]['coordonnees'] = unserialize($value->coordonnees);
                         $data[$key]['district_id'] = $value->district_id;
                         $data[$key]['district'] = $district;
                     }
