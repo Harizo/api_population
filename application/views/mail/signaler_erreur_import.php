@@ -318,7 +318,7 @@
                     </tr>
                     <tr>
                         <td class="free-text">
-                            Lors de la vérification des données<?php echo $type_fichier?>à importer dans la base de données, nous vous signalons par la présente qu'il y avait 
+                            Lors de la vérification des données<?php echo $type_fichier?>à importer dans la base de données, nous vous signalons par le présent mail qu'il y avait 
 							des données erronées ou incompl&egrave;tes au nombre de <?php echo $nombre_erreur;?> (<?php echo $nombre_erreur_en_lettre;?>) dans le fichier :
                         </td>
                     </tr>

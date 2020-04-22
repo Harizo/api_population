@@ -353,13 +353,14 @@ class Importercoordonneescommune extends CI_Controller {
 		echo json_encode($val_ret);
 	}
 	public function Mise_a_jour_coordonnees() {
+		set_time_limit(0);
 		$trouver= array(")");		
 		$remplacer=array('');
 		$les_communes = $this->CommuneManager->FindAll();
 		$nombre_miseajour=0;
 		foreach($les_communes as $k=>$v) {
 			$id_commune = $v->id;
-			if($id_commune==240 || $id_commune==21) { // Pour test
+			// if($id_commune==240 || $id_commune==21) { // Pour test
 				$liste_coordonees=$this->ImportercoordonneescommuneManager->selection_coordonnees_commune($id_commune);
 				$coordonnees_text="";
 				$resultat_coordonnees=array();
@@ -379,21 +380,28 @@ class Importercoordonneescommune extends CI_Controller {
 					$coordonnees_text=explode(",",$coordonnees_text);
 					foreach($coordonnees_text as $indice=>$valeur) {
 						// Eclater chaque élément en 2 parties : latitude et longitude
-						$position_espace=strpos($valeur,"-");
-						$longitude=substr($valeur,0,($position_espace - 1));
-						$latitude=substr($valeur,($position_espace));
+						$position_moins=strpos($valeur,"-");
+						$longitude=substr($valeur,0,($position_moins - 1));
+						$latitude=substr($valeur,($position_moins));
 						$valeur_temp=array();
-						$valeur_temp["latitude"]=$latitude;
-						$valeur_temp["longitude"]=$longitude;						
-						$resultat_coordonnees[]=$valeur_temp;
+						$position_quatre=strpos($longitude,"4");
+						if($position_quatre >0 && $position_quatre <=3) {
+							$longitude=substr($longitude,$position_quatre);
+						}
+						// Eviter les orphelins ???? lors du test import id 240 : longitude 47.7515 sans couple -18????
+						if(floatval($latitude) <0 and floatval($longitude) >0) {
+							$valeur_temp["latitude"]=$latitude;
+							$valeur_temp["longitude"]=$longitude;						
+							$resultat_coordonnees[]=$valeur_temp;
+						}	
 					}
 					$miseajour=$this->ImportercoordonneescommuneManager->miseajour_coordonnees_commune($id_commune,serialize($resultat_coordonnees));
+				}
 					if($miseajour) {
 						$nombre_miseajour=$nombre_miseajour + 1;
 					}
-				}
 			}	
-			}	
+			// }	
 		}
 		echo json_encode($nombre_miseajour);
 	}

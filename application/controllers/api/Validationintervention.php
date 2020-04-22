@@ -184,6 +184,8 @@ class Validationintervention extends CI_Controller {
 						}	 
 					}
 					// Si donnée incorrect : coleur cellule en rouge
+					// initialisation $id_acteur
+					$id_acteur =null;
 					if($nom_acteur=="") {
 						$nombre_erreur = $nombre_erreur + 1;
 						$erreur_nom_acteur=$erreur_nom_acteur +1;	
@@ -211,6 +213,7 @@ class Validationintervention extends CI_Controller {
 									 )
 							 );		
 							$nombre_erreur = $nombre_erreur + 1; 
+							$erreur_nom_acteur = $erreur_nom_acteur + 1;
 							$sheet->setCellValue("J3", "tsy tao");
 						}
 					} 
@@ -237,6 +240,7 @@ class Validationintervention extends CI_Controller {
 									 )
 							 );		
 							$nombre_erreur = $nombre_erreur + 1; 
+							$erreur_intitule_intervention = $erreur_intitule_intervention + 1;
 						} else {
 							// id_intervention : à utliser plus tard pour vérifier si l'intervention se déroule dans le fokontany en question
 							// sinon : paramétrage DDB à modifier et insérer le fokontany 
@@ -422,6 +426,9 @@ class Validationintervention extends CI_Controller {
 									 );	
 									$nombre_erreur = $nombre_erreur + 1;	
 									$erreur_nom_district = $erreur_nom_district + 1;		
+									$nombre_erreur = $nombre_erreur + 2;
+									$erreur_nom_commune = $erreur_nom_commune + 1;		
+									$erreur_nom_fokontany = $erreur_nom_fokontany + 1;											
 								}
 								if(intval($id_district) >0) {
 									if($nom_commune >'') {
@@ -506,6 +513,23 @@ class Validationintervention extends CI_Controller {
 												$nombre_erreur = $nombre_erreur + 1;
 												$erreur_nom_fokontany = $erreur_nom_fokontany + 1;	
 											}
+										} else {
+											// Pas de commune : marquer commune,fokontany 
+											$sheet->getStyle("F3")->getFill()->applyFromArray(
+													 array('type'       => PHPExcel_Style_Fill::FILL_SOLID,'rotation'   => 0,
+														 'startcolor' => array('rgb' => 'FF0000'),
+														 'endcolor'   => array('argb' => 'FF0000')
+													 )
+											 );	
+											$sheet->getStyle("H3")->getFill()->applyFromArray(
+													 array('type'       => PHPExcel_Style_Fill::FILL_SOLID,'rotation'   => 0,
+														 'startcolor' => array('rgb' => 'FF0000'),
+														 'endcolor'   => array('argb' => 'FF0000')
+													 )
+											 );	
+											$nombre_erreur = $nombre_erreur + 2;
+											$erreur_nom_commune = $erreur_nom_commune + 1;		
+											$erreur_nom_fokontany = $erreur_nom_fokontany + 1;													
 										} 
 									} else {										
 										// Pas de commune : marquer commune,fokontany 
@@ -521,8 +545,9 @@ class Validationintervention extends CI_Controller {
 													 'endcolor'   => array('argb' => 'FF0000')
 												 )
 										 );	
-										$nombre_erreur = $nombre_erreur + 1;
+										$nombre_erreur = $nombre_erreur + 2;
 										$erreur_nom_commune = $erreur_nom_commune + 1;		
+										$erreur_nom_fokontany = $erreur_nom_fokontany + 1;		
 									}		
 								}
 							} else {
@@ -545,8 +570,10 @@ class Validationintervention extends CI_Controller {
 											 'endcolor'   => array('argb' => 'FF0000')
 										 )
 								 );	
-								$nombre_erreur = $nombre_erreur + 1;	
+								$nombre_erreur = $nombre_erreur + 3;	
 								$erreur_nom_district = $erreur_nom_district + 1;
+								$erreur_nom_commune = $erreur_nom_commune + 1;
+								$erreur_nom_fokontany = $erreur_nom_fokontany + 1;
 							}		
 						}
 					} else {
@@ -706,11 +733,13 @@ class Validationintervention extends CI_Controller {
 			$lien_vers_mon_document_excel = $chemin . $nomfichier;
 			$array_data = array();
 			// Contrôler si doublon dans la table suivi_menage_entete ou suivi_individu_entete selon les cas
-			$retour = $this->ValidationinterventionManager->RechercheDoublonInterventionParDateEtFokontany($menage_ou_individu,$date_intervention,$id_fokontany,$id_intervention);
 			$nombre=0;
-			foreach($retour as $k=>$v) {
-				$nombre=$v->nombre;
-			}
+			if(intval($id_fokontany) > 0) {
+				$retour = $this->ValidationinterventionManager->RechercheDoublonInterventionParDateEtFokontany($menage_ou_individu,$date_intervention,$id_fokontany,$id_intervention);
+				foreach($retour as $k=>$v) {
+					$nombre=$v->nombre;
+				}
+			}	
 			if($nombre >0) {
 				// Doublon : ERREUR
 				$sheet->getStyle("G4")->getFill()->applyFromArray(
@@ -730,12 +759,14 @@ class Validationintervention extends CI_Controller {
 			$remplacer=array('&eacute;','e','e','a','o','c','_');
 			$trouver= array('é','è','ê','à','ö','ç',' ');
 			$code_precedent="";
-			$retour=$this->ValidationinterventionManager->recuperer_code_region_district_commune_fokontany($id_fokontany);
-			if($retour) {
-				foreach($retour as $k=>$v) {
-					$code_precedent=$v->code_precedent;
-				}
-			}													
+			if(intval($id_fokontany) > 0) {
+				$retour=$this->ValidationinterventionManager->recuperer_code_region_district_commune_fokontany($id_fokontany);
+				if($retour) {
+					foreach($retour as $k=>$v) {
+						$code_precedent=$v->code_precedent;
+					}
+				}	
+			}	
 			foreach($rowIterator as $row) {
 				// Contrôle détail s'il y a des doublons
 				// Le controle se fait en 2 étapes
@@ -760,14 +791,16 @@ class Validationintervention extends CI_Controller {
 					}
 					//$id_acteur
 					// 1- Recherche par identifiant_appariement = $identifiant_appariement et $id_acteur stocké auparavant
-						$retour=$this->ValidationinterventionManager->RechercheParIdentifiantActeur($menage_ou_individu,$identifiant_appariement,$id_acteur);
 					$nombre=0;
 					$identifiant_unique=null;
-					if($retour) {
-						foreach($retour as $k=>$v) {
-							$identifiant_unique = $v->identifiant_unique;
-						}
-					}	
+					if(intval($id_acteur) > 0) {
+						$retour=$this->ValidationinterventionManager->RechercheParIdentifiantActeur($menage_ou_individu,$identifiant_appariement,$id_acteur);
+						if($retour) {
+							foreach($retour as $k=>$v) {
+								$identifiant_unique = $v->identifiant_unique;
+							}
+						}	
+					}
 					if($identifiant_unique ==null) {
 						 // Bénéficiaire introuvable : ERREUR Marquage colonne F par Bénéficiaire inexistant dans la BDD de couleur Jaune
 						$sheet->getStyle("F".$ligne)->getFill()->applyFromArray(
@@ -787,11 +820,14 @@ class Validationintervention extends CI_Controller {
 				$ligne = $ligne + 1;
 			}
 			// Vérification : si l'intervention se déroule bien dans le fokontany
-			$retour=$this->ValidationinterventionManager->RechercheFokontanyIntervention($id_fokontany,$id_intervention);
-			foreach($retour as $k=>$v) {
-				$nombre = $v->nombre;
-			}
-			if($nombre==0) {
+			$nombre=0;
+			if(intval($id_fokontany) > 0 && intval($id_intervention) > 0) {
+				$retour=$this->ValidationinterventionManager->RechercheFokontanyIntervention($id_fokontany,$id_intervention);
+				foreach($retour as $k=>$v) {
+					$nombre = $v->nombre;
+				}
+			}	
+			if($nombre==0 && intval($id_fokontany) >0) {
 				$sheet->getStyle("G4")->getFill()->applyFromArray(
 						 array('type'       => PHPExcel_Style_Fill::FILL_SOLID,'rotation'   => 0,
 							 'startcolor' => array('rgb' => 'FF0000'),

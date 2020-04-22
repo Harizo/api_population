@@ -318,7 +318,7 @@
                     </tr>
                     <tr>
                         <td class="free-text">
-							Nous vous signalerons par la présente mail qu'après int&eacute;gration des donn&eacute;es<?php echo $type_fichier?> : 
+							Nous vous signalerons par le présent mail qu'après int&eacute;gration des donn&eacute;es<?php echo $type_fichier?> : 
                         </td>
                     </tr>
                     <tr>
