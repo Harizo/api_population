@@ -16,6 +16,17 @@ class Region_model extends CI_Model
             return null;
         }                    
     }
+    public function addImport($region)
+    {	// Ajout d'un enregitrement
+        $this->db->set($this->_setImport($region))
+                            ->insert($this->table);
+        if($this->db->affected_rows() === 1)
+        {
+            return $this->db->insert_id();
+        }else{
+            return null;
+        }                    
+    }
 
 
     public function update($id, $region)
@@ -39,8 +50,14 @@ class Region_model extends CI_Model
             //'superficie'    =>      $region['superficie']                       
         );
     }
-
-
+    public function _setImport($region)
+    {	// Affectation des valeurs
+        return array(
+            'code'       =>  $region['code'],
+            'nom'        =>  $region['nom'],
+            'chef_lieu'  =>  $region['chef_lieu']                       
+        );
+    }
     public function delete($id)
     {	// Suppression d'un enregitrement
         $this->db->where('id', (int) $id)->delete($this->table);

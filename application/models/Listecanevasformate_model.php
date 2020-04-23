@@ -59,7 +59,7 @@ class Listecanevasformate_model extends CI_Model {
 	public function getlescanevasformate() {
 		// Selection de tous les recommandations
 		$requete="select cf.id,cf.resume,cf.id_utilisateur,cf.nom_fichier,cf.repertoire,cf.date_upload,"
-				."concat_ws(' ',u.nom,u.prenom) as nomutilisateur"
+				."concat_ws(' ',u.prenom,u.nom) as nomutilisateur"
 				." from liste_canevas_formtate as cf"
 				." left outer join utilisateur as u on u.id=cf.id_utilisateur"
 				." order by cf.date_upload";
