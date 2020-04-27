@@ -64,7 +64,7 @@ class Commune extends REST_Controller {
                 if ($menu) {
                     foreach ($menu as $key => $value) {
                         
-                        if ($key < 10) {
+                        if ($key < 3) {
                            $district = array();
                         $district = $this->DistrictManager->findById($value->district_id);
                         $data[$key]['id'] = $value->id;
