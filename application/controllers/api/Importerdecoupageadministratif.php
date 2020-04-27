@@ -108,21 +108,21 @@ class Importerdecoupageadministratif extends CI_Controller {
 					if('A' == $cell->getColumn()) {
 						$code_region =$cell->getValue();
 					} else if('C' == $cell->getColumn()) {
-							$code_region =$cell->getValue();
-							$code_region_original =$cell->getValue();
+							$nom_region =$cell->getValue();
+							$nom_region_original =$cell->getValue();
 					} else if('G' == $cell->getColumn()) {
 							$chef_lieu =$cell->getValue();	
 					} 
 				}
 				$amoron_mania=false;
-				$code_region = strtolower($code_region);
-				$x= strpos($code_region,'mania');
+				$nom_region = strtolower($nom_region);
+				$x= strpos($nom_region,'mania');
 				if($x > 0) {
 					$amoron_mania=true;
 				} else {
 					$amoron_mania=false;
 				}
-				$code_region=str_replace($trouver,$remplacer,$code_region);
+				$nom_region=str_replace($trouver,$remplacer,$nom_region);
 				$region_ok = false;
 				$insert_region=false;
 				$id_region=null;
@@ -144,7 +144,7 @@ class Importerdecoupageadministratif extends CI_Controller {
 						$insert_region=true;
 						$data = array(
 							'code' => $code_region,
-							'nom' => $code_region_original,
+							'nom' => $nom_region_original,
 							'surface' => null,
 							'chef_lieu' => $chef_lieu,
 						);  
@@ -427,6 +427,7 @@ class Importerdecoupageadministratif extends CI_Controller {
 								'code' => $code_commune,
 								'nom' => $nom_commune_original,
 								'district_id' => $district_id,
+								'coordonnees' => null,
 							);  
 							$id_commune = $this->CommuneManager->add($data);	
 						}	

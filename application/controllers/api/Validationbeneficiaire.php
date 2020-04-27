@@ -1,5 +1,5 @@
 <?php
-
+define ('SITE_ROOT', realpath(dirname(__FILE__)));
 defined('BASEPATH') OR exit('No direct script access allowed');
 // require APPPATH . '/libraries/REST_Controller.php';
 require APPPATH . '/PHPMailer/PHPMailerAutoload.php';
@@ -18,6 +18,16 @@ class Validationbeneficiaire extends CI_Controller {
         $this->load->model('intervention_model', 'InterventionManager');        
         $this->load->model('listevalidationbeneficiaire_model', 'ListevalidationbeneficiaireManager');
     }
+	// Download canevas fichier fichier bénéficiaire et suivi intervention
+	public function prendre_fichier()  {
+		$filename = $_POST["nom_fichier"]; 
+		$rep = $_POST["repertoire"];
+		$data=$rep.$filename;    
+		$this->load->helper('download');
+		$name = 'h'.$filename;
+		force_download($name, $data);
+        echo json_encode($data);
+	}  		
 	// Récupération nombre fichier non validées : bénéficiaire et intervention en même temps : pour affichage SUR le MENU
 	public function recuperer_nombre_liste_fichier_non_valides() {	
 		$total_non_validees =0;
