@@ -78,6 +78,7 @@ $db['default'] = array(
 	'hostname' => 'localhost',
 	'username' => 'postgres',
 	'password' => 'root',
+	//'password' => 'post@22042020',
 	'database' => 'population_db',
 	'dbdriver' => 'postgre',
 	'dbprefix' => '',

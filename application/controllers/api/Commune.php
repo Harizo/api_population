@@ -16,7 +16,7 @@ class Commune extends REST_Controller {
     public function index_get() 
     {
         set_time_limit(0);
-        ini_set ('memory_limit', '2048M');
+        ini_set ('memory_limit', '4000M');
         $id = $this->get('id');
         $cle_etrangere = $this->get('cle_etrangere');
         $id_commune = $this->get('id_commune');
@@ -63,7 +63,9 @@ class Commune extends REST_Controller {
                 $menu = $this->CommuneManager->findAll();
                 if ($menu) {
                     foreach ($menu as $key => $value) {
-                        $district = array();
+                        
+                        if ($key < 10) {
+                           $district = array();
                         $district = $this->DistrictManager->findById($value->district_id);
                         $data[$key]['id'] = $value->id;
                         $data[$key]['code'] = $value->code;
@@ -71,6 +73,11 @@ class Commune extends REST_Controller {
                         $data[$key]['coordonnees'] = unserialize($value->coordonnees);
                         $data[$key]['district_id'] = $value->district_id;
                         $data[$key]['district'] = $district;
+                        $data[$key]['stroke']['color'] = '#6060FB';
+                        $data[$key]['stroke']['weight'] = 1;
+                        $data[$key]['fill']['opacity'] = 0;
+                     //   $data[$key]['events']['click'] =  (object)("function(){console.log();}");
+                        }
                     }
                 } else
                     $data = array();
