@@ -405,4 +405,55 @@ class Importercoordonneescommune extends CI_Controller {
 		}
 		echo json_encode($nombre_miseajour);
 	}
+	public function Miseajour_coordonnees_tronquees() {
+		set_time_limit(0);
+		$trouver= array(")");		
+		$remplacer=array('');
+		$les_communes = $this->ImportercoordonneescommuneManager->Commune_avec_coordonnees_tronquees();
+		$nombre_miseajour=0;
+		foreach($les_communes as $k=>$v) {
+			$id_commune = $v->id_commune;
+				$liste_coordonees=$v;
+				$coordonnees_text="";
+				$coordonnees=$v->coordonnees;
+				$resultat_coordonnees=array();
+			if($liste_coordonees) {	
+				// foreach($liste_coordonees as $key=>$value) {				
+					$longueur = strlen($coordonnees);
+					$position_truncated=strpos($coordonnees,"TRUNCATED");
+					if($position_truncated >0) {
+						$coordonnees_text=substr($coordonnees,31);
+					} else {
+						$coordonnees_text=substr($coordonnees,16);
+					}
+					// Remplacer ')' par ''
+					$coordonnees_text=str_replace($trouver,$remplacer,$coordonnees_text);
+					// Transformer en tableau
+					$coordonnees_text=explode(",",$coordonnees_text);
+					foreach($coordonnees_text as $indice=>$valeur) {
+						// Eclater chaque élément en 2 parties : latitude et longitude
+						$position_moins=strpos($valeur,"-");
+						$longitude=substr($valeur,0,($position_moins - 1));
+						$latitude=substr($valeur,($position_moins));
+						$valeur_temp=array();
+						$position_quatre=strpos($longitude,"4");
+						if($position_quatre >0 && $position_quatre <=3) {
+							$longitude=substr($longitude,$position_quatre);
+						}
+						// Eviter les orphelins ???? lors du test import id 240 : longitude 47.7515 sans couple -18????
+						if(floatval($latitude) <0 and floatval($longitude) >0) {
+							$valeur_temp["latitude"]=$latitude;
+							$valeur_temp["longitude"]=$longitude;						
+							$resultat_coordonnees[]=$valeur_temp;
+						}	
+					}
+					$miseajour=$this->ImportercoordonneescommuneManager->miseajour_coordonnees_commune($id_commune,serialize($resultat_coordonnees));
+				// }
+					if($miseajour) {
+						$nombre_miseajour=$nombre_miseajour + 1;
+					}
+			}	
+		}
+		echo json_encode($nombre_miseajour);
+	}
 } ?>	
