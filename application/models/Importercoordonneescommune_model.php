@@ -147,5 +147,10 @@ class Importercoordonneescommune_model extends CI_Model
             return false;
         }    		
 	}
+	public function Commune_avec_coordonnees_tronquees() {
+		$requete="select * from limite_commune_truncated  where coordonnees >''";
+		$query = $this->db->query($requete);
+		return $query->result();
+	}
 }
 ?>
