@@ -64,7 +64,7 @@ class Commune extends REST_Controller {
                 if ($menu) {
                     foreach ($menu as $key => $value) {
                         
-                        if ($key < 3) {
+                        if ($key < 6) {
                            $district = array();
                         $district = $this->DistrictManager->findById($value->district_id);
                         $data[$key]['id'] = $value->id;
@@ -73,10 +73,7 @@ class Commune extends REST_Controller {
                         $data[$key]['coordonnees'] = unserialize($value->coordonnees);
                         $data[$key]['district_id'] = $value->district_id;
                         $data[$key]['district'] = $district;
-                        $data[$key]['stroke']['color'] = '#6060FB';
-                        $data[$key]['stroke']['weight'] = 1;
-                        $data[$key]['fill']['opacity'] = 0;
-                     //   $data[$key]['events']['click'] =  (object)("function(){console.log();}");
+                 
                         }
                     }
                 } else
