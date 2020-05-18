@@ -64,6 +64,12 @@ class Validationbeneficiaire_model extends CI_Model
 		$query = $this->db->query($requete);
         return $query->result();				
 	}
+	// Selection fokontany par id
+	public function selectionfokontanyparid($id) {
+		$requete="select id,nom,code from fokontany where id='".$id."'";
+		$query = $this->db->query($requete);
+        return $query->result();				
+	}
 	// Selection fokontany par nom et id_commune
 	public function selectionfokontany_avec_espace($nom1,$nom2,$id_commune) {
 		$requete="select id,nom,code from fokontany where lower(nom) like '%".$nom1."%' and lower(nom) like'%".$nom2."%' and id_commune ='".$id_commune."' limit 1";
@@ -181,8 +187,8 @@ class Validationbeneficiaire_model extends CI_Model
 			." left outer join commune as c on c.id=f.id_commune"
 			." left outer join district as d on d.id=c.district_id"
 			." left outer join region as r on r.id=d.region_id"
-			." where i.identifiant_appariement='".$identifiant_appariement."' and i.id_acteur=".$id_acteur
-			." and i.nom='".$nom."' and i.prenom='".$prenom."' and i.cin='".$cin."' and i.id_fokontany=".$id_fokontany;
+			." where m.identifiant_appariement='".$identifiant_appariement."' and m.id_acteur=".$id_acteur
+			." and m.nom='".$nom."' and m.prenom='".$prenom."' and m.cin='".$cin."' and m.id_fokontany=".$id_fokontany;
 			$query = $this->db->query($requete);
 			return $query->result();				
 		} else if($parametre_table=="individu_menage") {
@@ -199,6 +205,46 @@ class Validationbeneficiaire_model extends CI_Model
 			return $query->result();				
 		}
 	}
+	public function RechercheNombreIndividuFokontanyParNomPrenomCIN_Fokontany_Acteur($parametre_table,$identifiant_appariement,$id_acteur,$nom,$prenom,$cin,$id_fokontany,$id_menage) {
+		if($parametre_table=="individu") {
+			// Individu tout court : sans considération clé étrangère id_menage
+			$requete= "select count(*) as nombre"
+			." from individu as i "
+			." where i.identifiant_appariement='".$identifiant_appariement."' and i.id_acteur=".$id_acteur
+			." and i.nom='".$nom."' and i.prenom='".$prenom."' and i.cin='".$cin."' and i.id_fokontany=".$id_fokontany
+			.(intval($id_menage) > 0 ? " and i.id_menage=".$id_menage : "");
+			$query = $this->db->query($requete);
+			return $query->result();				
+		} else if($parametre_table=="menage") {
+			// Chef ménage
+			$requete= "count(*) as nombre"
+			." from menage as m "
+			." where m.identifiant_appariement='".$identifiant_appariement."' and m.id_acteur=".$id_acteur
+			." and m.nom='".$nom."' and m.prenom='".$prenom."' and m.cin='".$cin."' and m.id_fokontany=".$id_fokontany;
+			$query = $this->db->query($requete);
+			return $query->result();				
+		} else if($parametre_table=="individu_menage") {
+			// Individu appartenant à un ménage
+			$requete= "select count(*) as nombre"
+			." from individu as i "
+			."where i.identifiant_appariement='".$identifiant_appariement."' and i.id_acteur=".$id_acteur
+			." and i.nom='".$nom."' and i.prenom='".$prenom."' and i.cin='".$cin."' and i.id_fokontany=".$id_fokontany;
+			$query = $this->db->query($requete);
+			return $query->result();				
+		}
+	}
+	public function RechercheIndividuParIdentifiantAppariementActeur($identifiant_appariement,$id_acteur) {
+			$requete= "select count(*) as nombre,i.id as id_individu,i.id_menage,i.id_fokontany,f.code as code_fokontany,c.code as code_commune,d.code as code_district,r.code as code_region,i.identifiant_unique"
+			." from individu as i "
+			." left outer join fokontany as f on f.id=i.id_fokontany"
+			." left outer join commune as c on c.id=f.id_commune"
+			." left outer join district as d on d.id=c.district_id"
+			." left outer join region as r on r.id=d.region_id"
+			." where i.identifiant_appariement='".$identifiant_appariement."' and i.id_acteur=".$id_acteur
+			." group by i.id,i.id_menage,i.id_fokontany,f.code,c.code,d.code,r.code,i.identifiant_unique";
+		$query = $this->db->query($requete);
+        return $query->result();				
+	}	
 	// Fonction qui controle si un ménage ou individu bénéficie déjà de l'intervention
 	public function ControlerSiBeneficiaireIntervention($table,$id_menage,$id_intervention) {
 		$requete="select count(*) as nombre from ".$table." where id_intervention=".$id_intervention

@@ -193,5 +193,57 @@ class Importationbeneficiaire_model extends CI_Model
 		$query = $this->db->query($requete);
 		return $query->result();				
 	}	
+	// Récupération contenu fichier temporaire
+	public function RecupererTableTemporaire() {
+		// $requete="select * from temporaire where district='VATOMANDRY' order by id";
+		$requete="select * from temporaire "
+		// ."where id<=60001"
+		// ."where id >=60002 and id <=120000"
+		// ."where id >=120001 and id <=180002"
+		// ."where id >=180003 and id <=240000"
+		// ."where id >=240001 and id <=249999"
+		// ."where id >=250000 and id <=265000"
+		// ."where id >=265001 and id <=300000"
+		// ."where id >=300001 and id <=350000"
+		// ."where id >=350001 and id <=355000"
+		// ."where id >=355001 and id <=375003" // 12-05-2020
+		// ."where id >=375004 and id <=378002" // 12-05-2020
+		// ."where id >=378003 and id <=420005" // 12-05-2020
+		// ."where id >=420006 and id <=469911" // Tapaka départ vaovao = 457470
+		// ."where id >=457470 and id <=490001" // 13-05-2020
+		// ."where id >=490002 and id <=502001" // 13-05-2020
+		// ."where id >=502002 and id <=505004" // 13-05-2020
+		// ."where id >=502005 and id <=508006" // 13-05-2020
+		// ."where id >=508007 and id <=512009"
+		// ."where id >=512010 and id <=516002"
+		// ."where id >=516003 and id <=520001"
+		// ."where id >=520002 and id <=524000"
+		// ."where id >=524001 and id <=528004"
+		// ."where id >=528005 and id <=532001"
+		// ."where id >=532002 and id<=536005"
+		// ."where id >=536006 and id<=540500"
+		// ."where id >=540501 and id<=545503"
+		// ."where id >=545504 and id<=549502"
+		// ."where id >=549503"
+		// ." where lower(region) like '%androy%' and lower(district) like '%tsihombe%' "
+		// ." and lower(commune) in ('tsihombe','nikoly','anjampaly') and id < 457470"
+		// Tsihombe  34821 lignes : 14852 individu et 3791 menage
+		." where lower(region) like '%atsimo andrefana%' and lower(district) like '%ankazoabo%' "
+		." and lower(commune) in ('fotivolo','berenty','ankeriky','ankazoabo sud') "		
+		." order by id";
+		$query = $this->db->query($requete);
+		return $query->result();				
+	}	
+	// Mise à jour observation : ERREUR
+	public function MiseajourTableTemporaire($id_temporaire,$observation) {
+		$requete="update temporaire set observation='".$observation."' where id=".$id_temporaire;
+		$query = $this->db->query($requete);
+		return "OK";				
+	}	
+	public function MiseajourIdmenageIdIndividuTableTemporaire($id_temporaire,$id_menage,$id_individu) {
+		$requete="update temporaire set id_menage=".$id_menage.",id_individu=".$id_individu." where id=".$id_temporaire;
+		$query = $this->db->query($requete);
+		return "OK";				
+	}	
 }
 ?>
