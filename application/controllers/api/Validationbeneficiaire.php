@@ -218,36 +218,123 @@ class Validationbeneficiaire extends CI_Controller {
 		foreach($rowIterator as $row) {
 			$ligne = $row->getRowIndex ();
 			if($ligne >=2) {
-				if($ligne ==2) {
+					// Contrôle de toutes les cellules à partir de la ligne 5
 					// Contrôle partenaire / intitulé intervention / Date 
 					 $cellIterator = $row->getCellIterator();
 					 $cellIterator->setIterateOnlyExistingCells(false);
 					 $rowIndex = $row->getRowIndex ();
 					foreach ($cellIterator as $cell) {
-						if('B' == $cell->getColumn()) {
+						if('A' == $cell->getColumn()) {
+							$nom_region = $cell->getValue();
+							$nom_region_original = $cell->getValue();
+						 } else if('B' == $cell->getColumn()) {
+							$nom_district = $cell->getValue();
+							$nom_district_original = $cell->getValue();
+						 } else if('C' == $cell->getColumn()) {
+								$nom_commune =$cell->getValue();	
+								$nom_commune_original =$cell->getValue();	
+						 }	else if('D' == $cell->getColumn()) {
+								$nom_fokontany =$cell->getValue();
+								$nom_fokontany_original =$cell->getValue();
+						} else if('G' == $cell->getColumn()) {
+							$identifiant_appariement =$cell->getValue();
+						 } else if('I' == $cell->getColumn()) {
+							$nom =$cell->getValue();	
+						 } else if('J' == $cell->getColumn()) {
+							$prenom = $cell->getValue();
+						 } else if('K' == $cell->getColumn()) {
+							$chef_menage = $cell->getValue();
+						 } else if('L' == $cell->getColumn()) {
+							$date_naissance = $cell->getValue();
+							$date_naissance_chaine = $cell->getValue();
+							if(isset($date_naissance) && $date_naissance>"") {
+								// $sheet->setCellValue("F".$ligne, PHPExcel_Shared_Date::PHPToExcel( '2014-10-16' ));
+								if(PHPExcel_Shared_Date::isDateTime($cell)) {
+									 $date_naissance = date('Y-m-d', PHPExcel_Shared_Date::ExcelToPHP($date_naissance)); 
+								}
+							} else {
+								$date_naissance=null;
+							}								 
+						 } else if('M' == $cell->getColumn()) {
+							 $age = $cell->getValue();
+						 } else if('N' == $cell->getColumn()) {
+							$sexe = $cell->getValue(); 
+						 } else if('O' == $cell->getColumn()) {
+							 $situation_matrimonale = $cell->getValue();
+						 } else if('P' == $cell->getColumn()) {
+							$cin = $cell->getValue(); 
+						 } else if('Q' == $cell->getColumn()) {
+							$profession = $cell->getValue(); 
+						 } else if('L' == $cell->getColumn()) {
+							 $adresse = $cell->getValue();
+						 } else if('R' == $cell->getColumn()) {
+							$surnom = $cell->getValue(); 
+						 } else if('S' == $cell->getColumn()) {
+							$lien_de_parente = $cell->getValue(); 
+						 } else if('O' == $cell->getColumn()) {
+							 
+						 } else if('U' == $cell->getColumn()) {
+							$niveau_classe = $cell->getValue(); 
+						 } else if('V' == $cell->getColumn()) {
+							$langue = $cell->getValue(); 
+						 } else if('W' == $cell->getColumn()) {
+							$revenu = $cell->getValue(); 
+						 } else if('X' == $cell->getColumn()) {
+							$depense = $cell->getValue(); 
+						 } else if('Z' == $cell->getColumn()) {
+							$telephone = $cell->getValue();  
+						 } else if('AB' == $cell->getColumn()) {
+							$handicap_visuel = $cell->getValue();  
+						 } else if('AC' == $cell->getColumn()) {
+							$handicap_auditif = $cell->getValue();  
+						 } else if('AA' == $cell->getColumn()) {
+							$handicap_moteur = $cell->getValue();  
+						 } else if('AD' == $cell->getColumn()) {
+							$handicap_mental = $cell->getValue();  
+						 } else if('AE' == $cell->getColumn()) {
+							$nom_enqueteur = $cell->getValue();  
+						 } else if('AF' == $cell->getColumn()) {
+							$date_enquete = $cell->getValue();
+							if(isset($date_enquete) && $date_enquete>"") {
+								if(PHPExcel_Shared_Date::isDateTime($cell)) {
+									 $date_enquete = date('Y-m-d', PHPExcel_Shared_Date::ExcelToPHP($date_enquete)); 
+								}
+							} else {
+								$date_enquete=null;
+							}								 							 
+						 } else if('AG' == $cell->getColumn()) {
+							$indice_vulnerabilite = $cell->getValue();  
+						 } else if('E' == $cell->getColumn()) {
 							$nom_acteur =$cell->getValue();
-						} else if('D' == $cell->getColumn()) {
+						} else if('F' == $cell->getColumn()) {
 							$intitule_intervention =$cell->getValue();	
 							$intitule_intervention_original =$cell->getValue();	
-						} else if('F' == $cell->getColumn()) {
+						} else if('Y' == $cell->getColumn()) {
 							$date_inscription = $cell->getValue();
 							$date_envoi_fichier = $cell->getValue();
+							$date_inscription_detail_chaine = $cell->getValue();
 							if(isset($date_inscription) && $date_inscription>"") {
 								if(PHPExcel_Shared_Date::isDateTime($cell)) {
-									 $date_inscription = date($format='Y-m-d', PHPExcel_Shared_Date::ExcelToPHP($date_inscription)); 
+									 $date_inscription = date('Y-m-d', PHPExcel_Shared_Date::ExcelToPHP($date_inscription)); 
 									 $date_inscription_beneficiaire = $date_inscription;
 									 $date_envoi_fichier=$date_inscription;
+									 $date_inscription_detail_beneficiaire=$date_inscription;
 								}
 							} else {
 								$date_inscription=null;
 								$date_inscription_beneficiaire =null;
 								$date_envoi_fichier=null;
+								$date_inscription_detail_beneficiaire=null;
 							}	
-						} else if('H' == $cell->getColumn()) {
+						} else if('AI' == $cell->getColumn()) {
 							$menage_ou_individu = $cell->getValue();
 							$menage_ou_groupe = $cell->getValue();
 						}	 
+						 // } else if('AA' == $cell->getColumn()) {
+							// $handicap_parole = $cell->getValue();  
+						 $handicap_parole='Non';
 					}
+					// Controle ligne par ligne	
 					// Si donnée incorrect : coleur cellule en rouge
 					if($nom_acteur=="") {
 						$nombre_erreur = $nombre_erreur + 1;
@@ -313,7 +400,7 @@ class Validationbeneficiaire extends CI_Controller {
 					if(!$date_inscription) {
 						$nombre_erreur = $nombre_erreur + 1;
 						$erreur_date_envoi_fichier=$erreur_date_envoi_fichier + 1;	
-						$sheet->getStyle("F2")->getFill()->applyFromArray(
+						$sheet->getStyle("Y".$ligne)->getFill()->applyFromArray(
 								 array('type'       => PHPExcel_Style_Fill::FILL_SOLID,'rotation'   => 0,
 									 'startcolor' => array('rgb' => 'FF0000'),
 									 'endcolor'   => array('argb' => 'FF0000')
@@ -340,29 +427,6 @@ class Validationbeneficiaire extends CI_Controller {
 						} else {
 							$menage_ou_individu="individu";
 						}
-					}	
-				}	
-				if($ligne ==3) {
-					// Contrôle découpage administratif
-					 $cellIterator = $row->getCellIterator();
-					 // Loop all cells, even if it is not set
-					 $cellIterator->setIterateOnlyExistingCells(false);
-					 $rowIndex = $row->getRowIndex ();
-					 $a_inserer =0;
-					foreach ($cellIterator as $cell) {
-						if('B' == $cell->getColumn()) {
-							$nom_region = $cell->getValue();
-							$nom_region_original = $cell->getValue();
-						 } else if('D' == $cell->getColumn()) {
-							$nom_district = $cell->getValue();
-							$nom_district_original = $cell->getValue();
-						 } else if('F' == $cell->getColumn()) {
-								$nom_commune =$cell->getValue();	
-								$nom_commune_original =$cell->getValue();	
-						 }	else if('H' == $cell->getColumn()) {
-								$nom_fokontany =$cell->getValue();
-								$nom_fokontany_original =$cell->getValue();
-						 }
 					}
 					// Controle region,district,commune : si tout est ok =>
 					$amoron_mania=false;
@@ -417,25 +481,25 @@ class Validationbeneficiaire extends CI_Controller {
 							} 						
 						} else {
 							// Pas de région : marquer tous les découpages administratif 
-							$sheet->getStyle("B3")->getFill()->applyFromArray(
+							$sheet->getStyle("A".$ligne)->getFill()->applyFromArray(
 									 array('type'       => PHPExcel_Style_Fill::FILL_SOLID,'rotation'   => 0,
 										 'startcolor' => array('rgb' => 'FF0000'),
 										 'endcolor'   => array('argb' => 'FF0000')
 									 )
 							 );	
-							$sheet->getStyle("D3")->getFill()->applyFromArray(
+							$sheet->getStyle("B".$ligne)->getFill()->applyFromArray(
 									 array('type'       => PHPExcel_Style_Fill::FILL_SOLID,'rotation'   => 0,
 										 'startcolor' => array('rgb' => 'FF0000'),
 										 'endcolor'   => array('argb' => 'FF0000')
 									 )
 							 );	
-							$sheet->getStyle("F3")->getFill()->applyFromArray(
+							$sheet->getStyle("C".$ligne)->getFill()->applyFromArray(
 									 array('type'       => PHPExcel_Style_Fill::FILL_SOLID,'rotation'   => 0,
 										 'startcolor' => array('rgb' => 'FF0000'),
 										 'endcolor'   => array('argb' => 'FF0000')
 									 )
 							 );	
-							$sheet->getStyle("H3")->getFill()->applyFromArray(
+							$sheet->getStyle("D".$ligne)->getFill()->applyFromArray(
 									 array('type'       => PHPExcel_Style_Fill::FILL_SOLID,'rotation'   => 0,
 										 'startcolor' => array('rgb' => 'FF0000'),
 										 'endcolor'   => array('argb' => 'FF0000')
@@ -467,19 +531,19 @@ class Validationbeneficiaire extends CI_Controller {
 									}
 								} else {
 									// Pas de district : marquer district,commune,fokontany 
-									$sheet->getStyle("D3")->getFill()->applyFromArray(
+									$sheet->getStyle("B".$ligne)->getFill()->applyFromArray(
 											 array('type'       => PHPExcel_Style_Fill::FILL_SOLID,'rotation'   => 0,
 												 'startcolor' => array('rgb' => 'FF0000'),
 												 'endcolor'   => array('argb' => 'FF0000')
 											 )
 									 );	
-									$sheet->getStyle("F3")->getFill()->applyFromArray(
+									$sheet->getStyle("C".$ligne)->getFill()->applyFromArray(
 											 array('type'       => PHPExcel_Style_Fill::FILL_SOLID,'rotation'   => 0,
 												 'startcolor' => array('rgb' => 'FF0000'),
 												 'endcolor'   => array('argb' => 'FF0000')
 											 )
 									 );	
-									$sheet->getStyle("H3")->getFill()->applyFromArray(
+									$sheet->getStyle("D".$ligne)->getFill()->applyFromArray(
 											 array('type'       => PHPExcel_Style_Fill::FILL_SOLID,'rotation'   => 0,
 												 'startcolor' => array('rgb' => 'FF0000'),
 												 'endcolor'   => array('argb' => 'FF0000')
@@ -511,13 +575,13 @@ class Validationbeneficiaire extends CI_Controller {
 											}
 										} else {
 											// Pas de commune : marquer commune,fokontany 
-											$sheet->getStyle("F3")->getFill()->applyFromArray(
+											$sheet->getStyle("C".$ligne)->getFill()->applyFromArray(
 													 array('type'       => PHPExcel_Style_Fill::FILL_SOLID,'rotation'   => 0,
 														 'startcolor' => array('rgb' => 'FF0000'),
 														 'endcolor'   => array('argb' => 'FF0000')
 													 )
 											 );	
-											$sheet->getStyle("H3")->getFill()->applyFromArray(
+											$sheet->getStyle("D".$ligne)->getFill()->applyFromArray(
 													 array('type'       => PHPExcel_Style_Fill::FILL_SOLID,'rotation'   => 0,
 														 'startcolor' => array('rgb' => 'FF0000'),
 														 'endcolor'   => array('argb' => 'FF0000')
@@ -547,10 +611,10 @@ class Validationbeneficiaire extends CI_Controller {
 														$id_fokontany = $v->id;
 														$code_fokontany = $v->code;
 													}
-													$sheet->setCellValue("I3", $id_fokontany);
+													$sheet->setCellValue("AJ".$ligne, $id_fokontany);
 												} else {													
 													// Pas de fokontany : marquer fokontany 
-													$sheet->getStyle("H3")->getFill()->applyFromArray(
+													$sheet->getStyle("D".$ligne)->getFill()->applyFromArray(
 															 array('type'       => PHPExcel_Style_Fill::FILL_SOLID,'rotation'   => 0,
 																 'startcolor' => array('rgb' => 'FF0000'),
 																 'endcolor'   => array('argb' => 'FF0000')
@@ -561,7 +625,7 @@ class Validationbeneficiaire extends CI_Controller {
 												}												
 											} else {
 												// Pas de fokontany : marquer fokontany 
-												$sheet->getStyle("H3")->getFill()->applyFromArray(
+												$sheet->getStyle("D".$ligne)->getFill()->applyFromArray(
 														 array('type'       => PHPExcel_Style_Fill::FILL_SOLID,'rotation'   => 0,
 															 'startcolor' => array('rgb' => 'FF0000'),
 															 'endcolor'   => array('argb' => 'FF0000')
@@ -573,13 +637,13 @@ class Validationbeneficiaire extends CI_Controller {
 										} 
 									} else {										
 										// Pas de commune : marquer commune,fokontany 
-										$sheet->getStyle("F3")->getFill()->applyFromArray(
+										$sheet->getStyle("C".$ligne)->getFill()->applyFromArray(
 												 array('type'       => PHPExcel_Style_Fill::FILL_SOLID,'rotation'   => 0,
 													 'startcolor' => array('rgb' => 'FF0000'),
 													 'endcolor'   => array('argb' => 'FF0000')
 												 )
 										 );	
-										$sheet->getStyle("H3")->getFill()->applyFromArray(
+										$sheet->getStyle("D".$ligne)->getFill()->applyFromArray(
 												 array('type'       => PHPExcel_Style_Fill::FILL_SOLID,'rotation'   => 0,
 													 'startcolor' => array('rgb' => 'FF0000'),
 													 'endcolor'   => array('argb' => 'FF0000')
@@ -591,19 +655,19 @@ class Validationbeneficiaire extends CI_Controller {
 								}
 							} else {
 								// Pas de district : marquer district,commune,fokontany 
-								$sheet->getStyle("D3")->getFill()->applyFromArray(
+								$sheet->getStyle("B".$ligne)->getFill()->applyFromArray(
 										 array('type'       => PHPExcel_Style_Fill::FILL_SOLID,'rotation'   => 0,
 											 'startcolor' => array('rgb' => 'FF0000'),
 											 'endcolor'   => array('argb' => 'FF0000')
 										 )
 								 );	
-								$sheet->getStyle("F3")->getFill()->applyFromArray(
+								$sheet->getStyle("C".$ligne)->getFill()->applyFromArray(
 										 array('type'       => PHPExcel_Style_Fill::FILL_SOLID,'rotation'   => 0,
 											 'startcolor' => array('rgb' => 'FF0000'),
 											 'endcolor'   => array('argb' => 'FF0000')
 										 )
 								 );	
-								$sheet->getStyle("H3")->getFill()->applyFromArray(
+								$sheet->getStyle("D".$ligne)->getFill()->applyFromArray(
 										 array('type'       => PHPExcel_Style_Fill::FILL_SOLID,'rotation'   => 0,
 											 'startcolor' => array('rgb' => 'FF0000'),
 											 'endcolor'   => array('argb' => 'FF0000')
@@ -615,25 +679,25 @@ class Validationbeneficiaire extends CI_Controller {
 						}
 					} else {
 						// Pas de région : marquer tous les découpages administratif 
-						$sheet->getStyle("B3")->getFill()->applyFromArray(
+						$sheet->getStyle("A".$ligne)->getFill()->applyFromArray(
 								 array('type'       => PHPExcel_Style_Fill::FILL_SOLID,'rotation'   => 0,
 									 'startcolor' => array('rgb' => 'FF0000'),
 									 'endcolor'   => array('argb' => 'FF0000')
 								 )
 						 );	
-						$sheet->getStyle("D3")->getFill()->applyFromArray(
+						$sheet->getStyle("B".$ligne)->getFill()->applyFromArray(
 								 array('type'       => PHPExcel_Style_Fill::FILL_SOLID,'rotation'   => 0,
 									 'startcolor' => array('rgb' => 'FF0000'),
 									 'endcolor'   => array('argb' => 'FF0000')
 								 )
 						 );	
-						$sheet->getStyle("F3")->getFill()->applyFromArray(
+						$sheet->getStyle("C".$ligne)->getFill()->applyFromArray(
 								 array('type'       => PHPExcel_Style_Fill::FILL_SOLID,'rotation'   => 0,
 									 'startcolor' => array('rgb' => 'FF0000'),
 									 'endcolor'   => array('argb' => 'FF0000')
 								 )
 						 );	
-						$sheet->getStyle("H3")->getFill()->applyFromArray(
+						$sheet->getStyle("D".$ligne)->getFill()->applyFromArray(
 								 array('type'       => PHPExcel_Style_Fill::FILL_SOLID,'rotation'   => 0,
 									 'startcolor' => array('rgb' => 'FF0000'),
 									 'endcolor'   => array('argb' => 'FF0000')
@@ -642,95 +706,8 @@ class Validationbeneficiaire extends CI_Controller {
 						$nombre_erreur = $nombre_erreur + 1;
 						$erreur_nom_region = $erreur_nom_region + 1;	
 					}
-				}		
-				if($ligne >=5) {
-					// Contrôle de toutes les cellules à partir de la ligne 5
-					// Contrôle partenaire / intitulé intervention / Date 
-					 $cellIterator = $row->getCellIterator();
-					 $cellIterator->setIterateOnlyExistingCells(false);
-					 $rowIndex = $row->getRowIndex ();
-					foreach ($cellIterator as $cell) {
-						 if('B' == $cell->getColumn()) {
-							$identifiant_appariement =$cell->getValue();
-						 } else if('C' == $cell->getColumn()) {
-							$nom =$cell->getValue();	
-						 } else if('D' == $cell->getColumn()) {
-							$prenom = $cell->getValue();
-						 } else if('E' == $cell->getColumn()) {
-							$chef_menage = $cell->getValue();
-						 } else if('F' == $cell->getColumn()) {
-							$date_naissance = $cell->getValue();
-							$date_naissance_chaine = $cell->getValue();
-							if(isset($date_naissance) && $date_naissance>"") {
-								if(PHPExcel_Shared_Date::isDateTime($cell)) {
-									 $date_naissance = date($format='Y-m-d', PHPExcel_Shared_Date::ExcelToPHP($date_naissance)); 
-								}
-							} else {
-								$date_naissance=null;
-							}								 
-						 } else if('G' == $cell->getColumn()) {
-							 $age = $cell->getValue();
-						 } else if('H' == $cell->getColumn()) {
-							$sexe = $cell->getValue(); 
-						 } else if('I' == $cell->getColumn()) {
-							 $situation_matrimonale = $cell->getValue();
-						 } else if('J' == $cell->getColumn()) {
-							$cin = $cell->getValue(); 
-						 } else if('K' == $cell->getColumn()) {
-							$profession = $cell->getValue(); 
-						 } else if('L' == $cell->getColumn()) {
-							 $adresse = $cell->getValue();
-						 } else if('M' == $cell->getColumn()) {
-							$surnom = $cell->getValue(); 
-						 } else if('N' == $cell->getColumn()) {
-							$lien_de_parente = $cell->getValue(); 
-						 } else if('O' == $cell->getColumn()) {
-							 
-						 } else if('P' == $cell->getColumn()) {
-							$niveau_classe = $cell->getValue(); 
-						 } else if('Q' == $cell->getColumn()) {
-							$langue = $cell->getValue(); 
-						 } else if('R' == $cell->getColumn()) {
-							$revenu = $cell->getValue(); 
-						 } else if('S' == $cell->getColumn()) {
-							$depense = $cell->getValue(); 
-						 } else if('T' == $cell->getColumn()) {
-							$date_inscription_detail_beneficiaire = $cell->getValue();
-							$date_inscription_detail_chaine = $cell->getValue();
-							if(isset($date_inscription_detail_beneficiaire) && $date_inscription_detail_beneficiaire>"") {
-								if(PHPExcel_Shared_Date::isDateTime($cell)) {
-									 $date_inscription_detail_beneficiaire = date($format='Y-m-d', PHPExcel_Shared_Date::ExcelToPHP($date_inscription_detail_beneficiaire)); 
-								}
-							} else {
-								$date_inscription_detail_beneficiaire=null;
-							}								 							 
-						 } else if('U' == $cell->getColumn()) {
-							$telephone = $cell->getValue();  
-						 } else if('V' == $cell->getColumn()) {
-							$handicap_visuel = $cell->getValue();  
-						 } else if('W' == $cell->getColumn()) {
-							$handicap_auditif = $cell->getValue();  
-						 } else if('X' == $cell->getColumn()) {
-							$handicap_parole = $cell->getValue();  
-						 } else if('Y' == $cell->getColumn()) {
-							$handicap_moteur = $cell->getValue();  
-						 } else if('Z' == $cell->getColumn()) {
-							$handicap_mental = $cell->getValue();  
-						 } else if('AA' == $cell->getColumn()) {
-							$nom_enqueteur = $cell->getValue();  
-						 } else if('AB' == $cell->getColumn()) {
-							$date_inscription = $cell->getValue();
-							if(isset($date_inscription) && $date_inscription>"") {
-								if(PHPExcel_Shared_Date::isDateTime($cell)) {
-									 $date_inscription = date($format='Y-m-d', PHPExcel_Shared_Date::ExcelToPHP($date_inscription)); 
-								}
-							} else {
-								$date_inscription=null;
-							}								 							 
-						 } else if('AC' == $cell->getColumn()) {
-							$indice_vulnerabilite = $cell->getValue();  
-						 }
-					}
+					// Controle ligne par ligne	
+				
 					if($identifiant_appariement=='') {
 						$sheet->getStyle("B".$ligne)->getFill()->applyFromArray(
 								 array('type'       => PHPExcel_Style_Fill::FILL_SOLID,'rotation'   => 0,
@@ -742,7 +719,7 @@ class Validationbeneficiaire extends CI_Controller {
 						$erreur_identifiant_appariement=$erreur_identifiant_appariement + 1;	
 					}
 					if($nom=='') {
-						$sheet->getStyle("C".$ligne)->getFill()->applyFromArray(
+						$sheet->getStyle("I".$ligne)->getFill()->applyFromArray(
 								 array('type'       => PHPExcel_Style_Fill::FILL_SOLID,'rotation'   => 0,
 									 'startcolor' => array('rgb' => 'FF0000'),
 									 'endcolor'   => array('argb' => 'FF0000')
@@ -790,7 +767,7 @@ class Validationbeneficiaire extends CI_Controller {
 						
 					} */
 					if($date_naissance_chaine=="0000-00-00" || $date_naissance_chaine=="00-00-0000" || $date_naissance_chaine=="00/00/0000") {
-						$sheet->getStyle("F".$ligne)->getFill()->applyFromArray(
+						$sheet->getStyle("L".$ligne)->getFill()->applyFromArray(
 								 array('type'       => PHPExcel_Style_Fill::FILL_SOLID,'rotation'   => 0,
 									 'startcolor' => array('rgb' => 'FF0000'),
 									 'endcolor'   => array('argb' => 'FF0000')
@@ -800,7 +777,7 @@ class Validationbeneficiaire extends CI_Controller {
 						$erreur_date_naissance_age=$erreur_date_naissance_age + 1;	
 					}
 					if(intval($age) >120) {
-						$sheet->getStyle("G".$ligne)->getFill()->applyFromArray(
+						$sheet->getStyle("M".$ligne)->getFill()->applyFromArray(
 								 array('type'       => PHPExcel_Style_Fill::FILL_SOLID,'rotation'   => 0,
 									 'startcolor' => array('rgb' => 'FF0000'),
 									 'endcolor'   => array('argb' => 'FF0000')
@@ -810,7 +787,7 @@ class Validationbeneficiaire extends CI_Controller {
 						$erreur_date_naissance_age=$erreur_date_naissance_age + 1;	
 					}
 					if($sexe=='') {
-						$sheet->getStyle("H".$ligne)->getFill()->applyFromArray(
+						$sheet->getStyle("N".$ligne)->getFill()->applyFromArray(
 								 array('type'       => PHPExcel_Style_Fill::FILL_SOLID,'rotation'   => 0,
 									 'startcolor' => array('rgb' => 'FF0000'),
 									 'endcolor'   => array('argb' => 'FF0000')
@@ -920,7 +897,7 @@ class Validationbeneficiaire extends CI_Controller {
 						$erreur_depense=$erreur_depense + 1;
 					}*/
 					if($date_inscription_detail_beneficiaire=='') {
-						$sheet->getStyle("T".$ligne)->getFill()->applyFromArray(
+						$sheet->getStyle("Y".$ligne)->getFill()->applyFromArray(
 								 array('type'       => PHPExcel_Style_Fill::FILL_SOLID,'rotation'   => 0,
 									 'startcolor' => array('rgb' => 'FF0000'),
 									 'endcolor'   => array('argb' => 'FF0000')
@@ -930,7 +907,7 @@ class Validationbeneficiaire extends CI_Controller {
 						$erreur_date_inscription_detail_beneficiaire=$erreur_date_inscription_detail_beneficiaire + 1;
 					}
 					if($date_inscription_detail_chaine=="0000-00-00" || $date_inscription_detail_chaine=="00-00-0000" || $date_inscription_detail_chaine=="00/00/0000") {
-						$sheet->getStyle("T".$ligne)->getFill()->applyFromArray(
+						$sheet->getStyle("Y".$ligne)->getFill()->applyFromArray(
 								 array('type'       => PHPExcel_Style_Fill::FILL_SOLID,'rotation'   => 0,
 									 'startcolor' => array('rgb' => 'FF0000'),
 									 'endcolor'   => array('argb' => 'FF0000')
@@ -1031,12 +1008,11 @@ class Validationbeneficiaire extends CI_Controller {
 							$erreur_indice_vulnerabilite=$erreur_indice_vulnerabilite + 1;
 						}
 					}	
-				}	
 				$ligne = $ligne + 1;
 			}		
 		}
-		$date_inscription_beneficiaire = new DateTime($date_inscription_beneficiaire); 
-		$date_inscription_beneficiaire =$date_inscription_beneficiaire->format('d/m/Y');				
+		// $date_inscription_beneficiaire = new DateTime($date_inscription_beneficiaire); 
+		// $date_inscription_beneficiaire =$date_inscription_beneficiaire->format('d/m/Y');				
 		$objWriter = PHPExcel_IOFactory::createWriter($excel, 'Excel2007');
 		$objWriter->save(dirname(__FILE__) . "/../../../../" .$repertoire. $nomfichier);
 		$val_ret = array();
@@ -1137,90 +1113,120 @@ class Validationbeneficiaire extends CI_Controller {
 				// 2- Par nom,prenom CIN / Fokontany
 				$beneficiaire_existant = false; // Si bénéficiaire déjà repertorié => Vérifier si déjà bénéficiaire de l'intervention =>Doublon
 				$ligne = $row->getRowIndex ();
-				if($ligne >=5) {
+				if($ligne >=2) {
 					// Contrôle de toutes les cellules à partir de la ligne 5
 					 $cellIterator = $row->getCellIterator();
 					 $cellIterator->setIterateOnlyExistingCells(false);
 					 $rowIndex = $row->getRowIndex ();
 					foreach ($cellIterator as $cell) {
 						if('A' == $cell->getColumn()) {
-							$numero_ordre=$cell->getValue();
-						} else if('B' == $cell->getColumn()) {
-							$identifiant_appariement =$cell->getValue();
+							$nom_region = $cell->getValue();
+							$nom_region_original = $cell->getValue();
+						 } else if('B' == $cell->getColumn()) {
+							$nom_district = $cell->getValue();
+							$nom_district_original = $cell->getValue();
 						 } else if('C' == $cell->getColumn()) {
+								$nom_commune =$cell->getValue();	
+								$nom_commune_original =$cell->getValue();	
+						 }	else if('D' == $cell->getColumn()) {
+								$nom_fokontany =$cell->getValue();
+								$nom_fokontany_original =$cell->getValue();
+						} else if('G' == $cell->getColumn()) {
+							$identifiant_appariement =$cell->getValue();
+						 } else if('I' == $cell->getColumn()) {
 							$nom =$cell->getValue();	
-						 } else if('D' == $cell->getColumn()) {
+						 } else if('J' == $cell->getColumn()) {
 							$prenom = $cell->getValue();
-						 } else if('E' == $cell->getColumn()) {
+						 } else if('K' == $cell->getColumn()) {
 							$chef_menage = $cell->getValue();
-						 } else if('F' == $cell->getColumn()) {
+						 } else if('L' == $cell->getColumn()) {
 							$date_naissance = $cell->getValue();
+							$date_naissance_chaine = $cell->getValue();
 							if(isset($date_naissance) && $date_naissance>"") {
+								// $sheet->setCellValue("F".$ligne, PHPExcel_Shared_Date::PHPToExcel( '2014-10-16' ));
 								if(PHPExcel_Shared_Date::isDateTime($cell)) {
-									 $date_naissance = date($format='Y-m-d', PHPExcel_Shared_Date::ExcelToPHP($date_naissance)); 
+									 $date_naissance = date('Y-m-d', PHPExcel_Shared_Date::ExcelToPHP($date_naissance)); 
 								}
 							} else {
 								$date_naissance=null;
 							}								 
-						 } else if('G' == $cell->getColumn()) {
+						 } else if('M' == $cell->getColumn()) {
 							 $age = $cell->getValue();
-						 } else if('H' == $cell->getColumn()) {
+						 } else if('N' == $cell->getColumn()) {
 							$sexe = $cell->getValue(); 
-						 } else if('I' == $cell->getColumn()) {
+						 } else if('O' == $cell->getColumn()) {
 							 $situation_matrimonale = $cell->getValue();
-						 } else if('J' == $cell->getColumn()) {
+						 } else if('P' == $cell->getColumn()) {
 							$cin = $cell->getValue(); 
-						 } else if('K' == $cell->getColumn()) {
+						 } else if('Q' == $cell->getColumn()) {
 							$profession = $cell->getValue(); 
 						 } else if('L' == $cell->getColumn()) {
 							 $adresse = $cell->getValue();
-						 } else if('M' == $cell->getColumn()) {
+						 } else if('R' == $cell->getColumn()) {
 							$surnom = $cell->getValue(); 
-						 } else if('N' == $cell->getColumn()) {
+						 } else if('S' == $cell->getColumn()) {
 							$lien_de_parente = $cell->getValue(); 
 						 } else if('O' == $cell->getColumn()) {
 							 
-						 } else if('P' == $cell->getColumn()) {
-							$niveau_classe = $cell->getValue(); 
-						 } else if('Q' == $cell->getColumn()) {
-							$langue = $cell->getValue(); 
-						 } else if('R' == $cell->getColumn()) {
-							$revenu = $cell->getValue(); 
-						 } else if('S' == $cell->getColumn()) {
-							$depense = $cell->getValue(); 
-						 } else if('T' == $cell->getColumn()) {
-							$date_inscription = $cell->getValue();
-							if(isset($date_inscription) && $date_inscription>"") {
-								if(PHPExcel_Shared_Date::isDateTime($cell)) {
-									 $date_inscription = date($format='Y-m-d', PHPExcel_Shared_Date::ExcelToPHP($date_inscription)); 
-								}
-							} else {
-								$date_inscription=null;
-							}								 							 
 						 } else if('U' == $cell->getColumn()) {
-							$telephone = $cell->getValue();  
+							$niveau_classe = $cell->getValue(); 
 						 } else if('V' == $cell->getColumn()) {
-							$handicap_visuel = $cell->getValue();  
+							$langue = $cell->getValue(); 
 						 } else if('W' == $cell->getColumn()) {
-							$handicap_auditif = $cell->getValue();  
+							$revenu = $cell->getValue(); 
 						 } else if('X' == $cell->getColumn()) {
-							$handicap_parole = $cell->getValue();  
-						 } else if('Y' == $cell->getColumn()) {
-							$handicap_moteur = $cell->getValue();  
+							$depense = $cell->getValue(); 
 						 } else if('Z' == $cell->getColumn()) {
-							$handicap_mental = $cell->getValue();  
-						 } else if('AA' == $cell->getColumn()) {
-							$nom_enqueteur = $cell->getValue();  
+							$telephone = $cell->getValue();  
 						 } else if('AB' == $cell->getColumn()) {
+							$handicap_visuel = $cell->getValue();  
+						 } else if('AC' == $cell->getColumn()) {
+							$handicap_auditif = $cell->getValue();  
+						 } else if('AA' == $cell->getColumn()) {
+							$handicap_moteur = $cell->getValue();  
+						 } else if('AD' == $cell->getColumn()) {
+							$handicap_mental = $cell->getValue();  
+						 } else if('AE' == $cell->getColumn()) {
+							$nom_enqueteur = $cell->getValue();  
+						 } else if('AF' == $cell->getColumn()) {
 							$date_enquete = $cell->getValue();
 							if(isset($date_enquete) && $date_enquete>"") {
 								if(PHPExcel_Shared_Date::isDateTime($cell)) {
-									 $date_enquete = date($format='Y-m-d', PHPExcel_Shared_Date::ExcelToPHP($date_enquete)); 
+									 $date_enquete = date('Y-m-d', PHPExcel_Shared_Date::ExcelToPHP($date_enquete)); 
 								}
 							} else {
 								$date_enquete=null;
 							}								 							 
-						 }
+						 } else if('AG' == $cell->getColumn()) {
+							$indice_vulnerabilite = $cell->getValue();  
+						 } else if('E' == $cell->getColumn()) {
+							$nom_acteur =$cell->getValue();
+						} else if('F' == $cell->getColumn()) {
+							$intitule_intervention =$cell->getValue();	
+							$intitule_intervention_original =$cell->getValue();	
+						} else if('Y' == $cell->getColumn()) {
+							$date_inscription = $cell->getValue();
+							$date_envoi_fichier = $cell->getValue();
+							if(isset($date_inscription) && $date_inscription>"") {
+								if(PHPExcel_Shared_Date::isDateTime($cell)) {
+									 $date_inscription = date('Y-m-d', PHPExcel_Shared_Date::ExcelToPHP($date_inscription)); 
+									 $date_inscription_beneficiaire = $date_inscription;
+									 $date_envoi_fichier=$date_inscription;
+									 $date_inscription_detail_beneficiaire = $date_inscription;
+								}
+							} else {
+								$date_inscription=null;
+								$date_inscription_beneficiaire =null;
+								$date_envoi_fichier=null;
+								$date_inscription_detail_beneficiaire=null;
+							}	
+						} else if('AI' == $cell->getColumn()) {
+							$menage_ou_individu = $cell->getValue();
+							$menage_ou_groupe = $cell->getValue();
+						}	
+						 // } else if('AA' == $cell->getColumn()) {
+							// $handicap_parole = $cell->getValue();  
+						$handicap_parole ='Non';
 					}
 					$nom=str_replace($search,$replace,$nom);
 					$prenom=str_replace($search,$replace,$prenom);					
@@ -1230,7 +1236,7 @@ class Validationbeneficiaire extends CI_Controller {
 						$parametre_table="individu";
 						$table ="individu";
 						$table_controle ="individu_beneficiaire"; // Pour controler si un individu est déjà bénéficiaire de l'intervention
-					} else if(strtolower($chef_menage) =="o") {
+					} else if(strtolower($chef_menage) =="oui") {
 						// Si chef ménage
 						$parametre_table="menage";
 						$table ="menage";
@@ -1239,10 +1245,10 @@ class Validationbeneficiaire extends CI_Controller {
 						// Individu apprtenant à un ménage
 						$parametre_table="individu";
 						$table ="individu";
-						$table_controle ="menage_beneficiaire"; // Pour controler si un ménage est déjà bénéficiaire de l'intervention
+						$table_controle ="menage_beneficiaire"; // Pour controler si un individu est déjà bénéficiaire de l'intervention
 					}					
 					if($menage_ou_individu=="menage" || $menage_ou_individu=="groupe") {
-						if(strtolower($chef_menage) =="o") {
+						if(strtolower($chef_menage) =="oui") {
 							// 1- Recherche par identifiant_appariement = $identifiant_appariement et $id_acteur stocké auparavant CHEF MENAGE
 							$retour=$this->ValidationbeneficiaireManager->RechercheParIdentifiantActeur($table,$identifiant_appariement,$id_acteur);
 							$nombre=0;
@@ -1272,11 +1278,13 @@ class Validationbeneficiaire extends CI_Controller {
 							}
 						} else {
 							// 2- Recherche individu appartenant à un ménage
-							$retour=$this->ValidationbeneficiaireManager->RechercheFokontanyParNomPrenomCIN_Fokontany_Acteur($parametre_table,$identifiant_appariement,$id_acteur,$nom,$prenom,$cin,$id_fokontany,$id_menage);
 							$nombre=0;
-							foreach($retour as $k=>$v) {
-								$nombre = $v->nombre;
-							}							
+							if($id_fokontany >0) {
+								$retour=$this->ValidationbeneficiaireManager->RechercheFokontanyParNomPrenomCIN_Fokontany_Acteur($parametre_table,$identifiant_appariement,$id_acteur,$nom,$prenom,$cin,$id_fokontany,$id_menage);
+								foreach($retour as $k=>$v) {
+									$nombre = $v->nombre;
+								}															
+							}
 						}	
 					} else {
 						// 3- Recherche individu sans attache ménage
@@ -1289,7 +1297,7 @@ class Validationbeneficiaire extends CI_Controller {
 					}	
 					if($nombre >0) {
 						if( $menage_ou_individu=="menage" || $menage_ou_individu=="groupe") {
-							if(strtolower($chef_menage) =="o") {
+							if(strtolower($chef_menage) =="oui") {
 								// Chef ménage
 								$retour=$this->ValidationbeneficiaireManager->RechercheFokontanyMenageParIdentifiantActeur($identifiant_appariement,$id_acteur);
 								$code_region="????";
@@ -1393,7 +1401,7 @@ class Validationbeneficiaire extends CI_Controller {
 						// De plus si la liste est ménage; il faut chercher dans la table menage si chef_menage = "O"
 						// sinon recherche dans la table individu
 						if($menage_ou_individu=="menage" || $menage_ou_individu=="groupe") {
-							if(strtolower($chef_menage) =="o") {
+							if(strtolower($chef_menage) =="oui") {
 								// 1- CHEF MENAGE
 								$retour=$this->ValidationbeneficiaireManager->RechercheMenageParNomPrenomCIN_Fokontany_Acteur($identifiant_appariement,$id_acteur,$nom,$prenom,$cin,$id_fokontany);
 								$code_region="????";
@@ -1433,26 +1441,27 @@ class Validationbeneficiaire extends CI_Controller {
 								}	 
 							} else {
 								// 2- Recherche individu appartenant à un ménage
-								$retour=$this->ValidationbeneficiaireManager->RechercheIndividuMenageParNomPrenomCIN_Fokontany_Acteur($identifiant_appariement,$id_acteur,$nom,$prenom,$cin,$id_fokontany,$id_menage);
 								$code_region="????";
 								$code_district="????";
 								$code_commune="????";
 								$code_fokontany="????";
 								$id_individu=null;
-								
-								if($retour) {
-									 foreach($retour as $k=>$v) {
-										$code_region=$v->code_region;
-										$code_district=$v->code_district;
-										$code_commune=$v->code_commune;
-										$code_fokontany=$v->code_fokontany;							 
-										$identifiant_unique=$v->identifiant_unique;
-										$id_menage=$v->id_menage; 
-										$id_individu=$v->id_individu; 
-									 }
-									$sheet->setCellValue("AD".$ligne, $code_region."-".$code_district."-".$code_commune."-".$code_fokontany."-".$identifiant_unique);
-									$beneficiaire_existant=true;
-								}	 
+								if($id_fokontany>0) {
+									$retour=$this->ValidationbeneficiaireManager->RechercheIndividuMenageParNomPrenomCIN_Fokontany_Acteur($identifiant_appariement,$id_acteur,$nom,$prenom,$cin,$id_fokontany,$id_menage);								
+									if($retour) {
+										 foreach($retour as $k=>$v) {
+											$code_region=$v->code_region;
+											$code_district=$v->code_district;
+											$code_commune=$v->code_commune;
+											$code_fokontany=$v->code_fokontany;							 
+											$identifiant_unique=$v->identifiant_unique;
+											$id_menage=$v->id_menage; 
+											$id_individu=$v->id_individu; 
+										 }
+										$sheet->setCellValue("AD".$ligne, $code_region."-".$code_district."-".$code_commune."-".$code_fokontany."-".$identifiant_unique);
+										$beneficiaire_existant=true;
+									}	
+								}			
 							}	
 						} else {
 							// 3- Recherche individu sans attache ménage
@@ -1506,7 +1515,8 @@ class Validationbeneficiaire extends CI_Controller {
 						$date_naissance = date('d/m/Y', strtotime($now. ' -'.$age.' years +1 days'));
 						
 						// $date_naissance = $date_par_defaut->sub(DateInterval::createFromDateString("'".$age." year'"));
-						$sheet->setCellValue('F'.$ligne, $date_naissance);
+						// $sheet->setCellValue('F'.$ligne, $date_naissance);
+						$sheet->setCellValue('L'.$ligne, $date_naissance);
 						// $sheet->setCellValue('I3', $id_fokontany);
 					}
 				}	
@@ -1514,7 +1524,8 @@ class Validationbeneficiaire extends CI_Controller {
 			}
 			if($nombre_erreur > 0) {
 				// Signaler les erreurs par mail
-				$date_inscription_beneficiaire = new DateTime($date_envoi_fichier); 
+				// $date_inscription_beneficiaire = new DateTime($date_envoi_fichier); 
+				$date_inscription_beneficiaire = new DateTime(); 
 				$date_inscription_beneficiaire =$date_inscription_beneficiaire->format('d/m/Y');				
 				$val_ret["reponse"] = "ERREUR";
 				$val_ret["region"] = $nom_region_original;
