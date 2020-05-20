@@ -16,34 +16,51 @@ class District extends REST_Controller {
     public function index_get() {
         $id = $this->get('id');
         $cle_etrangere = $this->get('cle_etrangere');
-        if ($cle_etrangere){
+        $data_non_vide = $this->get('data_non_vide');
+
+        if ($cle_etrangere)
+        {
             $data = array();
-			// Récupération de tous les district par région
-            $tmp = $this->DistrictManager->findAllByRegion($cle_etrangere);
-            if ($tmp) 
+			if ($data_non_vide == 1) 
             {
-                foreach ($tmp as $key => $value) 
+                $data = $this->DistrictManager->findAllByRegion_filter($cle_etrangere);
+            }
+            else
+            {
+                // Récupération de tous les district par région
+                $tmp = $this->DistrictManager->findAllByRegion($cle_etrangere);
+                if ($tmp) 
                 {
-					// Récupération description région
-                    $region = array();
-                    $region = $this->RegionManager->findById($value->region_id);
-                    $data[$key]['id'] = $value->id;
-                    $data[$key]['code'] = $value->code;
-                    $data[$key]['nom'] = $value->nom;
-                    $data[$key]['region'] = $region;
+                    foreach ($tmp as $key => $value) 
+                    {
+                        // Récupération description région
+                        $region = array();
+                        $region = $this->RegionManager->findById($value->region_id);
+                        $data[$key]['id'] = $value->id;
+                        $data[$key]['code'] = $value->code;
+                        $data[$key]['nom'] = $value->nom;
+                        $data[$key]['region'] = $region;
+                    }
                 }
             }
             
-        } else {
-            if ($id) {
+        } 
+        else 
+        {
+            if ($id) 
+            {
                 $data = array();
 				// Récupération par id
                 $data = $this->DistrictManager->findById($id);
-            } else {
+            } 
+            else 
+            {
 				// Récupération de tous les districts
                 $menu = $this->DistrictManager->findAll();
-                if ($menu) {
-                    foreach ($menu as $key => $value) {
+                if ($menu) 
+                {
+                    foreach ($menu as $key => $value) 
+                    {
                         $region = array();
                         $region = $this->RegionManager->findById($value->region_id);
                         $data[$key]['id'] = $value->id;
@@ -52,7 +69,8 @@ class District extends REST_Controller {
                         $data[$key]['region_id'] = $value->region_id;
                         $data[$key]['region'] = $region;
                     }
-                } else
+                } 
+                else
                     $data = array();
             }
         }

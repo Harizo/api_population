@@ -12,8 +12,10 @@ class Region extends REST_Controller {
         $this->load->model('region_model', 'RegionManager');
     }
     //recuperation region
-    public function index_get() {
+    public function index_get() 
+    {
         $id = $this->get('id');
+        $all_filter = $this->get('all_filter');
             if ($id) {
                 $data = array();
 				// Selection par id
@@ -23,20 +25,32 @@ class Region extends REST_Controller {
                 $data['nom'] = $region->nom;
                 $data['chef_lieu'] = $region->chef_lieu;
                 
-            } else {
-				// Selection de tous les enregistrements
-                $region = $this->RegionManager->findAll();
-                if ($region) {
-                    foreach ($region as $key => $value) {
-                        
-                        $data[$key]['id'] = $value->id;
-                        $data[$key]['code'] = $value->code;
-                        $data[$key]['nom'] = $value->nom;
-                        $data[$key]['chef_lieu'] = $value->chef_lieu;
-                        
-                    };
-                } else
-                    $data = array();
+            } 
+            else 
+            {
+				if ($all_filter == 1) 
+                {
+                    $data = $this->RegionManager->findAll_filter();
+                }
+                else
+                {
+                    // Selection de tous les enregistrements
+                    $region = $this->RegionManager->findAll();
+                    if ($region) 
+                    {
+                        foreach ($region as $key => $value) 
+                        {
+                            
+                            $data[$key]['id'] = $value->id;
+                            $data[$key]['code'] = $value->code;
+                            $data[$key]['nom'] = $value->nom;
+                            $data[$key]['chef_lieu'] = $value->chef_lieu;
+                            
+                        };
+                    } 
+                    else
+                        $data = array();
+                }
             }
         if (count($data)>0) {
             $this->response([

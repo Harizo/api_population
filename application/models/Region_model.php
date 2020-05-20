@@ -83,6 +83,63 @@ class Region_model extends CI_Model
             return null;
         }                 
     }
+
+    public function findAll_filter()
+    {   
+        $sql = "
+
+
+                select
+
+                    niv_1.id,
+                    niv_1.code,
+                    niv_1.nom,
+                    niv_1.chef_lieu
+
+                from
+                    (
+                        select 
+
+                            DISTINCT(reg.id) as id,
+                            reg.nom as nom,
+                            reg.code as code,
+                            reg.chef_lieu as chef_lieu
+                              
+                        from 
+                            menage as men
+
+                            join fokontany as foko on foko.id=men.id_fokontany
+                            join commune as com on com.id=foko.id_commune
+                            join district as dist on dist.id=com.district_id
+                            join region as reg on reg.id=dist.region_id
+
+                    UNION
+
+                        select 
+
+                            DISTINCT(reg.id) as id,
+                            reg.nom as nom,
+                            reg.code as code,
+                            reg.chef_lieu as chef_lieu
+                              
+                        from 
+                            individu as ind
+
+                            join fokontany as foko on foko.id=ind.id_fokontany
+                            join commune as com on com.id=foko.id_commune
+                            join district as dist on dist.id=com.district_id
+                            join region as reg on reg.id=dist.region_id
+
+
+                    ) niv_1
+
+                order by niv_1.nom
+                      
+                ";              
+
+        return $this->db->query($sql)->result();
+    }
+
     public function findById($id)  {
 		// Selection par id
         $this->db->where("id", $id);
