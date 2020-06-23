@@ -300,7 +300,7 @@
                 <table cellspacing="0" cellpadding="0" width="100%" bgcolor="#ffffff" background="http://s3.amazonaws.com/swu-filepicker/4E687TRe69Ld95IDWyEg_bg_top_02.jpg" style="background-color:transparent">
                     <tr>
                         <td width="100%" height="80" valign="top" style="text-align: center; vertical-align:middle;">
-                            <h1>MINISTERE DE LA POPULATION MALAGASY</h1>
+                            <h1>MINISTERE DE LA POPULATION, DE LA PROTECTION SOCIALE ET DE LA PROMOTION DE LA FEMME</h1>
                         </td>
                     </tr>
                 </table>

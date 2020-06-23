@@ -661,8 +661,8 @@ class Validationintervention extends CI_Controller {
 		$date_inscription =$date_inscription->format('d/m/Y');				
 		$val_ret = array();
 		// Fermer fichier Excel
-			$sender = "ndrianaina.aime.bruno@gmail.com";
-			$mdpsender = "finaritra";
+			$sender = "registrebeneficiaire@gmail.com";
+			$mdpsender = "Registre2020";
 	/*	if($nombre_erreur > 0) {
 			// Signaler les erreurs par mail
 			$val_ret["reponse"] = "ERREUR";
@@ -702,9 +702,9 @@ class Validationintervention extends CI_Controller {
 			$mail->SMTPAuth = true;
 			$mail->Username = $sender;
 			$mail->Password = $mdpsender;
-			$mail->From = "ndrianaina.aime.bruno@gmail.com"; // adresse mail de l’expéditeur
+			$mail->From = "registrebeneficiaire@gmail.com"; // adresse mail de l’expéditeur
 			$mail->FromName = "Ministère de la population Malagasy"; // nom de l’expéditeur	
-			$mail->addReplyTo('ndrianaina.aime.bruno@gmail.com', 'Ministère de la population');
+			$mail->addReplyTo('registrebeneficiaire@gmail.com', 'Ministère de la population');
 			$mail->SMTPSecure = 'tls';
 			$mail->Port = 587;
 			$mail->SMTPOptions = array(
@@ -1000,9 +1000,9 @@ class Validationintervention extends CI_Controller {
 				$mail->SMTPAuth = true;
 				$mail->Username = $sender;
 				$mail->Password = $mdpsender;
-				$mail->From = "ndrianaina.aime.bruno@gmail.com"; // adresse mail de l’expéditeur
+				$mail->From = "registrebeneficiaire@gmail.com"; // adresse mail de l’expéditeur
 				$mail->FromName = "Ministère de la population Malagasy"; // nom de l’expéditeur	
-				$mail->addReplyTo('ndrianaina.aime.bruno@gmail.com', 'Ministère de la population');
+				$mail->addReplyTo('registrebeneficiaire@gmail.com', 'Ministère de la population');
 				$mail->SMTPSecure = 'tls';
 				$mail->Port = 587;
 				$mail->SMTPOptions = array(
@@ -1065,8 +1065,8 @@ class Validationintervention extends CI_Controller {
 		$data["commune"] = $commune;
 		$data["fokontany"] = $fokontany;
 		$data["intervention"] = $intervention;
-		$sender = "ndrianaina.aime.bruno@gmail.com";
-		$mdpsender = "finaritra";
+		$sender = "registrebeneficiaire@gmail.com";
+		$mdpsender = "Registre2020";
 		$sujet = "Accusé de reception : fichier excel intervention";
 		$corps = $this->load->view('mail/signaler_import_valide.php', $data, true);
 		$mail = new PHPMailer;
@@ -1075,9 +1075,9 @@ class Validationintervention extends CI_Controller {
 		$mail->SMTPAuth = true;
 		$mail->Username = $sender;
 		$mail->Password = $mdpsender;
-		$mail->From = "ndrianaina.aime.bruno@gmail.com"; // adresse mail de l’expéditeur
+		$mail->From = "registrebeneficiaire@gmail.com"; // adresse mail de l’expéditeur
 		$mail->FromName = "Ministère de la population Malagasy"; // nom de l’expéditeur	
-		$mail->addReplyTo('ndrianaina.aime.bruno@gmail.com', 'Ministère de la population');
+		$mail->addReplyTo('registrebeneficiaire@gmail.com', 'Ministère de la population');
 		$mail->SMTPSecure = 'tls';
 		$mail->Port = 587;
 		$mail->SMTPOptions = array(

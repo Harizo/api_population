@@ -15,10 +15,38 @@ class Utilisateurs extends REST_Controller {
         $this->load->model('privilege_groupe_model', 'Privilege_groupeManager');
     }
     public function index_get() {
+
+        set_time_limit(0);
+        ini_set ('memory_limit', '2048M');
         //find by id
         $id = $this->get('id');
         $enabled = $this->get('enabled');
         $tab_groupe = $this->get('tab_groupe');
+
+        //authentification
+        $email = $this->get('email');
+        $pwd = sha1($this->get('pwd'));
+        $site = $this->get('site');
+        //authentification
+
+        // Methode get et à la fois post
+        $id_utilisateur = $this->get('id_utilisateur');
+        $confirm_pwd = $this->get('conf_pwd');
+
+        //get par email
+        $fndmail = $this->get('courriel');
+        $fndmdp = $this->get('mdp');
+
+        //REINIT PWD 
+        $courriel = $this->get('courriel_reset');
+        $reinitpwd = sha1($this->get('reinitpwd'));
+        $reinitpwdtoken = $this->get('reinitpwdtoken');
+
+
+        $email_connection = $this->get('email_connection');
+        $test_connection = $this->get('test_connection');
+
+
         if ($id) 
         {
             $user = $this->UserManager->findById($id);
@@ -84,156 +112,163 @@ class Utilisateurs extends REST_Controller {
                 }
                 else
                 {
-                    // Récupération de tous les enregistrements de la table utlisateur
-                    $usr = $this->UserManager->findAll();
-                    if ($usr) 
+                    
+                    
+                    if ($email && $pwd) 
                     {
-                        foreach ($usr as $key => $value)  
+                        $value = $this->UserManager->sign_in($email, $pwd);
+                        if ($value) 
                         {
-                            $data[$key]['id'] = $value->id;
-                            $data[$key]['nom'] = $value->nom;
-                            $data[$key]['prenom'] = $value->prenom;
-                            $data[$key]['password'] = $value->password;
-                            $data[$key]['default_password'] = $value->default_password;
-                            $data[$key]['token'] = $value->token;
-                            $data[$key]['email'] = $value->email;
-                            $data[$key]['enabled'] = $value->enabled;                  
-                            $data[$key]['groupes'] = unserialize($value->roles);
+                            $data = array();
+                            $data['etat_connexion'] = $value[0]->etat_connexion;
+                            $data['id'] = $value[0]->id;
+                            $data['nom'] = $value[0]->nom;
+                            $data['prenom'] = $value[0]->prenom;
+                            $data['token'] = $value[0]->token;
+                            $data['email'] = $value[0]->email;
+                            $data['enabled'] = $value[0]->enabled;         
+                            $data['default_password'] = $value[0]->default_password;         
+                           // $data['roles'] = unserialize($value[0]->roles);
 
-                            $data[$key]['roles'] =array();
+                            $data['groupes'] = unserialize($value[0]->roles);
 
-                            foreach ($data[$key]['groupes'] as $k => $v) 
+                            $data['roles'] =array();
+
+                            foreach ($data['groupes'] as $k => $v) 
                             {
                                 $tmp = $this->Privilege_groupeManager->findBygroupe($v);
 
                                 $privileges = unserialize($tmp[0]->privileges) ;
 
-                                $data[$key]['roles'] = array_unique(array_merge($data[$key]['roles'], $privileges)) ;
+                                $data['roles'] = array_unique(array_merge($data['roles'], $privileges)) ;
+                            }
+                        }
+                        else
+                        {
+                            $data = array();
+                        }
+                    }
+                    else if ($confirm_pwd && $id_utilisateur) 
+                    {
+                        $data = array(
+                            'password' => sha1($confirm_pwd),
+                            'default_password' => 0,
+                        );
+                        $value = $this->UserManager->first_login($data,$id_utilisateur);
+                        if ($value) {
+                            $data = array();
+                            $data['id'] = $value->id;
+                            $data['nom'] = $value->nom;
+                            $data['prenom'] = $value->prenom;
+                            $data['token'] = $value->token;
+                            $data['email'] = $value->email;
+                            $data['enabled'] = $value->enabled;         
+                            $data['default_password'] = $value->default_password;         
+                           // $data['roles'] = unserialize($value->roles);
+
+                            $data['groupes'] = unserialize($value->roles);
+
+                            $data['roles'] =array();
+
+                            foreach ($data['groupes'] as $k => $v) 
+                            {
+                                $tmp = $this->Privilege_groupeManager->findBygroupe($v);
+
+                                $privileges = unserialize($tmp[0]->privileges) ;
+
+                                $data['roles'] = array_unique(array_merge($data['roles'], $privileges)) ;
                             }
 
-                            $data[$key]['id_region'] = $value->id_region;
-                            $data[$key]['id_district'] = $value->id_district;
-                            $data[$key]['id_commune'] = $value->id_commune;
-                            $data[$key]['id_fokontany'] = $value->id_fokontany;
-                            $data[$key]['id_intervention'] = $value->id_intervention;
-                            $data[$key]['piece_identite'] = $value->piece_identite;
-                            $data[$key]['adresse'] = $value->adresse;
-                            $data[$key]['fonction'] = $value->fonction;
-                            $data[$key]['telephone'] = $value->telephone;
-                            $data[$key]['raison_sociale'] = $value->raison_sociale;
-                            $data[$key]['adresse_hote'] = $value->adresse_hote;
-                            $data[$key]['nom_responsable'] = $value->nom_responsable;
-                            $data[$key]['fonction_responsable'] = $value->fonction_responsable;
-                            $data[$key]['email_hote'] = $value->email_hote;
-                            $data[$key]['telephone_hote'] = $value->telephone_hote;
-                            $data[$key]['description_hote'] = $value->description_hote;
+                        }else{
+                            $data = array();
                         }
-                    } 
-                    else 
-                    {
-                        $data = array();
                     }
+                    else if ($fndmail) 
+                    {
+                        $data = $this->UserManager->findByMail($fndmail);
+                        if (!$data)
+                            $data = array();
+                    }
+                    else if ($fndmdp) 
+                    {
+                        $data = $this->UserManager->findByPassword($fndmdp);
+                        if (!$data)
+                            $data = array();
+                    }
+
+                    //else if ($courriel && $reinitpwd && $reinitpwdtoken) {
+                    else if ($reinitpwd && $reinitpwdtoken) {
+                        $data = $this->UserManager->reinitpwd($reinitpwd, $reinitpwdtoken);
+                        if (!$data)
+                            $data = array();
+                    }
+                    else
+                    {
+                        if ($test_connection == 1 && $email_connection) 
+                        {
+                            $data = $this->UserManager->test_connection($email_connection);
+                        }
+                        else
+                        {
+                            $usr = $this->UserManager->findAll();
+                            if ($usr) 
+                            {
+                                foreach ($usr as $key => $value)  
+                                {
+                                    $data[$key]['etat_connexion'] = $value->etat_connexion;
+                                    $data[$key]['id'] = $value->id;
+                                    $data[$key]['nom'] = $value->nom;
+                                    $data[$key]['prenom'] = $value->prenom;
+                                    $data[$key]['password'] = $value->password;
+                                    $data[$key]['default_password'] = $value->default_password;
+                                    $data[$key]['token'] = $value->token;
+                                    $data[$key]['email'] = $value->email;
+                                    $data[$key]['enabled'] = $value->enabled;                  
+                                    $data[$key]['groupes'] = unserialize($value->roles);
+
+                                    $data[$key]['roles'] =array();
+
+                                    foreach ($data[$key]['groupes'] as $k => $v) 
+                                    {
+                                        $tmp = $this->Privilege_groupeManager->findBygroupe($v);
+
+                                        $privileges = unserialize($tmp[0]->privileges) ;
+
+                                        $data[$key]['roles'] = array_unique(array_merge($data[$key]['roles'], $privileges)) ;
+                                    }
+
+                                    $data[$key]['id_region'] = $value->id_region;
+                                    $data[$key]['id_district'] = $value->id_district;
+                                    $data[$key]['id_commune'] = $value->id_commune;
+                                    $data[$key]['id_fokontany'] = $value->id_fokontany;
+                                    $data[$key]['id_intervention'] = $value->id_intervention;
+                                    $data[$key]['piece_identite'] = $value->piece_identite;
+                                    $data[$key]['adresse'] = $value->adresse;
+                                    $data[$key]['fonction'] = $value->fonction;
+                                    $data[$key]['telephone'] = $value->telephone;
+                                    $data[$key]['raison_sociale'] = $value->raison_sociale;
+                                    $data[$key]['adresse_hote'] = $value->adresse_hote;
+                                    $data[$key]['nom_responsable'] = $value->nom_responsable;
+                                    $data[$key]['fonction_responsable'] = $value->fonction_responsable;
+                                    $data[$key]['email_hote'] = $value->email_hote;
+                                    $data[$key]['telephone_hote'] = $value->telephone_hote;
+                                    $data[$key]['description_hote'] = $value->description_hote;
+                                }
+                            } 
+                            else 
+                            {
+                                $data = array();
+                            }
+                        }
+                    }
+                    
+                    
                 }
             }                             
         }
-        //authentification
-        $email = $this->get('email');
-        $pwd = sha1($this->get('pwd'));
-        $site = $this->get('site');
-        if ($email && $pwd) 
-        {
-            $value = $this->UserManager->sign_in($email, $pwd);
-            if ($value) 
-            {
-                $data = array();
-                $data['id'] = $value[0]->id;
-                $data['nom'] = $value[0]->nom;
-                $data['prenom'] = $value[0]->prenom;
-                $data['token'] = $value[0]->token;
-                $data['email'] = $value[0]->email;
-                $data['enabled'] = $value[0]->enabled;         
-                $data['default_password'] = $value[0]->default_password;         
-               // $data['roles'] = unserialize($value[0]->roles);
 
-                $data['groupes'] = unserialize($value[0]->roles);
 
-                $data['roles'] =array();
 
-                foreach ($data['groupes'] as $k => $v) 
-                {
-                    $tmp = $this->Privilege_groupeManager->findBygroupe($v);
-
-                    $privileges = unserialize($tmp[0]->privileges) ;
-
-                    $data['roles'] = array_unique(array_merge($data['roles'], $privileges)) ;
-                }
-            }
-            else
-            {
-                $data = array();
-            }
-        }
-        //first login : modification mot de passe par défaut
-		// Methode get et à la fois post
-        $id_utilisateur = $this->get('id_utilisateur');
-        $confirm_pwd = $this->get('conf_pwd');
-        if ($confirm_pwd && $id_utilisateur) {
-			$data = array(
-				'password' => sha1($confirm_pwd),
-				'default_password' => 0,
-			);
-            $value = $this->UserManager->first_login($data,$id_utilisateur);
-            if ($value) {
-                $data = array();
-                $data['id'] = $value->id;
-                $data['nom'] = $value->nom;
-                $data['prenom'] = $value->prenom;
-                $data['token'] = $value->token;
-                $data['email'] = $value->email;
-                $data['enabled'] = $value->enabled;         
-                $data['default_password'] = $value->default_password;         
-               // $data['roles'] = unserialize($value->roles);
-
-                $data['groupes'] = unserialize($value->roles);
-
-                $data['roles'] =array();
-
-                foreach ($data['groupes'] as $k => $v) 
-                {
-                    $tmp = $this->Privilege_groupeManager->findBygroupe($v);
-
-                    $privileges = unserialize($tmp[0]->privileges) ;
-
-                    $data['roles'] = array_unique(array_merge($data['roles'], $privileges)) ;
-                }
-
-            }else{
-                $data = array();
-            }
-        }
-        //find by email
-        $fndmail = $this->get('courriel');
-        if ($fndmail) {
-            $data = $this->UserManager->findByMail($fndmail);
-            if (!$data)
-                $data = array();
-        }
-        //find by mdp
-        $fndmdp = $this->get('mdp');
-        if ($fndmdp) {
-            $data = $this->UserManager->findByPassword($fndmdp);
-            if (!$data)
-                $data = array();
-        }
-        //mise a jour mdp
-        $courriel = $this->get('courriel');
-        $reinitpwd = sha1($this->get('reinitpwd'));
-        $reinitpwdtoken = $this->get('reinitpwdtoken');
-        if ($courriel && $reinitpwd && $reinitpwdtoken) {
-            $data = $this->UserManager->reinitpwd($courriel, $reinitpwd, $reinitpwdtoken);
-            if (!$data)
-                $data = array();
-        }
         //status success + data
         if ($data) {
             $this->response([
@@ -252,6 +287,7 @@ class Utilisateurs extends REST_Controller {
 	// Sauvegarde des dnnées dans la table utilisateur
     public function index_post() {           
         $id = $this->post('id') ;
+        $deconnexion = $this->post('deconnexion') ;
         $gestion_utilisateur = intval($this->post('gestion_utilisateur')) ;
         $supprimer = $this->post('supprimer') ;
         $profil = $this->post('profil') ;
@@ -297,6 +333,7 @@ class Utilisateurs extends REST_Controller {
 						'prenom' => $this->post('prenom'),         
 						'email' => $this->post('email'),                 
 						'enabled' => $this->post('enabled'),
+                        'etat_connexion' => $this->post('etat_connexion'),
 						'roles' => serialize($getrole),
 						'id_region' => $id_region,
 						'id_district' => $id_district,
@@ -318,13 +355,15 @@ class Utilisateurs extends REST_Controller {
 				} 
                 else 
                 {
+                    $tkn = bin2hex(openssl_random_pseudo_bytes(32)) ;
 					// Mot de passe par défaut : création d'un utlisateur
 					$data = array(
 						'nom' => $this->post('nom'),
 						'prenom' => $this->post('prenom'),         
 						'password' => sha1($this->post('password')),
 						'default_password' => $this->post('default_password'),
-						'token' => bin2hex(openssl_random_pseudo_bytes(32)),
+                        'etat_connexion' => $this->post('etat_connexion'),
+						'token' => $tkn,
 						'email' => $this->post('email'),                 
 						'enabled' => $this->post('enabled'),
 						'roles' => serialize($getrole),
@@ -354,18 +393,26 @@ class Utilisateurs extends REST_Controller {
 				}	
 				// Nouvel utilisateur : envoi mail vers l'utilisateur du compte crée
 				if($envoyer_mail_creation_user==true) {
-					$sender = "ndrianaina.aime.bruno@gmail.com";
-					$mdpsender = "finaritra";
+					$sender = "registrebeneficiaire@gmail.com";
+					$mdpsender = "Registre2020";
 					// DEBUT ENVOI MAIL SIGNALANT LA CREATION D'UTILISATEUR
 					$nom = $this->post('nom');
 					$prenom = $this->post('prenom');
                     
                     //LIEN DE L'APPLICATION
 
-                    $data["connexion"] = "41.207.51.186/registresocial/";
+                    $adresse_serveur = "http://registrebeneficiaires.mg" ;
+                    $base_url_serveur = $adresse_serveur."/2019/population/api/index.php/api" ;
+
+                    /*$adresse_serveur = "http://localhost:3000" ;
+                    $base_url_serveur = "http://localhost"."/2019/population/api/index.php/api" ;*/
+
+                    $adr_email = $this->post('email') ;
+
+                    $data["connexion"] = $base_url_serveur . "/mail?actif=4&courriel=" . $adr_email . "&token=" . $tkn;//activation compte par email
 
 
-                    //LIEN DE L'APPLICATION
+                    //FIN LIEN DE L'APPLICATION
 
 					$data["nom"] = $this->post('nom');
 					$data["prenom"] =$this->post('prenom');
@@ -385,7 +432,7 @@ class Utilisateurs extends REST_Controller {
 					$data["email_hote"] =$this->post('email_hote');
 					$email_hote =$this->post('email_hote');
 					$data["telephone_hote"] =$this->post('telephone_hote');
-					$sujet = "OUVERTURE DE COMPTE UTILISATEUR : application WEB du MINISTERE DE LA POPULATION MALAGASY";
+					$sujet = "OUVERTURE DE COMPTE UTILISATEUR : application WEB du MINISTERE DE LA POPULATION, DE LA PROTECTION SOCIALE ET DE LA PROMOTION DE LA FEMME";
 					$corps = $this->load->view('mail/activation.php', $data, true);
 					$mail = new PHPMailer;
 					$mail->isSMTP();
@@ -393,9 +440,9 @@ class Utilisateurs extends REST_Controller {
 					$mail->SMTPAuth = true;
 					$mail->Username = $sender;
 					$mail->Password = $mdpsender;
-					$mail->From = "ndrianaina.aime.bruno@gmail.com"; // adresse mail de l’expéditeur
+					$mail->From = "registrebeneficiaire@gmail.com"; // adresse mail de l’expéditeur
 					$mail->FromName = "Ministère de la population Malagasy"; // nom de l’expéditeur	
-					$mail->addReplyTo('ndrianaina.aime.bruno@gmail.com', 'Ministère de la population');
+					$mail->addReplyTo('registrebeneficiaire@gmail.com', 'Ministère de la population');
 					$mail->SMTPSecure = 'tls';
 					$mail->Port = 587;
 					$mail->SMTPOptions = array(
@@ -484,35 +531,93 @@ class Utilisateurs extends REST_Controller {
             }
             else
             {
-                $getrole = array("USER");
-                $data = array(
-                    'nom' => $this->post('nom'),
-                    'prenom' => $this->post('prenom'),
-                    'email' => $this->post('email'),
-                    'password' => sha1($this->post('password')),
-                    'enabled' => 0,
-                    'token' => bin2hex(openssl_random_pseudo_bytes(32)),
-                    'roles' => serialize($getrole)
-                );
-                if (!$data) {
-                    $this->response([
-                        'status' => FALSE,
-                        'response' => 0,
-                        'message' => 'No request found'
-                            ], REST_Controller::HTTP_OK);
+                if ($deconnexion == 1) //update etat connexion en 0
+                {
+                    $mail = $this->post('email') ;
+                    $token = $this->post('token') ;
+                    $deconnexion_login = $this->post('deconnexion_login') ;
+                    
+                  
+                    if ($deconnexion_login == 1) 
+                    {
+                        if (!$mail) 
+                        {
+                            $this->response([
+                                'status' => FALSE,
+                                'response' => "Data not found",
+                                'message' => 'No request found'
+                                    ], REST_Controller::HTTP_OK);
+                        }
+                        $dataId = $this->UserManager->sign_out_login($mail);
+                        if (!is_null($dataId)) {
+                            $this->response([
+                                'status' => TRUE,
+                                'response' => $dataId
+                                    ], REST_Controller::HTTP_OK);
+                        } else {
+                            $this->response([
+                                'status' => FALSE,
+                               'message' => 'No request found'
+                                    ], REST_Controller::HTTP_OK);
+                        }
+                    } 
+                    else
+                    {
+                        
+                        if (!$mail || !$token) 
+                        {
+                            $this->response([
+                                'status' => FALSE,
+                                'response' => "Data not found",
+                                'message' => 'No request found'
+                                    ], REST_Controller::HTTP_OK);
+                        }
+                        $dataId = $this->UserManager->sign_out($mail, $token);
+                        if (!is_null($dataId)) {
+                            $this->response([
+                                'status' => TRUE,
+                                'response' => $dataId
+                                    ], REST_Controller::HTTP_OK);
+                        } else {
+                            $this->response([
+                                'status' => FALSE,
+                               'message' => 'No request found'
+                                    ], REST_Controller::HTTP_OK);
+                        }
+                    }
+                } 
+                 else
+                {
+                    $getrole = array("USER");
+                    $data = array(
+                        'nom' => $this->post('nom'),
+                        'prenom' => $this->post('prenom'),
+                        'email' => $this->post('email'),
+                        'password' => sha1($this->post('password')),
+                        'enabled' => 0,
+                        'token' => bin2hex(openssl_random_pseudo_bytes(32)),
+                        'roles' => serialize($getrole)
+                    );
+                    if (!$data) {
+                        $this->response([
+                            'status' => FALSE,
+                            'response' => 0,
+                            'message' => 'No request found'
+                                ], REST_Controller::HTTP_OK);
+                    }
+                    $dataId = $this->UserManager->add($data);
+                    if (!is_null($dataId)) {
+                        $this->response([
+                            'status' => TRUE,
+                            'response' => $dataId
+                                ], REST_Controller::HTTP_OK);
+                    } else {
+                        $this->response([
+                            'status' => FALSE,
+                           'message' => 'No request found'
+                                ], REST_Controller::HTTP_OK);
+                    } 
                 }
-                $dataId = $this->UserManager->add($data);
-                if (!is_null($dataId)) {
-                    $this->response([
-                        'status' => TRUE,
-                        'response' => $dataId
-                            ], REST_Controller::HTTP_OK);
-                } else {
-                    $this->response([
-                        'status' => FALSE,
-                       'message' => 'No request found'
-                            ], REST_Controller::HTTP_OK);
-                }  
             }
                          
         }       

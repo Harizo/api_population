@@ -19,6 +19,9 @@ class Export_excel extends REST_Controller {
 
     public function index_get() 
     {
+
+        set_time_limit(0);
+        ini_set ('memory_limit', '2048M');
         
         $menu = $this->get('menu'); 
         $repertoire = $this->get('repertoire'); 

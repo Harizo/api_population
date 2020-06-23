@@ -318,7 +318,7 @@
                     </tr>
                     <tr>
                         <td class="free-text">
-                            Bienvenue dans l'application WEB du minist&eacute;re de la Population, pour r&eacute;initialiser votre mot de passe, veuillez cliquer sur le bouton R&eacute;initialiser,
+                            Bienvenue dans l'application WEB du minist&eacute;re de la Population, pour d&eacute;connecter le compte connecté, veuillez cliquer sur le bouton D&eacute;connecter,
                         </td>
                     </tr>
                     <tr>
@@ -337,7 +337,7 @@
                                                     <div><a class="button-mobile"
                                                             href="<?php echo $confirmer; ?>"
                                                             style="background-color:#4a89dc;border-radius:5px;color:#ffffff;display:inline-block;font-family:'Cabin', Helvetica, Arial, sans-serif;font-size:14px;font-weight:regular;line-height:45px;text-align:center;text-decoration:none;width:155px;-webkit-text-size-adjust:none;mso-hide:all;">
-                                                            R&eacute;initialiser</a>
+                                                            D&eacute;connecter</a>
                                                     </div>
                                                 </td>
                                             </tr>

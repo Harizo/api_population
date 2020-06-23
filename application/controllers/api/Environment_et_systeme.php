@@ -18,6 +18,9 @@ class Environment_et_systeme extends REST_Controller {
     }
 
     public function index_get() {
+
+        set_time_limit(0);
+        ini_set ('memory_limit', '2048M');
         
         $menu = $this->get('menu'); 
         $id_region= $this->get('id_region'); 
@@ -47,6 +50,11 @@ class Environment_et_systeme extends REST_Controller {
             $data = $this->Systeme_protection_socialManager->repartition_par_age_sexe_beneficiaire();
             
             
+        }
+
+        if ($menu == 'tableu_bord_dg') 
+        {
+            $data = $this->Systeme_protection_socialManager->beneficiaire_par_district();
         }
 
        

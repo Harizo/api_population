@@ -12,9 +12,9 @@ class Utilisateurs_model extends CI_Model
                  ->set('date_modification', 'NOW()', false)
                  ->insert($this->table);
 			$id_utilisateur =	$this->db->insert_id(); 
-		// Sauvegarde mot de passe par défaut au cas où mdp oublié	
-    //    $this->db->set($this->_set_default_password($id_utilisateur,$utilisateurs['password']))
-     //            ->insert("mot_de_passe_par_defaut");
+            // Sauvegarde mot de passe par défaut au cas où mdp oublié	
+            //    $this->db->set($this->_set_default_password($id_utilisateur,$utilisateurs['password']))
+            //            ->insert("mot_de_passe_par_defaut");
 			
         if($this->db->affected_rows() === 1) {
             return $id_utilisateur;
@@ -35,6 +35,8 @@ class Utilisateurs_model extends CI_Model
             return null;
         }                      
     }
+
+
     public function update2($courriel,$token)  {
 		// Mise à jour email et token (activation compte)
         $array = array('email' => $courriel, 'token' => $token);
@@ -47,6 +49,22 @@ class Utilisateurs_model extends CI_Model
             return 0;
         }                      
     }
+
+    public function activation_compte_par_email($courriel,$token)  
+    {
+        // Mise à jour email et token (activation compte)
+        $array = array('email' => $courriel, 'token' => $token);
+        $this->db->set('enabled', 1)
+                 ->where($array)
+                 ->update($this->table);
+        if($this->db->affected_rows() === 1) {
+            return 1;
+        }else{
+            return 0;
+        }                      
+    }
+
+
 	// Mise à jour profil utilisateur
     public function update_profil($id, $utilisateurs)  {
         $this->db->set($this->_set_profil($utilisateurs))
@@ -68,9 +86,9 @@ class Utilisateurs_model extends CI_Model
         );
     }
 	// Réinitialisation mot de passe : si mot de passe oublié
-    public function reinitpwd($courriel,$pwd,$token) {
+    public function reinitpwd($pwd,$token) {
         $this->db->set('password', $pwd)
-                 ->where('email', $courriel)
+                // ->where('email', $courriel)
                  ->where('token', $token)
                  ->update($this->table);
         if($this->db->affected_rows() === 1)
@@ -128,6 +146,7 @@ class Utilisateurs_model extends CI_Model
             'prenom'               => $utilisateurs['prenom'],
             'email'                => $utilisateurs['email'],
             'enabled'              => $utilisateurs['enabled'],
+            'etat_connexion'              => $utilisateurs['etat_connexion'],
             'roles'                => $utilisateurs['roles'],
             'id_region'            => $utilisateurs['id_region'],
             'id_district'          => $utilisateurs['id_district'],
@@ -225,20 +244,72 @@ class Utilisateurs_model extends CI_Model
         }
         return null;
     }
+
+    public function test_connection($email)   {
+        // Selection par mail et password
+        $this->db->select('etat_connexion');
+        $this->db->where("email", $email);
+        $q = $this->db->get($this->table);
+        if ($q->num_rows() > 0) {
+            return $q->row();
+        }
+        return null;            
+    }
+
+
     public function sign_in($email, $pwd)   {
 		// Selection par mail et password
         $result = $this->db->select('*')
                         ->from($this->table)
                         ->where("email", $email)
                         ->where("password", $pwd)
+                       // ->where("etat_connexion", 0)//where compte deconnecter
                         ->order_by('id', 'desc')
                         ->get()
                         ->result();
-        if($result)  {
+
+
+        if($result)  
+        {
+            $array = array('email' => $email, 'password' => $pwd );
+            $this->db->set('etat_connexion', 1)
+                     ->where($array)
+                     ->update($this->table);
             return $result;
-        }else{
+        }
+        else
+        {
             return null;
         }                  
+    }
+
+    public function sign_out($email, $token)
+    {
+        $array = array('email' => $email, 'token' => $token );
+            $this->db->set('etat_connexion', 0)
+                     ->where($array)
+                     ->update($this->table);
+
+        if($this->db->affected_rows() === 1)
+        {
+            return array("Déconnexion ok");
+        }else{
+            return array();
+        }  
+    }
+    public function sign_out_login($email)
+    {
+        $array = array('email' => $email);
+            $this->db->set('etat_connexion', 0)
+                     ->where($array)
+                     ->update($this->table);
+
+        if($this->db->affected_rows() === 1)
+        {
+            return array("Déconnexion ok");
+        }else{
+            return array();
+        }  
     }
     public function _set_first_login($utilisateurs)  {
 		// Affectation des valeurs lors de la première connexion

@@ -983,8 +983,8 @@ class Importationbeneficiaire extends CI_Controller {
 		}
 		$val_ret = array();
 		// Fermer fichier Excel
-		$sender = "ndrianaina.aime.bruno@gmail.com";
-		$mdpsender = "finaritra";
+		$sender = "registrebeneficiaire@gmail.com";
+		$mdpsender = "Registre2020";
 		$objWriter = PHPExcel_IOFactory::createWriter($excel, 'Excel2007');
 		$objWriter->save(dirname(__FILE__) . "/../../../../" .$repertoire. $nomfichier);
 		unset($excel);
@@ -1061,8 +1061,8 @@ class Importationbeneficiaire extends CI_Controller {
 		$data["fokontany"] =$fokontany;
 		$data["intervention"] =$intervention;
 		$data["date_inscription"] =$date_inscription;
-		$sender = "ndrianaina.aime.bruno@gmail.com";
-		$mdpsender = "finaritra";
+		$sender = "registrebeneficiaire@gmail.com";
+		$mdpsender = "Registre2020";
 		$sujet = "Intégration des données : fichier excel bénéficiaire";
 		$corps = $this->load->view('mail/signaler_import_donnees.php', $data, true);
 		$mail = new PHPMailer;
@@ -1071,9 +1071,9 @@ class Importationbeneficiaire extends CI_Controller {
 		$mail->SMTPAuth = true;
 		$mail->Username = $sender;
 		$mail->Password = $mdpsender;
-		$mail->From = "ndrianaina.aime.bruno@gmail.com"; // adresse mail de l’expéditeur
+		$mail->From = "registrebeneficiaire@gmail.com"; // adresse mail de l’expéditeur
 		$mail->FromName = "Ministère de la population Malagasy"; // nom de l’expéditeur	
-		$mail->addReplyTo('ndrianaina.aime.bruno@gmail.com', 'Ministère de la population');
+		$mail->addReplyTo('registrebeneficiaire@gmail.com', 'Ministère de la population');
 		$mail->SMTPSecure = 'tls';
 		$mail->Port = 587;
 		$mail->SMTPOptions = array(

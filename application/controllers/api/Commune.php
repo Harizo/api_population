@@ -18,11 +18,18 @@ class Commune extends REST_Controller {
         set_time_limit(0);
         ini_set ('memory_limit', '4000M');
         $id = $this->get('id');
+
+        $district_id = $this->get('district_id');
+        $etat_carte = $this->get('etat_carte');
+
         $cle_etrangere = $this->get('cle_etrangere');
         $id_commune = $this->get('id_commune');
         $id_district = $this->get('id_district');
         $id_region = $this->get('id_region');
-        if ($cle_etrangere) {
+
+
+        if ($cle_etrangere) 
+        {
             $data = array();
 			// Récupération des enregistrements par district
             $temporaire = $this->CommuneManager->findAllByDistrict($cle_etrangere);
@@ -40,44 +47,76 @@ class Commune extends REST_Controller {
                     $data[$key]['district'] = $district;
                 }
             }           
-        } else {
-            if ($id)  {
+        } 
+        else 
+        {
+            if ($id)  
+            {
 				// Récupération par id (id=clé primaire)
                 $data = array();
                 $data = $this->CommuneManager->findById($id);
-            } else if($id_commune) {
+            } 
+            else if($id_commune) 
+            {
 				$menu = $this->CommuneManager->find_Fokontany_avec_District_et_Region($id_commune);
                 if ($menu) {
 					$data=$menu;
                 } else
                     $data = array();
-			} else if($id_district) {	
+			} 
+            else if($id_district) 
+            {	
 				// Récupération des communes par district 
 				$menu = $this->CommuneManager->find_Commune_avec_District_et_Region($id_district);
                 if ($menu) {
 					$data=$menu;
                 } else
                     $data = array();
-			} else {
-				// Récupération de tous les enregistrements
-                $menu = $this->CommuneManager->findAll();
-                if ($menu) {
-                    foreach ($menu as $key => $value) {
-                        
-                        if ($key < 6) {
-                           $district = array();
-                        $district = $this->DistrictManager->findById($value->district_id);
-                        $data[$key]['id'] = $value->id;
-                        $data[$key]['code'] = $value->code;
-                        $data[$key]['nom'] = $value->nom;
-                        $data[$key]['coordonnees'] = unserialize($value->coordonnees);
-                        $data[$key]['district_id'] = $value->district_id;
-                        $data[$key]['district'] = $district;
-                 
+			} 
+            else 
+            {
+				if ($etat_carte == 1) 
+                {
+                    $menu = $this->CommuneManager->get_analyse_strategique_by_district($district_id);
+                    if ($menu) {
+                        foreach ($menu as $key => $value) {
+                            
+                            
+                            $data[$key]['id'] = $value->id;
+                            $data[$key]['nom'] = $value->nom;
+                            $data[$key]['nbr_menage_beneficiaire_commune'] = $value->nbr_menage_beneficiaire_commune;
+                            $data[$key]['total_nbr_menage_beneficiaire_district'] = $value->total_nbr_menage_beneficiaire_district;
+                            $data[$key]['coordonnees'] = unserialize($value->coordonnees);
+                     
+                            
                         }
-                    }
-                } else
-                    $data = array();
+                    } 
+                    else
+                        $data = array();
+                }
+                else
+                {
+                    // Récupération de tous les enregistrements
+                    $menu = $this->CommuneManager->findAll();
+                    if ($menu) {
+                        foreach ($menu as $key => $value) {
+                            
+                            
+                               $district = array();
+                            $district = $this->DistrictManager->findById($value->district_id);
+                            $data[$key]['id'] = $value->id;
+                            $data[$key]['code'] = $value->code;
+                            $data[$key]['nom'] = $value->nom;
+                            $data[$key]['coordonnees'] = unserialize($value->coordonnees);
+                            $data[$key]['district_id'] = $value->district_id;
+                            $data[$key]['district'] = $district;
+                     
+                            
+                        }
+                    } 
+                    else
+                        $data = array();
+                }
             }
         }
         if (count($data)>0) {

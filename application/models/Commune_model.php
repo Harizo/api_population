@@ -102,6 +102,73 @@ class Commune_model extends CI_Model {
             return null;
         }                 
     }
+
+    public function get_analyse_strategique_by_district($district_id)
+    {
+        $sql =
+        "
+            select 
+                com.id as id,
+                com.nom as nom,
+                com.coordonnees as coordonnees,
+
+                (
+                    select
+                        count(menage_beneficiaire.id) 
+                    from
+                        menage,
+                        menage_beneficiaire,
+                        fokontany,
+                        commune,
+                        district
+                    where
+                        menage.id = menage_beneficiaire.id_menage
+                        and fokontany.id = menage.id_fokontany
+                        and commune.id = fokontany.id_commune
+                        and district.id = commune.district_id
+                        and district.id = ".$district_id."
+                ) as total_nbr_menage_beneficiaire_district,
+                (
+                    select
+                        count(menage_beneficiaire.id) 
+                    from
+                        menage,
+                        menage_beneficiaire,
+                        fokontany,
+                        commune
+                    where
+                        menage.id = menage_beneficiaire.id_menage
+                        and fokontany.id = menage.id_fokontany
+                        and commune.id = fokontany.id_commune
+                        and commune.id = com.id
+                ) as nbr_menage_beneficiaire_commune,
+
+
+                (
+                    select
+                        count(individu_beneficiaire.id) 
+                    from
+                        individu,
+                        individu_beneficiaire,
+                        fokontany,
+                        commune
+                    where
+                        individu.id = individu_beneficiaire.id_individu
+                        and fokontany.id = individu.id_fokontany
+                        and commune.id = fokontany.id_commune
+                        and commune.id = com.id
+                ) as nbr_individu_beneficiaire_commune
+
+            from
+                commune as com,
+                district as dist
+            where
+                com.district_id = dist.id 
+                and dist.id = ".$district_id."
+        " ;
+
+        return $this->db->query($sql)->result();
+    }
     public function findById($id) {
 		// Selection par id
         $result =  $this->db->select('*')
